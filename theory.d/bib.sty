@@ -1,0 +1,103 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% BIBLIOGRAPHY PACKAGE                                                     %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% INITIALIZE BIBLATEX WITH BACKEND *BIBER*
+\usepackage[citestyle=phys,
+            bibstyle=phys,
+            biblabel=brackets,
+            pageranges=true,
+            minnames=10,
+            maxnames=10,
+            backend=biber]{biblatex}
+
+%%% VERTICAL SPACING OF BIBLIOGRAPHY ENTRIES
+\setlength{\bibitemsep}{2em}
+
+%%% --- BIBLIOGRAPHY DRIVERS ----------------------------------------------- %%%
+
+% REDEFINE COMMANDS FOR CORRECT NAME TYPESETTING
+\renewcommand*{\multinamedelim}{\addcomma\space}
+\DeclareDelimFormat{finalnamedelim}{%
+    \ifnum\value{listtotal}=2{%
+        \addspace and\addspace%
+    }\else{%
+        \addcomma\addspace and\addspace%
+    }\fi
+}
+
+% DRIVER: ARTICLE
+\DeclareBibliographyDriver{article}{%
+    \printnames{author}\addcomma\addspace%
+    `\thefield{title}'\addcomma\addspace%
+    \iffieldundef{url}{%
+        \printfield{shortjournal}\addspace%
+        \textbf{\printfield{volume}}\addcomma\addspace%
+        \iffieldundef{pages}{%
+            \printfield{number}\addspace%
+        }{%
+            \printfield{pages}\addspace%
+        }%
+        \printfield{year}%
+    }{%
+        \href{\thefield{url}}{%
+            \printfield{shortjournal}\addspace%
+            \textbf{\printfield{volume}}\addcomma\addspace%
+            \iffieldundef{pages}{%
+                \printfield{number}\addspace%
+            }{%
+                \printfield{pages}\addspace%
+            }%
+            \printfield{year}%
+        }%
+    }%
+    \finentry
+}
+
+% DRIVER: BOOK
+\DeclareBibliographyDriver{book}{%
+    \printnames{author}\addcomma\addspace%
+    \printfield{title}%
+    \ifnameundef{editor}{}{%
+        \addcomma\addspace\printnames{editor}%
+    }%
+    \addspace%
+    (%
+    \printlist{publisher}\addcomma\addspace%
+    \printlist{location}\addcomma\addspace%
+    \thefield{year}%
+    )%
+    \iffieldundef{edition}{}{%
+        \addspace\printfield{edition}%
+    }%
+    \iffieldundef{volume}{}{%
+        \addspace\printfield{volume}%
+    }%
+    \iffieldundef{isbn}{}{%
+        \addspace\printfield{isbn}%
+    }%
+    \iffieldundef{pages}{}{%
+        \addspace\printfield{pages}%
+    }%
+    \finentry
+}
+
+%%% DRIVER: THESIS
+\DeclareBibliographyDriver{thesis}{%
+    \printnames{author}\addcomma\addspace%
+    \thefield{type}\addcomma\addspace%
+    \printlist{location}\addcomma\addspace%
+    \textit{\thefield{title}}\addspace%
+    \printfield{year}%
+    \finentry
+}
+
+%%% DRIVER: ARXIV
+\DeclareBibliographyDriver{arxiv}{%
+    \printnames{author}\addcomma\addspace%
+    `\thefield{title}'\addcomma\addspace%
+    \href{\thefield{url}}{\printfield{journaltitle}\addspace}%
+    \finentry
+}
+
+%%% ------------------------------------------------------------------------ %%%

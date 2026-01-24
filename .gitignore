@@ -1,0 +1,33 @@
+################################################################################
+### Gitignore                                                                ###
+###                                                                          ###
+### Autore of this file: Simon Euchner                                       ###
+################################################################################
+
+# Object code and libraries
+**.O
+**.o
+**.so
+
+# TeX files
+**.aux
+**.bbl
+**.bbl-SAVE-ERROR
+**.blg
+**.fdb_latexmk
+**.fls
+**.log
+**.out
+**.toc
+**.run.xml
+**.bcf
+**.bcf-SAVE-ERROR
+
+# Data
+/data.d/discretisation-*
+/data.d/energies-*
+/data.d/state-*
+
+# Binaries
+/a.out
+/tmp.d/e*

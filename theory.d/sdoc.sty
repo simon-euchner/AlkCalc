@@ -1,0 +1,44 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% PACKAGE FOR SOFTWARE DOCUMENTATION                                       %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{changepage}
+
+%%% COMMAND TO ADD ARGUMENT
+\newcommand{\sdocarg}[2]{%
+    \hspace*{10mm}\texttt{#1}\par%
+    \begingroup%
+        \leftskip=20mm%
+        #2\par%
+    \endgroup%
+    \vspace*{2mm}\par%
+}
+
+%%% COMMAND TO ADD RETURN
+\newcommand{\sdocret}[2]{%
+    \vspace*{3mm}RETURN\par%
+    \hspace*{10mm}\texttt{#1}\par%
+    \begingroup%
+        \leftskip=20mm%
+        #2\par%
+    \endgroup%
+}
+
+%%% ENVIRONMENT TO DOCUMENT A FUNCTION
+\newenvironment{sdocfun}[2]{
+    \rule{100mm}{0.5mm}\par%
+    \textbf{FUNCTION}\par%
+    \hspace*{10mm}\texttt{#1}\par%
+    \vspace*{5mm}\par%
+    DESCRIPTION\par%
+    \begingroup%
+        \leftskip=10mm%
+        #2\par%
+    \endgroup%
+    \vspace*{5mm}\par%
+    ARGUMENTS\vspace*{2mm}\par%
+}{
+    \par%
+    \rule{100mm}{0.5mm}\par%
+    \bigskip\bigskip\par%
+}
