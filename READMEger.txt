@@ -353,3 +353,4 @@ Referenzen.
    [11] INTERNATIONAL STANDARD ISO/IEC 9899:1999(E) (American National Standard
         Institute, New York, 1999) 2nd ed.
    [12] "GCC, The GNU Compiler Collection", URL: https://gcc.gnu.org
+   [13] 'The GNU C Library', URL: https://www.gnu.org/software/libc
