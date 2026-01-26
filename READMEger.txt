@@ -159,13 +159,13 @@ Installation.
        Makefile aus. Das baut den relevanten Anteil von SuperLU (siehe
        Ref. [7]).
 
-    4. Navigieren Sie in den Ordner interface.d und setzten Sie die Variable
+    4. Navigieren Sie in den Ordner interface.d und setzen Sie die Variable
        PATH_TO_STATES, welche den Ort definiert, an dem die Daten für die
        radialen Eigenzustände später abgelegt werden.
 
 --- Notiz (*)
 
-    5. Im Ordner interface.d, setzten Sie die relevanten Dateipfade in der Datei
+    5. Im Ordner interface.d, setzen Sie die relevanten Dateipfade in der Datei
        alkcalc.h. Dabei muss PATH_TO_ALKCALC der absolute Dateipfad sein, der
        zum Ordner führt in dem AlkCalc abgelegt ist. Mit der Variable
        PATH_TO_STATES wird AlkCalc der Ort mitgeteilt, an dem die radialen
@@ -205,7 +205,7 @@ Datenerzeugung.
        Einträge für X vorhanden sind. Falls X neu hinzugefügt werden muss,
        folgen Sie der Formatierung der bestehenden Einträge.
 
-    2. Öffnen Sie die Datei settings.c und setzten Sie die Parameter. Der
+    2. Öffnen Sie die Datei settings.c und setzen Sie die Parameter. Der
        Identifikator für X ist definiert in species.dat. Die zwei wichtigsten
        Parameter sind "offset" und "shift". Diese sollten auf die folgende Weise
        gewählt werden: Angenommen die Grundzustandsenergie (Ionisationsenergie)
