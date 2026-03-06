@@ -169,12 +169,12 @@ void alkcalc_state_free(alkcalc_state *state) {
  *                                                                            *
  * species : String specifying atom/ion species                               *
  * nb      : Principal quantum number of bra                                  *
- * lb      : Orbital angular momentum l = 1, 2, ..., n-1, of bra              *
+ * lb      : Orbital angular momentum l = 1, 2, ..., n-1 of bra               *
  * sb      : Spin of bra (Not an argument, since we always have s = 1/2!)     *
  * jb      : Total angular momentum quantum number j = |l-1/2|, l+1/2, of bra *
  * p       : Power of radius operator in matrix element                       *
  * nk      : Principal quantum number of ket                                  *
- * lk      : Orbital angular momentum l = 1, 2, ..., n-1, of ket              *
+ * lk      : Orbital angular momentum l = 1, 2, ..., n-1 of ket               *
  * sk      : Spin of ket (Not an argument, since we always have s = 1/2!)     *
  * jk      : Total angular momentum quantum number j = |l-1/2|, l+1/2, of ket *
  * -------------------------------------------------------------------------- */
@@ -436,6 +436,52 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
     spinor.u = cg1*y1; spinor.d = cg2*y2;
 
     return spinor;
+}
+
+/* -------------------------------------------------------------------------- *
+ * Oscillator strength (dimensionless)                                        *
+ * (see 'theory.d/theory.pdf', section 'Manual')                              *
+ *                                                                            *
+ * species : String specifying atom/ion species                               *
+ * ni      : Principal quantum number of initial state (i)                    *
+ * li      : Orbital angular momentum l = 1, 2, ..., n-1, of (i)              *
+ * si      : Spin of (i) (Not an argument, since we always have s = 1/2!)     *
+ * ji      : Total angular momentum quantum number j = |l-1/2|, l+1/2 of (i)  *
+ * mji     : Total magnetic quantum number of initial state, mj = -j, ..., j  *
+ * nf      : Principal quantum number of final state (f)                      *
+ * lf      : Orbital angular momentum l = 1, 2, ..., n-1 of (f)               *
+ * sf      : Spin of (f) (Not an argument, since we always have s = 1/2!)     *
+ * jf      : Total angular momentum quantum number j = |l-1/2|, l+1/2, of (f) *
+ * mjf     : Total magnetic quantum number of final state, mj = -j, ..., j    *
+ * -------------------------------------------------------------------------- */
+double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
+                     double mji, int32_t nf, int32_t lf, double jf,
+                     double mjf) {
+
+    int32_t MJI, MJF;
+    double Efi, r, rx, ry, rz, fitof;
+
+    /* Energy difference between initial (i) and final (f) state in Hartree */
+    Efi = alkcalc_Enlsj(species, nf, lf, jf)-alkcalc_Enlsj(species, ni, li, ji);
+
+    /* Convert magnetic quantum numbers */
+    MJI = CONVERT(mji); MJF = CONVERT(mjf);
+
+    /* Relevant dipole-transition matrix elements in units of Bohr's radius */
+    r = alkcalc_rp(species, ni, li, ji, 1., nf, lf, jf);
+    if (abs(MJI-MJF) > 2) { /* Dipole-forbidden */
+        rz = ry = rx = 0.;
+    } else
+    if (MJI == MJF) { /* Pi */
+        ry = rx = 0.; rz = 1. * r;
+    } else { /* Sigma */
+        ry = rx = 1. * r; rz = 0.;
+    }
+
+    /* Assemble result */
+    fitof = 2./3. * Efi * ( rx*rx + ry*ry + rz*rz );
+
+    return fitof;
 }
 
 /* -------------------------------------------------------------------------- *
