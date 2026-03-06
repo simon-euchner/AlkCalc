@@ -993,7 +993,7 @@
     {
         alkcalc\tus{rp}
     }{
-        Radial matrix elements with arbitrary power $p\in\mathbb{R}$ [see
+        Radial matrix element with arbitrary power $p\in\mathbb{R}$ [see
         Eq.~\eqref{eq:radialMatrixElement}]. Note that for too large and too
         negative $p$ the result's numerical error increases due to the finite
         precision used to compute differences of large numbers (catastrophic
@@ -1109,19 +1109,19 @@
             Angular momentum quantum number of first factor.
         }
         \sdocarg{double m1}{
-            Projection quantum number of first factor.
+            Magnetic quantum number of first factor.
         }
         \sdocarg{double j2}{
             Angular momentum quantum number of second factor.
         }
         \sdocarg{double m2}{
-            Projection quantum number of second factor.
+            Magnetic quantum number of second factor.
         }
         \sdocarg{double j}{
             Total angular momentum quantum number.
         }
         \sdocarg{double mj}{
-            Projection quantum number of total angular momentum.
+            Magnetic quantum number of total angular momentum.
         }
         \sdocret{alkcalc\tus{cg} c}{
             \texttt{c} contains three members: \texttt{sign},
@@ -1155,14 +1155,14 @@
             Orbital angular momentum quantum number $l=1,2,\dots,n-1$.
         }
         \sdocarg{int32\tus{t} ml}{
-            Projection quantum number of orbital angular momentum.
+            Magnetic quantum number of orbital angular momentum.
         }
         \sdocarg{double s}{
             Electron spin quantum number. Not an argument here, since
             $s=1\slash{2}$ is always assumed.
         }
         \sdocarg{double ms}{
-            Projection quantum number of electron spin, $m_s$. For any $m_s<0$
+            Magnetic quantum number of electron spin, $m_s$. For any $m_s<0$
             the value $m_s=-1\slash{2}$ is used internally, and for $m_s\geq0$
             the value $m_s=1\slash{2}$.
         }
@@ -1212,10 +1212,10 @@
             software internally uses $j=1\slash{2}$ in both cases.
         }
         \sdocarg{double mj}{
-            Projection quantum number of total angular momentum, $m_j$.
-            Regarding the floating point representation of half-integers, the
-            same convention as for the total angular momentum quantum number $j$
-            (see above) is employed.
+            Magnetic quantum number of total angular momentum, $m_j$. Regarding
+            the floating point representation of half-integers, the same
+            convention as for the total angular momentum quantum number $j$ (see
+            above) is employed.
         }
         \sdocarg{double theta}{
             Polar angle (Zenitwinkel), $\vartheta$, in range $[0,\pii]$.
@@ -1227,6 +1227,86 @@
             \texttt{s} has two components and represents a two-component spinor:
             \texttt{u} is the spin-up ($m_s=1\slash{2}$) component and
             \texttt{d} is the spin-down ($m_s=-1\slash{2}$) component.
+        }
+    \end{sdocfun}%
+    %
+
+    \begin{sdocfun}
+    {
+        alkcalc\tus{fitof}
+    }{
+        Oscillator strength for the transition between an initial state
+        $\psi_\mathrm{i}$ and a final state $\psi_\mathrm{f}$. The dimensionless
+        oscillator strength is defined as
+        \begin{equation}
+            f_{\mathrm{i\to{f}}}
+            =
+            \frac{2}{3}
+            \frac{\me\omega_\mathrm{if}}{\hbar}
+            \langle \psi_\mathrm{i}, \bm{r}\psi_\mathrm{f} \rangle^2
+        \,,
+        \end{equation}
+        with the angular transition frequency
+        $\omega_\mathrm{if}=(E_\mathrm{f}-E_\mathrm{i})\slash\hbar$ and the
+        fine-structure energies $E_\mathrm{i}$ and $E_\mathrm{f}$ of the initial
+        and final state, respectively, which are computable with the provided
+        function \texttt{alkcalc\tus{E}nlsj}.
+    }
+        \sdocarg{char *species}{
+            String to specify atom/ion species, e.g., \texttt{1H} for Hydrogen,
+            or \texttt{88SR+} for the $\mathrm{^{88}Sr^+}$ ion.
+        }
+        \sdocarg{int32\tus{t} ni}{
+            Principal quantum number of the initial state $\psi_\mathrm{i}$.
+        }
+        \sdocarg{int32\tus{t} li}{
+            Orbital angular momentum quantum number $l=1,2,\dots,n-1$ of the
+            initial state $\psi_\mathrm{i}$.
+        }
+        \sdocarg{double si}{
+            Electron spin quantum number of the initial state $\psi_\mathrm{i}$.
+            Not an argument here, since $s=1\slash{2}$ is always assumed.
+        }
+        \sdocarg{double ji}{
+            Total angular momentum quantum number of the initial state
+            $\psi_\mathrm{i}$., $j$. Here, the following convention is applied:
+            For $j\in[k,k+1)$, $k=0,1,2,\dots$, the library internally uses the
+            (half-integer) value $(2k+1)\slash{2}$. For instance, this means
+            that for $j=0.49999$ and $j=0.50001$ the software internally uses
+            $j=1\slash{2}$ in both cases.
+        }
+        \sdocarg{double mji}{
+            Total magnetic quantum number of initial state, $m_j=-j,...,j$ (same
+            numerical convention as for \texttt{ji} [see above] and
+            $k=0,\pm1,\pm2,\dots$).
+        }
+        \sdocarg{int32\tus{t} nf}{
+            Principal quantum number of the final state $\psi_\mathrm{f}$.
+        }
+        \sdocarg{int32\tus{t} lf}{
+            Orbital angular momentum quantum number $l=1,2,\dots,n-1$ of the
+            final state $\psi_\mathrm{f}$.
+        }
+        \sdocarg{double sf}{
+            Electron spin quantum number of the final state $\psi_\mathrm{f}$.
+            Not an argument here, since $s=1\slash{2}$ is always assumed.
+        }
+        \sdocarg{double jf}{
+            Total angular momentum quantum number of the final state
+            $\psi_\mathrm{i}$., $j$. Here, the following convention is applied:
+            For $j\in[k,k+1)$, $k=0,1,2,\dots$, the library internally uses the
+            (half-integer) value $(2k+1)\slash{2}$. For instance, this means
+            that for $j=0.49999$ and $j=0.50001$ the software internally uses
+            $j=1\slash{2}$ in both cases.
+        }
+        \sdocarg{double mjf}{
+            Total magnetic quantum number of final state, $m_j=-j,...,j$ (same
+            numerical convention as for \texttt{jf} [see above] and
+            $k=0,\pm1,\pm2,\dots$).
+        }
+        \sdocret{double fitof}{
+            $f_\mathrm{i\to{f}}$ is the oscillator strength of the selected
+            electronic transition.
         }
     \end{sdocfun}%
     %
