@@ -166,4 +166,17 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
 double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
                      double mi, int32_t nf, int32_t lf, double jf, double mf);
 
+/* -------------------------------------------------------------------------- *
+ * Lifetime of fine-structure state (nanoseconds)                             *
+ * (see 'theory.d/theory.pdf', section 'Manual')                              *
+ *                                                                            *
+ * T       : Temperature of black-body excitation spectrum in Kelvin (K)      *
+ * species : String specifying atom/ion species                               *
+ * n       : Principal quantum number n = 1, 2, 3, ...                        *
+ * l       : Orbital angular momentum l = 1, 2, ..., n-1                      *
+ * s       : Spin (Not an argument, since we always have s = 1/2!)            *
+ * j       : Total angular momentum quantum number j = |l-1/2|, l+1/2         *
+ * -------------------------------------------------------------------------- */
+double alkcalc_tau(double T, char *species, int32_t n, int32_t l, double j);
+
 #endif

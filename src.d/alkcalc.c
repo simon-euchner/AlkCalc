@@ -458,8 +458,8 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
 
     int8_t s;
     int32_t MJI, MJF;
-    double Efi, r, rx, ry, rz, cip, cim, cfp, cfm, wl, Y1p, Y1m, ap0p, ap0m,
-           ap1p, ap1m, am1p, am1m, fitof;
+    double Efi, r, cip, cim, cfp, cfm, wl, ap0p, ap0m, ap1p, ap1m, am1p, am1m,
+           Y1p, Y1m, rx, ry, rz, fitof;
 
     /* Energy difference between initial (i) and final (f) state in Hartree */
     Efi = alkcalc_Enlsj(species, nf, lf, jf)-alkcalc_Enlsj(species, ni, li, ji);
@@ -500,6 +500,27 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
     fitof = 2./3. * Efi * r*r * ( .5*rx*rx + .5*ry*ry + rz*rz );
 
     return fitof;
+}
+
+/* -------------------------------------------------------------------------- *
+ * Lifetime of fine-structure state (nanoseconds)                             *
+ * (see 'theory.d/theory.pdf', section 'Manual')                              *
+ *                                                                            *
+ * T       : Temperature of black-body excitation spectrum in Kelvin (K)      *
+ * species : String specifying atom/ion species                               *
+ * n       : Principal quantum number n = 1, 2, 3, ...                        *
+ * l       : Orbital angular momentum l = 1, 2, ..., n-1                      *
+ * s       : Spin (Not an argument, since we always have s = 1/2!)            *
+ * j       : Total angular momentum quantum number j = |l-1/2|, l+1/2         *
+ * -------------------------------------------------------------------------- */
+double alkcalc_tau(double T, char *species, int32_t n, int32_t l, double j) {
+
+    double kBT;
+
+    /* Temperature factor in units of Hartree */
+    kBT = 3.166812e-6*T;
+
+    return 0.;
 }
 
 /* -------------------------------------------------------------------------- *
