@@ -20,6 +20,7 @@ static int64_t s64iadd(int64_t, int64_t);
 static int64_t fac(int64_t);
 static int64_t euclid(int64_t, int64_t);
 static double complex Ylml(int32_t, int32_t, double, double);
+static double cgtofloat(alkcalc_cg);
 
 /* -------------------------------------------------------------------------- *
  * Eigenenergy in units of Hartree (27.211386245981(30) eV Ref. [5])          *
@@ -394,9 +395,8 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
                                 double phi) {
 
     int32_t ll, jj, mjmj;
-    double cg1, cg2;
-    double complex y1, y2;
-    alkcalc_cg cg;
+    double cgu, cgd;
+    double complex yu, yd;
     alkcalc_spinor spinor;
 
     /* Check input validity */
@@ -422,18 +422,16 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
         exit(1);
     }
 
-    /* Compute Clebsch-Gordan coefficients */
-    cg = alkcalc_cj1m1j2m2jmj(l, mj-.5, .5, .5, j, mj);
-    cg1 = cg.sign*sqrt(cg.numerator/(double)cg.denominator);
-    cg = alkcalc_cj1m1j2m2jmj(l, mj+.5, .5, -.5, j, mj);
-    cg2 = cg.sign*sqrt(cg.numerator/(double)cg.denominator);
+    /* Compute Clebsch-Gordan coefficients (spin up [u] and down [d]) */
+    cgu = cgtofloat(alkcalc_cj1m1j2m2jmj(l, mj-.5, .5, .5, j, mj));
+    cgd = cgtofloat(alkcalc_cj1m1j2m2jmj(l, mj+.5, .5, -.5, j, mj));
 
     /* Compute spherical harmonics */
-    y1 = Ylml(l, (CONVERT(mj)-1)/2, theta, phi);
-    y2 = Ylml(l, (CONVERT(mj)+1)/2, theta, phi);
+    yu = Ylml(l, (CONVERT(mj)-1)/2, theta, phi);
+    yd = Ylml(l, (CONVERT(mj)+1)/2, theta, phi);
 
     /* Assemble result */
-    spinor.u = cg1*y1; spinor.d = cg2*y2;
+    spinor.u = cgu*yu; spinor.d = cgd*yd;
 
     return spinor;
 }
@@ -458,28 +456,48 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
                      double mji, int32_t nf, int32_t lf, double jf,
                      double mjf) {
 
+    int8_t s;
     int32_t MJI, MJF;
-    double Efi, r, rx, ry, rz, fitof;
+    double Efi, r, rx, ry, rz, cip, cim, cfp, cfm, wl, Y1p, Y1m, ap0p, ap0m,
+           ap1p, ap1m, am1p, am1m, fitof;
 
     /* Energy difference between initial (i) and final (f) state in Hartree */
     Efi = alkcalc_Enlsj(species, nf, lf, jf)-alkcalc_Enlsj(species, ni, li, ji);
 
-    /* Convert magnetic quantum numbers */
+    /* Convert magnetic quantum numbers to half-integers and multiply by two */
     MJI = CONVERT(mji); MJF = CONVERT(mjf);
 
-    /* Relevant dipole-transition matrix elements in units of Bohr's radius */
+    /* Apply dipole-selection rules */
+    if ( (INTEGER_ABS(MJF-MJI) > 2) || (INTEGER_ABS(li-lf) != 1) ) return 0.;
+
+    /* Radial dipole-transition matrix element between (i) and (f) */
     r = alkcalc_rp(species, ni, li, ji, 1., nf, lf, jf);
-    if (abs(MJI-MJF) > 2) { /* Dipole-forbidden */
-        rz = ry = rx = 0.;
-    } else
-    if (MJI == MJF) { /* Pi */
-        ry = rx = 0.; rz = 1. * r;
-    } else { /* Sigma */
-        ry = rx = 1. * r; rz = 0.;
+
+    /* Clebsch-Gordan coefficients for plus (p) and minus (m) spin */
+    cip = cgtofloat(alkcalc_cj1m1j2m2jmj(li, mji-.5, .5, .5 , ji, mji));
+    cim = cgtofloat(alkcalc_cj1m1j2m2jmj(li, mji+.5, .5, -.5, ji, mji));
+    cfp = cgtofloat(alkcalc_cj1m1j2m2jmj(lf, mjf-.5, .5, .5 , jf, mjf));
+    cfm = cgtofloat(alkcalc_cj1m1j2m2jmj(lf, mjf+.5, .5, -.5, jf, mjf));
+
+    /* Angular matrix elements */
+    s = (MJF-1)%4 ? -1: 1;
+    wl = s*sqrt((2*lf+1.)*(2*li+1.))*cgtofloat(w3jm(2*lf, 0, 2, 0, 2*li, 0));
+    if (MJF == MJI) {
+        ap0p = wl*cgtofloat(w3jm(2*lf, -MJF+1, 2, 0, 2*li, MJI-1));
+        ap0m = -wl*cgtofloat(w3jm(2*lf, -MJF-1, 2, 0, 2*li, MJI+1));
+        ry = rx = 0.; rz = cip*cfp*ap0p+cim*cfm*ap0m;
+    } else {
+        ap1p = wl*cgtofloat(w3jm(2*lf, -MJF+1, 2, 2, 2*li, MJI-1));
+        ap1m = -wl*cgtofloat(w3jm(2*lf, -MJF-1, 2, 2, 2*li, MJI+1));
+        am1p = wl*cgtofloat(w3jm(2*lf, -MJF+1, 2, -2, 2*li, MJI-1));
+        am1m = -wl*cgtofloat(w3jm(2*lf, -MJF-1, 2, -2, 2*li, MJI+1));
+        Y1p = cip*cfp*ap1p+cim*cfm*ap1m;
+        Y1m = cip*cfp*am1p+cim*cfm*am1m;
+        rx = Y1p+Y1m; ry = Y1p-Y1m; rz = 0.;
     }
 
     /* Assemble result */
-    fitof = 2./3. * Efi * ( rx*rx + ry*ry + rz*rz );
+    fitof = 2./3. * Efi * r*r * ( .5*rx*rx + .5*ry*ry + rz*rz );
 
     return fitof;
 }
@@ -683,4 +701,9 @@ static double complex Ylml(int32_t l, int32_t ml, double theta, double phi) {
     y *= pf * Pk * ac;
 
     return y;
+}
+
+/* Convert symbolic Clebsch-Gordan coefficient into a floating-point number */
+static double cgtofloat(alkcalc_cg c) {
+    return c.sign*sqrt(c.numerator/(double)c.denominator);
 }
