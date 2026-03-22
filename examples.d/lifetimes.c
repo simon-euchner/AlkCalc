@@ -1,0 +1,26 @@
+/* -------------------------------------------------------------------------- *
+ * Example: Lifetimes                                                         *
+ *                                                                            *
+ * Compile: gcc -L../lib.d/ lifetimes.c -lalkcalc -Wl,-rpath,../lib.d/        *
+ *                                                                            *
+ * Author of this file: Simon Euchner                                         *
+ * -------------------------------------------------------------------------- */
+
+#include "../interface.d/alkcalc.h"
+
+int main(int argc, char **argv)
+{
+    (void)argc; (void)argv;
+
+    printf("%s\n", "--- Example: Lifetimes\n");
+
+    /* Define initial and final state */
+    int n, l;
+    double j;
+    n = 6; l = 1; j = .5;
+    printf("tau = %1.8lf\n\n", alkcalc_tau(0., "88SR+", n, l, j));
+
+    printf("%s\n", "--- End");
+
+    return 0;
+}
