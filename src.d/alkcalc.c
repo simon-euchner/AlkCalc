@@ -183,8 +183,8 @@ double alkcalc_rp(char *species, int32_t nb, int32_t lb, double jb, double p,
                   int32_t nk, int32_t lk, double jk) {
 
     int32_t dim, k;
-    double *t, *h, *Rpd, *Rpo, I1, I2, I3, tkm1, tk, tkp1, p1, p2, p3, rp, *f,
-           *g, xim, xip;
+    double *t, *h, *Rpd, *Rpo, isr3, tkm1, tk, tkp1, hk, hkp1, tm, tp, pm, pp,
+           I1, I2, I3, *f, *g, rp;
     alkcalc_state *bra, *ket;
 
     /* Load states */
@@ -199,31 +199,40 @@ double alkcalc_rp(char *species, int32_t nb, int32_t lb, double jb, double p,
     Rpo = (double *)malloc((dim-1)*sizeof(double)); /* Off-diagonal */
 
     /* Compute components of matrix Rp (diagonal [d] and off-diagonal [o]) */
+    isr3 = 1./sqrt(3.);
     for (k=1; k<dim; k++) {
-        xim = .5*(t[k-1]+t[k])-.2886751346*h[k-1];
-        xip = .5*(t[k-1]+t[k])+.2886751346*h[k-1];
-        I1 =   .5*h[k]
-             * (   pow(xim, p)*(xim-t[k-1])/h[k-1]*(xim-t[k-1])/h[k-1]
-                 + pow(xip, p)*(xip-t[k-1])/h[k-1]*(xip-t[k-1])/h[k-1] );
-        xim = .5*(t[k]+t[k+1])-.2886751346*h[k];
-        xip = .5*(t[k]+t[k+1])+.2886751346*h[k];
-        I2 =   .5*h[k+1]
-             * (   pow(xim, p)*(t[k+1]-xim)/h[k]*(t[k+1]-xim)/h[k]
-                 + pow(xip, p)*(t[k+1]-xip)/h[k]*(t[k+1]-xip)/h[k] );
-        I3 =   .5*h[k+1]
-             * (   pow(xim, p)*(t[k+1]-xim)/h[k]*(xim-t[k])/h[k]
-                 + pow(xip, p)*(t[k+1]-xip)/h[k]*(xip-t[k])/h[k] );
 
-        Rpd[k-1] = I1 + I2; Rpo[k-1] = I3;
+        /* Discretisation data */
+        tkm1 = t[k-1]; tk = t[k]; tkp1 = t[k+1]; hk = h[k-1]; hkp1 = h[k];
+
+        /* Integral for (Rp)k,kp1 */
+        tm = .5*(tk+tkp1-isr3*hkp1); tp = .5*(tk+tkp1+isr3*hkp1);
+        pm = pow(tm, p); pp = pow(tp, p);
+        I1 = .5*((tkp1-tm)*(tm-tk)*pm+(tkp1-tp)*(tp-tk)*pp)/hkp1;
+        Rpo[k-1] = I1;
+
+        /* Integrals for (Rp)k,k */
+        I2 = .5*((tkp1-tm)*(tkp1-tm)*pm+(tkp1-tp)*(tkp1-tp)*pp)/hkp1;
+        tm = .5*(tkm1+tk-isr3*hk); tp = .5*(tkm1+tk+isr3*hk);
+        pm = pow(tm, p); pp = pow(tp, p);
+        I3 = .5*((tm-tkm1)*(tm-tkm1)*pm+(tp-tkm1)*(tp-tkm1)*pp)/hk;
+        Rpd[k-1] = I2 + I3;
     }
-    Rpd[dim-1] = 0.; // FIXME !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    tkm1 = t[dim-1]; tk = t[dim]; tkp1 = t[dim+1]; hk = h[dim-1]; hkp1 = h[dim];
+    tm = .5*(tk+tkp1-isr3*hkp1); tp = .5*(tk+tkp1+isr3*hkp1);
+    pm = pow(tm, p); pp = pow(tp, p);
+    I2 = .5*((tkp1-tm)*(tkp1-tm)*pm+(tkp1-tp)*(tkp1-tp)*pp)/hkp1;
+    tm = .5*(tkm1+tk-isr3*hk); tp = .5*(tkm1+tk+isr3*hk);
+    pm = pow(tm, p); pp = pow(tp, p);
+    I3 = .5*((tm-tkm1)*(tm-tkm1)*pm+(tp-tkm1)*(tp-tkm1)*pp)/hk;
+    Rpd[dim-1] = I2 + I3;
 
-    /* Avoid warning of compiler, because Rpo[0] is not initialised if dim    *
-     * would be less than 2, i.e., if N < 4. Practically, this of course not  *
-     * a problem, because N must be large, e.g. 100000, to yield sensible     *
-     * results. This peace of code just defines the behavior for dim = 1      *
-     * unambigously. The vases dim < 1 are excluded by the condition N > 2,   *
-     * which is presented to the user in 'interface.d/settings.c'.            */
+    /* Avoid warning by compiler because Rpo[0] is not initialised if dim is  *
+     * less than 2, i.e., if N < 4. Practically, this of course not a         *
+     * problem, because N must be large, e.g. 100000, to yield sensible       *
+     * results. This code just defines the behavior for dim = 1 unambigously. *
+     * The case dim < 1 are excluded by the condition N > 2, which is         *
+     * presented to the user in 'interface.d/settings.c'.                     */
     f = bra->fnlsj; g = ket->fnlsj;
     if (dim < 2) {
         Rpo[0] = 0.; rp = f[0]*Rpd[0]*g[0];
