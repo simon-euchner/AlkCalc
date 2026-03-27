@@ -255,19 +255,6 @@ Data generation.
 
 Important additional information.
 
-    - Ophidia in herba! In the source code for the AlkCalc library function for
-      computing radial matrix elements, alkcalc_rp, there is a subtile danger
-      which becomes apparent for large absolute values of the exponent p: large
-      numbers are subtracted from each other resulting in so-called catastrophic
-      cancellation. Therefore, to ensure good results the type 'long double' is
-      used (see 'src.d/alkcalc.c'). Although the C99 standard (see Sec. 6.7.2 in
-      Ref. [11]) ensures that this type exists, it does not specify its width.
-      To achieve good results it is best to make sure that it is 128 bit. Of
-      course, one can also simply include a library with arbitrary precision
-      floating-point operations and replace the critical subtractions. We do not
-      do this by default to conform to the C99 standrad and not introduce
-      further software requirements and libraries.
-
     - By default, the mass correction factor C from 'theory.d/theory.pdf' is set
       to unity in the source code in 'src.d/eigensolver.c', that is, we make the
       approximation that the reduced mass is equal to the electron's mass. This

@@ -277,21 +277,6 @@ Datenerzeugung.
 
 Wichtige zusätzliche Informationen.
 
-    - Ophidia in herba! Im Quellkode für die Bibliotheksfunktion zur Berechnung
-      von Radialmatrixelementen, alkcalc_rp, offenbart sich für betragsmäßig
-      große Exponenten p eine subtile Gefahr: Es werden große Zahlen voneinander
-      subtrahiert was zur sog. katastrophalen Auslöschung führt. Um gute
-      Ergebnisse zu erhalten findet der Typ "long double" Verwendung (siehe
-      "src.d/alkcalc.c"). Der C99 Standard garantiert das dieser Datentyp
-      definiert ist (siehe Absch. 6.7.2 in Ref. [11]), jedoch wird offen
-      gelassen aus wie vielen Bit dieser besteht. Es sollte darauf geachtet
-      werden dass dieser Typ mindestens 128 Bit lang ist. Natürlich kann auch
-      zusätzliche Software verwendet werden, die Fließkommaarithmetik beliebiger
-      Präzision erlaubt, um die kritischen Subtraktionen zu ersetzen. Wir haben
-      uns gegen diese Maßnahme entschieden, um mit dem C99 Standard kompatibel
-      zu sein und keine weiteren Softwareabhängigkeiten und Bibliotheken
-      einzuführen zu müssen.
-
     - Per Standarteinstellung ist der Faktor C für die Massenkorrektur,
       definiert in "theory.d/theory.pdf", im Quellkode in "src.d/eigensolver.c"
       auf eins gesetzt. Das ist der Tatsache geschuldet, dass die
