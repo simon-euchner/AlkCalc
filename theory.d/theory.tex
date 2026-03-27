@@ -751,8 +751,9 @@
     \,.
     \end{equation}%
     %
-    To numerically compute the remaining integrals we use a two-point Gau\ss ian
-    quadrature. This method approximates the integral as \cite{burden2011}:
+    To numerically compute the remaining integrals we use a two-point
+    Gau\ss{i}an quadrature. This method approximates the integral as
+    \cite{burden2011}:
     \begin{equation}
         \int^b_a \dd{t} \alpha(t)
         \approx
@@ -771,10 +772,11 @@
     elements is effectively reduced to computing matrix products. However, note
     that for too large $p$ there can be numerical overflow or underflow when
     computing $t^p$. But, for 64-bit floating point arithmetic, $p=\pm10$ is
-    easily possible, such that, typically, all practical cases are included.
-    Finally, we remark that one can improve on the precision by employing
-    higher-order Gau\ss ian quadrature algorithms as described in
-    \cite{burden2011}.
+    easily possible (if the integral exists), such that, typically, all
+    practical cases are included. Explicitly, we could verify that for hydrogen
+    the range $p=-2,\dots,10$ yields reasonably good results. Finally, we remark
+    that one can improve on the precision by employing higher-order Gau\ss{i}an
+    quadrature algorithms as described in \cite{burden2011}.
 
     \clearpage%
 
