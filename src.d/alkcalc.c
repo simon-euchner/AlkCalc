@@ -183,7 +183,8 @@ double alkcalc_rp(char *species, int32_t nb, int32_t lb, double jb, double p,
                   int32_t nk, int32_t lk, double jk) {
 
     int32_t dim, k;
-    double *t, *h, *Rpa, *Rpb, tkm1, tk, tkp1, p1, p2, p3, rp, *f, *g;
+    double *t, *h, *Rpd, *Rpo, I1, I2, I3, tkm1, tk, tkp1, p1, p2, p3, rp, *f,
+           *g, xim, xip;
     alkcalc_state *bra, *ket;
 
     /* Load states */
@@ -194,94 +195,30 @@ double alkcalc_rp(char *species, int32_t nb, int32_t lb, double jb, double p,
     t = bra->t; h = bra->h;
 
     /* Allocate memory for matrix Rp */
-    Rpa = (double *)malloc((dim = bra->dim)*sizeof(double)); /* Diagonal */
-    Rpb = (double *)malloc((dim-1)*sizeof(double)); /* Off-diagonal */
+    Rpd = (double *)malloc((dim = bra->dim)*sizeof(double)); /* Diagonal */
+    Rpo = (double *)malloc((dim-1)*sizeof(double)); /* Off-diagonal */
 
-    /* Compute components of matrix Rp (diagonal [a] and off-diagonal [b]) */
-    if (-1e-7 < p+1 && p+1 < 1e-7) { /* p = -1 */
-        Rpa[0] = 0.; /* Vectors also almost zero here */
-        for (k=2; k<=dim; k++) {
-            tkm1 = t[k-1]; tk = t[k]; tkp1 = t[k+1];
-            Rpa[k-1] =     (   .5*(powl(tk, 2.)-powl(tkm1, 2.))
-                             - 2.*tkm1*((long double)tk-tkm1)
-                             + pow(tkm1, 2.)*logl(tk/tkm1) )
-                         / powl(h[k-1], 2.)
-                       +   (   .5*(powl(tkp1, 2.)-powl(tk, 2.))
-                             - 2.*tkp1*((long double)tkp1-tk)
-                             + powl(tkp1, 2.)*logl(tkp1/tk) )
-                         / powl(h[k], 2.);
-        }
-        for (k=1; k<dim; k++) {
-            tk = t[k]; tkp1 = t[k+1];
-            Rpb[k-1] =   (   powl(tkp1, 2.)
-                           - 2.*tkp1*logl(tkp1/tk)*tk
-                           - powl(tk, 2.) )
-                       / ( 2.*powl(h[k], 2.) );
-        }
-    } else
-    if (-1e-7 < p+2 && p+2 < 1e-7) { /* p = -2 */
-        Rpa[0] = 0.; /* Vectors also almost zero here */
-        for (k=2; k<=dim; k++) {
-            tkm1 = t[k-1]; tk = t[k]; tkp1 = t[k+1];
-            Rpa[k-1] =     (   .5*((long double)tk-tkm1)
-                             - 2.*tkm1*logl(tk/tkm1)
-                             + powl(tkm1, 2.)*(1./(long double)tk-1./tkm1) )
-                         / powl(h[k-1], 2.)
-                       +   (   .5*((long double)tkp1-tk)
-                             - 2.*tkp1*logl(tkp1/tk)
-                             + pow(tkp1, 2.)*(1./(long double)tkp1-1./tk) )
-                         / powl(h[k], 2.);
-        }
-        for (k=1; k<dim; k++) {
-            tk = t[k]; tkp1 = t[k+1];
-            Rpb[k-1] =   (   (tkp1+tk)*logl(tkp1/tk)
-                           - 2.*((long double)tkp1-tk) )
-                       / powl(h[k], 2.);
-        }
-    } else
-    if (-1e-7 < p+3 && p+3 < 1e-7) { /* p = -3 */
-        Rpa[0] = 0.; /* Vectors also almost zero here */
-        for (k=1; k<=dim; k++) {
-            tkm1 = t[k-1]; tk = t[k]; tkp1 = t[k+1];
-            Rpa[k-1] =     (   logl(tk/tkm1)
-                             - 2.*tkm1*logl(1./(long double)tk-1./tkm1)
-                             + pow(tkm1, 2.)*(1./powl(tk, 1.)-1./powl(tkm1, 2.))
-                           )
-                         / powl(h[k-1], 2.)
-                       +   (   logl(tkp1/tk)
-                             - 2.*tkp1*(1./(long double)tkp1-1./tk)
-                             + pow(tkp1, 2.)*(1./powl(tkp1, 1.)-1./powl(tk, 2.))
-                           )
-                         / powl(h[k], 2.);
-        }
-        for (k=1; k<dim; k++) {
-            tk = t[k]; tkp1 = t[k+1];
-            Rpb[k-1] =   (   tkp1/tk*(1.-powl(tk/tkp1, 2.))
-                           - 2.*logl(tkp1/tk) )
-                       / ( 2.*powl(h[k], 2.) );
-        }
-    } else { /* Other p */
-        p1 = p+1.; p2 = p+2.; p3 = p+3.; Rpa[0] = 0.;
-        for (k=2; k<=dim; k++) {
-            tkm1 = t[k-1]; tk = t[k]; tkp1 = t[k+1];
-            Rpa[k-1] =     (   (powl(tk, p3)-powl(tkm1, p3))/p3
-                             - 2.*tkm1*(powl(tk, p2)-powl(tkm1, p2))/p2
-                             + pow(tkm1, 2.)*(powl(tk, p1)-powl(tkm1, p1))/p1 )
-                         / powl(h[k-1], 2.)
-                       +   (   (powl(tkp1, p3)-powl(tk, p3))/p3
-                             - 2.*tkp1*(powl(tkp1, p2)-powl(tk, p2))/p2
-                             + pow(tkp1, 2.)*(powl(tkp1, p1)-powl(tk, p1))/p1 )
-                         / powl(h[k], 2.);
-        }
-        for (k=1; k<dim; k++) {
-            tk = t[k]; tkp1 = t[k+1];
-            Rpb[k-1] =   (   (tkp1*powl(tk, p2)-tk*powl(tkp1, p2))/(p1*p2)
-                           + (powl(tkp1, p3)-powl(tk, p3))/(p2*p3) )
-                       / powl(h[k], 2.);
-        }
+    /* Compute components of matrix Rp (diagonal [d] and off-diagonal [o]) */
+    for (k=1; k<dim; k++) {
+        xim = .5*(t[k-1]+t[k])-.2886751346*h[k-1];
+        xip = .5*(t[k-1]+t[k])+.2886751346*h[k-1];
+        I1 =   .5*h[k]
+             * (   pow(xim, p)*(xim-t[k-1])/h[k-1]*(xim-t[k-1])/h[k-1]
+                 + pow(xip, p)*(xip-t[k-1])/h[k-1]*(xip-t[k-1])/h[k-1] );
+        xim = .5*(t[k]+t[k+1])-.2886751346*h[k];
+        xip = .5*(t[k]+t[k+1])+.2886751346*h[k];
+        I2 =   .5*h[k+1]
+             * (   pow(xim, p)*(t[k+1]-xim)/h[k]*(t[k+1]-xim)/h[k]
+                 + pow(xip, p)*(t[k+1]-xip)/h[k]*(t[k+1]-xip)/h[k] );
+        I3 =   .5*h[k+1]
+             * (   pow(xim, p)*(t[k+1]-xim)/h[k]*(xim-t[k])/h[k]
+                 + pow(xip, p)*(t[k+1]-xip)/h[k]*(xip-t[k])/h[k] );
+
+        Rpd[k-1] = I1 + I2; Rpo[k-1] = I3;
     }
+    Rpd[dim-1] = 0.; // FIXME !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    /* Avoid warning of compiler, because Rpb[0] is not initialised if dim    *
+    /* Avoid warning of compiler, because Rpo[0] is not initialised if dim    *
      * would be less than 2, i.e., if N < 4. Practically, this of course not  *
      * a problem, because N must be large, e.g. 100000, to yield sensible     *
      * results. This peace of code just defines the behavior for dim = 1      *
@@ -289,21 +226,21 @@ double alkcalc_rp(char *species, int32_t nb, int32_t lb, double jb, double p,
      * which is presented to the user in 'interface.d/settings.c'.            */
     f = bra->fnlsj; g = ket->fnlsj;
     if (dim < 2) {
-        Rpb[0] = 0.; rp = f[0]*Rpa[0]*g[0];
+        Rpo[0] = 0.; rp = f[0]*Rpd[0]*g[0];
     } else {
-        rp = f[0]*(Rpa[0]*g[0]+Rpb[0]*g[1]);
+        rp = f[0]*(Rpd[0]*g[0]+Rpo[0]*g[1]);
     }
 
     /* Compute matrix element */
     for (k=1; k<dim-1; k++)
-        rp += f[k]*(Rpb[k-1]*g[k-1]+Rpa[k]*g[k]+Rpb[k]*g[k+1]);
-    rp += f[dim-1]*(Rpb[dim-2]*g[dim-2]+Rpa[dim-1]*g[dim-1]);
+        rp += f[k]*(Rpo[k-1]*g[k-1]+Rpd[k]*g[k]+Rpo[k]*g[k+1]);
+    rp += f[dim-1]*(Rpo[dim-2]*g[dim-2]+Rpd[dim-1]*g[dim-1]);
 
     /* Clean up */
     alkcalc_state_free(bra); bra = NULL;
     alkcalc_state_free(ket); ket = NULL;
-    free(Rpa); Rpa = NULL;
-    free(Rpb); Rpb = NULL;
+    free(Rpd); Rpd = NULL;
+    free(Rpo); Rpo = NULL;
 
     return rp;
 }
