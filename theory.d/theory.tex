@@ -751,7 +751,41 @@
     \,.
     \end{equation}%
     %
-    For the diagonal matrix elements we find
+    To numerically compute the remaining integrals we use a two-point Gaussian
+    quadrature, implemented by the approximation \cite{burden2011}:
+    \begin{equation}
+        \int^b_a \dd{t} \alpha(t)
+        =
+        \frac{b-a}{2}
+        \bigg[
+            \alpha\bigg(\frac{a+b}{2}-\frac{b-a}{2\sqrt{3}}\bigg)
+            +
+            \alpha\bigg(\frac{a+b}{2}+\frac{b-a}{2\sqrt{3}}\bigg)
+        \bigg]
+    \,,
+    \end{equation}
+    for any sufficiently smooth function $\alpha$ and $a<b$. Note that this
+    result is exact if $\alpha$ is a polynomial of degree three, i.e., when
+    computing dipole matrix elements the result is exact. We start with the
+    diagonal entries of $R_p$, which read
+    \begin{equation}
+        (R_p)_{k,k}
+        =
+        \int^{t_k}_{t_{k-1}} \dd{t} \phi^2_k(t) t^p
+        +
+        \int^{t_{k+1}}_{t_k} \dd{t} \phi^2_k(t) t^p
+    \,.
+    \end{equation}
+    %
+    This is straight-forward to implement. However, note that for too large $p$
+    there can be overflow or underflow in computing $t^p$. However, for 64-bit
+    floating point arithmetic, $p=\pm10$ is easily possible, such that all
+    typically appearing practical cases are included. With this result it is
+    straight-forward to construct the matrix $R_p$, that is, it is
+    straight-forward to compute arbitrary radial matrix elements.
+
+    \ind Note that the integrals can also be calculated analytically. This
+    results in
     \begin{equation}
         B(\phi_k,\mathrm{id}^p\phi_k)
         =
@@ -820,30 +854,9 @@
             \bigg],
             & \text{else}
         \end{cases}
-    \,.
     \end{equation}%
     %
-
-    \label{page:divergingIntegral}%
-    \ind We emphasise here that for $k=1$ and $p$ negative enough, the above
-    expression is not well-defined. This does not mean the matrix element does
-    not exist, because the functions $f_{n,l,s,j}$ and $f_{n',l',s',j'}$ tend to
-    zero as $t\to0$. If the radial matrix element exists, must therefore be
-    determined before computing it, e.g., by considering the form of the radial
-    equation for $t\ll{1}$, and thereby inferring the functional behaviour of
-    the radial eigenstates close to zero. When implementing the radial matrix
-    elements in a computer program, one may allow arbitrary (at least as long as
-    no numerical limits are reached) $p$ by simply setting $(R_p)_{1,1}=0$ (we
-    will see below that the off-diagonal components are always well-defined).
-    This simplifying `error' is justified by the fact that the step
-    $h_1=t_1-t_0$ should be chosen small (${\sim}10^{-6}$) in order to obtain
-    sensible results for the eigenenergies and eigenstates, as well as the fact
-    that the eigenfunctions $f_{n,l,s,j}$ vanish at $t=0$ fast enough (if the
-    integral exists mathematically). Hence, the error one makes will be
-    negligible, because, from a physical standpoint, it is clear that the radial
-    eigenstates do not change much on the length scale ${\sim}10^{-6}\aB$.
-
-    \ind The off-diagonal matrix elements of $R_p$ read
+    and
     \begin{equation}
         B(\phi_k,\mathrm{id}^p\phi_{k+1})
         =
@@ -874,8 +887,24 @@
     \,.
     \end{equation}%
     %
-    With this result it is straight-forward to construct the matrix $R_p$, that
-    is, it is straight-forward to compute arbitrary radial matrix elements.
+    \label{page:divergingIntegral}%
+    We emphasise here that for $k=1$ and $p$ negative enough, the above
+    expression is not well-defined. This does not mean the matrix element does
+    not exist, because the functions $f_{n,l,s,j}$ and $f_{n',l',s',j'}$ tend to
+    zero as $t\to0$. If the radial matrix element exists, must therefore be
+    determined before computing it, e.g., by considering the form of the radial
+    equation for $t\ll{1}$, and thereby inferring the functional behaviour of
+    the radial eigenstates close to zero. When implementing the radial matrix
+    elements in a computer program, one may allow arbitrary (at least as long as
+    no numerical limits are reached) $p$ by simply setting $(R_p)_{1,1}=0$ (we
+    will see below that the off-diagonal components are always well-defined).
+    This simplifying `error' is justified by the fact that the step
+    $h_1=t_1-t_0$ should be chosen small (${\sim}10^{-6}$) in order to obtain
+    sensible results for the eigenenergies and eigenstates, as well as the fact
+    that the eigenfunctions $f_{n,l,s,j}$ vanish at $t=0$ fast enough (if the
+    integral exists mathematically). Hence, the error one makes will be
+    negligible, because, from a physical standpoint, it is clear that the radial
+    eigenstates do not change much on the length scale ${\sim}10^{-6}\aB$.
 
     \clearpage%
 
