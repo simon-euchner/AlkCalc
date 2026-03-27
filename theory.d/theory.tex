@@ -751,11 +751,11 @@
     \,.
     \end{equation}%
     %
-    To numerically compute the remaining integrals we use a two-point Gaussian
-    quadrature, implemented by the approximation \cite{burden2011}:
+    To numerically compute the remaining integrals we use a two-point Gau\ss ian
+    quadrature. This method approximates the integral as \cite{burden2011}:
     \begin{equation}
         \int^b_a \dd{t} \alpha(t)
-        =
+        \approx
         \frac{b-a}{2}
         \bigg[
             \alpha\bigg(\frac{a+b}{2}-\frac{b-a}{2\sqrt{3}}\bigg)
@@ -765,146 +765,16 @@
     \,,
     \end{equation}
     for any sufficiently smooth function $\alpha$ and $a<b$. Note that this
-    result is exact if $\alpha$ is a polynomial of degree three, i.e., when
-    computing dipole matrix elements the result is exact. We start with the
-    diagonal entries of $R_p$, which read
-    \begin{equation}
-        (R_p)_{k,k}
-        =
-        \int^{t_k}_{t_{k-1}} \dd{t} \phi^2_k(t) t^p
-        +
-        \int^{t_{k+1}}_{t_k} \dd{t} \phi^2_k(t) t^p
-    \,.
-    \end{equation}
-    %
-    This is straight-forward to implement. However, note that for too large $p$
-    there can be overflow or underflow in computing $t^p$. However, for 64-bit
-    floating point arithmetic, $p=\pm10$ is easily possible, such that all
-    typically appearing practical cases are included. With this result it is
-    straight-forward to construct the matrix $R_p$, that is, it is
-    straight-forward to compute arbitrary radial matrix elements.
-
-    \ind Note that the integrals can also be calculated analytically. This
-    results in
-    \begin{equation}
-        B(\phi_k,\mathrm{id}^p\phi_k)
-        =
-        \begin{cases}
-                \frac{1}{(t_k-t_{k-1})^2}
-                \bigg[
-                    \frac{t^2_k-t^2_{k-1}}{2}
-                    -2t_{k-1}(t_k-t_{k-1})
-                    +t^2_{k-1}\ln(\frac{t_k}{t_{k-1}})
-                \bigg]
-            \\
-                +
-                \frac{1}{(t_{k+1}-t_k)^2}
-                \bigg[
-                    \frac{t^2_{k+1}-t^2_k}{2}
-                    -2t_{k+1}(t_{k+1}-t_k)
-                    +t^2_{k+1}\ln(\frac{t_{k+1}}{t_k})
-                \bigg],
-            & p=-1
-        \\
-            \frac{1}{(t_k-t_{k-1})^2}
-            \bigg[
-                t_k-t_{k-1}
-                -2t_{k-1}\ln(\frac{t_k}{t_{k-1}})
-                +t^2_{k-1}\big(\frac{1}{t_k}-\frac{1}{t_{k-1}}\big)
-            \bigg]
-        \\
-            +
-            \frac{1}{(t_{k+1}-t_k)^2}
-            \bigg[
-                t_{k+1}-t_k
-                -2t_{k+1}\ln(\frac{t_{k+1}}{t_k})
-                +t^2_{k+1}\big(\frac{1}{t_{k+1}}-\frac{1}{t_k}\big)
-            \bigg],
-            & p=-2
-        \\
-            \frac{1}{(t_k-t_{k-1})^2}
-            \bigg[
-                \ln(\frac{t_k}{t_{k-1}})
-                -2t_{k-1}\big(\frac{1}{t_k}-\frac{1}{t_{k-1}}\big)
-                +t^2_{k-1}\big(\frac{1}{t^2_k}-\frac{1}{t^2_{k-1}}\big)
-            \bigg]
-        \\
-            +
-            \frac{1}{(t_{k+1}-t_k)^2}
-            \bigg[
-                \ln(\frac{t_{k+1}}{t_k})
-                -2t_{k+1}\big(\frac{1}{t_{k+1}}-\frac{1}{t_k}\big)
-                +t^2_{k+1}\big(\frac{1}{t^2_{k+1}}-\frac{1}{t^2_k}\big)
-            \bigg],
-            & p=-3
-        \\
-            \frac{1}{(t_k-t_{k-1})^2}
-            \bigg[
-                \frac{t^{p+3}_k-t^{p+3}_{k-1}}{p+3}
-                -2t_{k-1}\frac{t^{p+2}_k-t^{p+2}_{k-1}}{p+2}
-                +t^2_{k-1}\frac{t^{p+1}_k-t^{p+1}_{k-1}}{p+1}
-            \bigg]
-        \\
-            +
-            \frac{1}{(t_{k+1}-t_k)^2}
-            \bigg[
-                \frac{t^{p+3}_{k+1}-t^{p+3}_k}{p+3}
-                -2t_{k+1}\frac{t^{p+2}_{k+1}-t^{p+2}_k}{p+2}
-                +t^2_{k+1}\frac{t^{p+1}_{k+1}-t^{p+1}_k}{p+1}
-            \bigg],
-            & \text{else}
-        \end{cases}
-    \end{equation}%
-    %
-    and
-    \begin{equation}
-        B(\phi_k,\mathrm{id}^p\phi_{k+1})
-        =
-        \begin{cases}
-            \frac{t^2_{k+1}-2t_{k+1}\ln(\frac{t_{k+1}}{t_k})t_k-t^2_k}
-                 {2(t_{k+1}-t_k)^2},
-            & p=-1
-        \\
-            \frac{(t_{k+1}+t_k)\ln(\frac{t_{k+1}}{t_k})-2(t_{k+1}-t_k)}
-                 {(t_{k+1}-t_k)^2},
-            & p=-2
-        \\
-            \frac{\frac{t_{k+1}}{t_k}
-                  \big(1-\frac{t^2_k}{t^2_{k+1}}\big)
-                  -2\ln(\frac{t_{k+1}}{t_k})}
-                 {2(t_{k+1}-t_k)^2},
-            & p=-3
-        \\
-            \frac{1}{(t_{k+1}-t_k)^2}
-            \bigg[
-                \frac{t_{k+1}t^{p+2}_k-t_kt^{p+2}_{k+1}}
-                     {(p+1)(p+2)}
-                +
-                \frac{t^{p+3}_{k+1}-t^{p+3}_k}{(p+2)(p+3)}
-            \bigg],
-            & \text{else}
-        \end{cases}
-    \,.
-    \end{equation}%
-    %
-    \label{page:divergingIntegral}%
-    We emphasise here that for $k=1$ and $p$ negative enough, the above
-    expression is not well-defined. This does not mean the matrix element does
-    not exist, because the functions $f_{n,l,s,j}$ and $f_{n',l',s',j'}$ tend to
-    zero as $t\to0$. If the radial matrix element exists, must therefore be
-    determined before computing it, e.g., by considering the form of the radial
-    equation for $t\ll{1}$, and thereby inferring the functional behaviour of
-    the radial eigenstates close to zero. When implementing the radial matrix
-    elements in a computer program, one may allow arbitrary (at least as long as
-    no numerical limits are reached) $p$ by simply setting $(R_p)_{1,1}=0$ (we
-    will see below that the off-diagonal components are always well-defined).
-    This simplifying `error' is justified by the fact that the step
-    $h_1=t_1-t_0$ should be chosen small (${\sim}10^{-6}$) in order to obtain
-    sensible results for the eigenenergies and eigenstates, as well as the fact
-    that the eigenfunctions $f_{n,l,s,j}$ vanish at $t=0$ fast enough (if the
-    integral exists mathematically). Hence, the error one makes will be
-    negligible, because, from a physical standpoint, it is clear that the radial
-    eigenstates do not change much on the length scale ${\sim}10^{-6}\aB$.
+    result is exact if $\alpha$ is a polynomial of degree three, which is the
+    case for radial dipole matrix elements. This method is straight-forward to
+    implement in a computer program, such that the problem of calculating matrix
+    elements is effectively reduced to computing matrix products. However, note
+    that for too large $p$ there can be numerical overflow or underflow when
+    computing $t^p$. But, for 64-bit floating point arithmetic, $p=\pm10$ is
+    easily possible, such that, typically, all practical cases are included.
+    Finally, we remark that one can improve on the precision by employing
+    higher-order Gau\ss ian quadrature algorithms as described in
+    \cite{burden2011}.
 
     \clearpage%
 
