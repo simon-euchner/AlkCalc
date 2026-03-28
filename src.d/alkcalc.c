@@ -468,30 +468,7 @@ double alkcalc_tau(double T, char *species, int32_t n, int32_t l, double j) {
     /* Temperature factor in units of Hartree */
     kBT = 3.166812e-6*T;
 
-    /* Obtain lowest n for l' (lp) for l'=l+1 and l'=l-1 */
-    lm1 = l-1; lp1 = l+1;
-    nminlm1 = 5;
-    nminlp1 = 5;
-
-    /* Sum of Einstein A-coefficients */
-    tau = 0.;
-    Ei = alkcalc_Enlsj(species, n, l, l+.5);
-    if (lm1 < 0) {
-    } else {
-        for (np=nminlm1; np<n; np++) {
-            r = alkcalc_rp(species, n, l, l+.5, 1., np, lm1, lm1+.5);
-            Eif = Ei - alkcalc_Enlsj(species, np, lm1, lm1+.5);
-            tau += (double)l/(2*l+1) * r*r * Eif*Eif*Eif;
-        }
-    }
-    for (np=nminlp1; np<n; np++) {
-        r = alkcalc_rp(species, n, l, l+.5, 1., np, lp1, lp1+.5);
-        Eif = Ei - alkcalc_Enlsj(species, np, lp1, lp1+.5);
-        tau += (double)(l+1)/(2*l+1) * r*r * Eif*Eif*Eif;
-    }
-    tau = .75 * pow(137., 3.) * 1./tau;
-
-    return tau * 2.4188843265864 * 1e-17 * 1e9;
+    return 1.;
 }
 
 /* -------------------------------------------------------------------------- *
