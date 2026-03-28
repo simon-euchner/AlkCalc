@@ -147,7 +147,7 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
                                 double phi);
 
 /* -------------------------------------------------------------------------- *
- * Oscillator strength (dimensionless)                                        *
+ * Oscillator strength between fine-structure states (dimensionless)          *
  * (see 'theory.d/theory.pdf', section 'Manual')                              *
  *                                                                            *
  * species : String specifying atom/ion species                               *
@@ -155,16 +155,13 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
  * li      : Orbital angular momentum l = 1, 2, ..., n-1 of (i)               *
  * si      : Spin of (i) (Not an argument, since we always have s = 1/2!)     *
  * ji      : Total angular momentum quantum number j = |l-1/2|, l+1/2  of (i) *
- * mji     : Total magnetic quantum number of initial state, mj = -j, ..., j  *
- * p       : Power of radius operator in matrix element                       *
  * nf      : Principal quantum number of final state (f)                      *
  * lf      : Orbital angular momentum l = 1, 2, ..., n-1 of (f)               *
  * sf      : Spin of (f) (Not an argument, since we always have s = 1/2!)     *
  * jf      : Total angular momentum quantum number j = |l-1/2|, l+1/2, of (f) *
- * mjf     : Total magnetic quantum number of final state, mj = -j, ..., j    *
  * -------------------------------------------------------------------------- */
 double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
-                     double mi, int32_t nf, int32_t lf, double jf, double mf);
+                     int32_t nf, int32_t lf, double jf);
 
 /* -------------------------------------------------------------------------- *
  * Lifetime of fine-structure state (nanoseconds)                             *

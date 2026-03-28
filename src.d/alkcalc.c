@@ -383,7 +383,7 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
 }
 
 /* -------------------------------------------------------------------------- *
- * Oscillator strength (dimensionless)                                        *
+ * Oscillator strength between fine-structure states (dimensionless)          *
  * (see 'theory.d/theory.pdf', section 'Manual')                              *
  *                                                                            *
  * species : String specifying atom/ion species                               *
@@ -391,59 +391,58 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
  * li      : Orbital angular momentum l = 1, 2, ..., n-1, of (i)              *
  * si      : Spin of (i) (Not an argument, since we always have s = 1/2!)     *
  * ji      : Total angular momentum quantum number j = |l-1/2|, l+1/2 of (i)  *
- * mji     : Total magnetic quantum number of initial state, mj = -j, ..., j  *
  * nf      : Principal quantum number of final state (f)                      *
  * lf      : Orbital angular momentum l = 1, 2, ..., n-1 of (f)               *
  * sf      : Spin of (f) (Not an argument, since we always have s = 1/2!)     *
  * jf      : Total angular momentum quantum number j = |l-1/2|, l+1/2, of (f) *
- * mjf     : Total magnetic quantum number of final state, mj = -j, ..., j    *
  * -------------------------------------------------------------------------- */
 double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
-                     double mji, int32_t nf, int32_t lf, double jf,
-                     double mjf) {
+                     int32_t nf, int32_t lf, double jf) {
 
-    int8_t s;
-    int32_t MJI, MJF;
-    double Efi, r, cip, cim, cfp, cfm, wl, ap0p, ap0m, ap1p, ap1m, am1p, am1m,
-           Y1p, Y1m, rx, ry, rz, fitof;
+    int32_t JI, JF, llp1, llm1;
+    double Efi, r, al, fitof;
+
+    /* Apply selection rules */
+    JI = CONVERT(ji); JF = CONVERT(jf);
+    if ( (JI < 0) || (JF < 0) || (li < 0) || (lf < 0) ) return 0;
+    if ( (INTEGER_ABS(JF-JI) > 2) || (INTEGER_ABS(lf-li) != 1) ) return 0.;
 
     /* Energy difference between initial (i) and final (f) state in Hartree */
     Efi = alkcalc_Enlsj(species, nf, lf, jf)-alkcalc_Enlsj(species, ni, li, ji);
 
-    /* Convert magnetic quantum numbers to half-integers and multiply by two */
-    MJI = CONVERT(mji); MJF = CONVERT(mjf);
-
-    /* Apply dipole-selection rules */
-    if ( (INTEGER_ABS(MJF-MJI) > 2) || (INTEGER_ABS(li-lf) != 1) ) return 0.;
-
     /* Radial dipole-transition matrix element between (i) and (f) */
     r = alkcalc_rp(species, ni, li, ji, 1., nf, lf, jf);
 
-    /* Clebsch-Gordan coefficients for plus (p) and minus (m) spin */
-    cip = cgtofloat(alkcalc_cj1m1j2m2jmj(li, mji-.5, .5, .5 , ji, mji));
-    cim = cgtofloat(alkcalc_cj1m1j2m2jmj(li, mji+.5, .5, -.5, ji, mji));
-    cfp = cgtofloat(alkcalc_cj1m1j2m2jmj(lf, mjf-.5, .5, .5 , jf, mjf));
-    cfm = cgtofloat(alkcalc_cj1m1j2m2jmj(lf, mjf+.5, .5, -.5, jf, mjf));
-
-    /* Angular matrix elements */
-    s = (MJF-1)%4 ? -1: 1;
-    wl = s*sqrt((2*lf+1.)*(2*li+1.))*cgtofloat(w3jm(2*lf, 0, 2, 0, 2*li, 0));
-    if (MJF == MJI) {
-        ap0p = wl*cgtofloat(w3jm(2*lf, -MJF+1, 2, 0, 2*li, MJI-1));
-        ap0m = -wl*cgtofloat(w3jm(2*lf, -MJF-1, 2, 0, 2*li, MJI+1));
-        ry = rx = 0.; rz = cip*cfp*ap0p+cim*cfm*ap0m;
-    } else {
-        ap1p = wl*cgtofloat(w3jm(2*lf, -MJF+1, 2, 2, 2*li, MJI-1));
-        ap1m = -wl*cgtofloat(w3jm(2*lf, -MJF-1, 2, 2, 2*li, MJI+1));
-        am1p = wl*cgtofloat(w3jm(2*lf, -MJF+1, 2, -2, 2*li, MJI-1));
-        am1m = -wl*cgtofloat(w3jm(2*lf, -MJF-1, 2, -2, 2*li, MJI+1));
-        Y1p = cip*cfp*ap1p+cim*cfm*ap1m;
-        Y1m = cip*cfp*am1p+cim*cfm*am1m;
-        rx = Y1p+Y1m; ry = Y1p-Y1m; rz = 0.;
+    /* Angular factor */
+    llp1 = 2*li+1; llm1 = 2*li-1;
+    if (lf == li+1) { /* lf-li = 1 */
+        if ( (JI == llp1) && (JF == llp1) ) {
+            al = 1./((llp1+2)*llp1);
+        } else
+        if ( (JI == llm1) && (JF == llp1) ) {
+            al = (li+1.)/llp1;
+        } else
+        if ( (JI == llp1) && (JF == llp1+2) ) {
+            al = (li+2.)/(llp1+2);
+        } else {
+            return 0;
+        }
+    } else { /* lf-li = -1 */
+        if ( (JI == llm1) && (JF == llm1) ) {
+            al = 1./(llp1*llm1);
+        } else
+        if ( (JI == llp1) && (JF == llm1) ) {
+            al = (double)li/llp1;
+        } else
+        if ( (JI == llm1) && (JF == llp1-2) ) {
+            al = (li-1.)/llm1;
+        } else {
+            return 0;
+        }
     }
 
     /* Assemble result */
-    fitof = 2./3. * Efi * r*r * ( .5*rx*rx + .5*ry*ry + rz*rz );
+    fitof = 2./3. * Efi * r*r * al;
 
     return fitof;
 }

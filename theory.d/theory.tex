@@ -1141,6 +1141,7 @@
         \begin{equation}
             f_{\mathrm{i\to{f}}}
             =
+            \sum_{m_\mathrm{f}}
             \frac{2}{3}
             \frac{\me\omega_\mathrm{if}}{\hbar}
             \norm*{\langle \psi_\mathrm{i}, \bm{r}\psi_\mathrm{f} \rangle}^2
@@ -1175,11 +1176,6 @@
             that for $j=0.49999$ and $j=0.50001$ the software internally uses
             $j=1\slash{2}$ in both cases.
         }
-        \sdocarg{double mji}{
-            Total magnetic quantum number of initial state, $m_j=-j,...,j$ (same
-            numerical convention as for \texttt{ji} [see above] and
-            $k=0,\pm1,\pm2,\dots$).
-        }
         \sdocarg{int32\tus{t} nf}{
             Principal quantum number of the final state $\psi_\mathrm{f}$.
         }
@@ -1198,11 +1194,6 @@
             (half-integer) value $(2k+1)\slash{2}$. For instance, this means
             that for $j=0.49999$ and $j=0.50001$ the software internally uses
             $j=1\slash{2}$ in both cases.
-        }
-        \sdocarg{double mjf}{
-            Total magnetic quantum number of final state, $m_j=-j,...,j$ (same
-            numerical convention as for \texttt{jf} [see above] and
-            $k=0,\pm1,\pm2,\dots$).
         }
         \sdocret{double fitof}{
             $f_\mathrm{i\to{f}}$ is the oscillator strength of the selected
