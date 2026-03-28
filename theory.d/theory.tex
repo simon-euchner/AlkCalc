@@ -23,9 +23,6 @@
 \usepackage{upgreek,textcomp}
 \AfterTOCHead[toc]{\sffamily}
 
-%%% INDENTATION AND TRAILING SPACE
-\setparsizes{0pt}{0pt}{0pt plus 1fill}
-
 %%% CAPTIONS
 \setcapindent{0em}
 \setcapwidth[c]{\textwidth}
@@ -54,7 +51,7 @@
 %%% GRAPHICS
 \usepackage[pdftex]{graphicx}
 \usepackage{tikz,color,xcolor}
-\graphicspath{{../../Figures/}}
+\graphicspath{{./}}
 
 %%% ALIGN TEXT
 \usepackage{enumerate}
@@ -99,7 +96,6 @@
 }
 
 %%% CUSTOM COMMANDS
-\newcommand{\ind}{\hspace*{1.5em}} % MANUALLY SET INDENTATION
 \newcommand{\ee}{\mathrm{e}}
 \newcommand{\ii}{\mathrm{i}}
 \newcommand{\pii}{\uppi}
@@ -157,55 +153,64 @@
     \setcounter{page}{1}%
     \renewcommand{\pagemark}{\thepage}%
 
-    %%% SECTION: INTRODUCTION
+    %%% SECTION
     \section{Introduction}
     \label{sec:introduction}
 
-    \ind Bound single-electron eigenfunctions of alkali-metal atoms and
+    Bound single-electron eigenfunctions of alkali-metal atoms and
     alkaline-earth metal ions are of relevance whenever properties of Rydberg
-    atoms are of interest (e.g. in Quantum Computing and Information, Quantum
-    Simulation, pure Rydberg Physics, Quantum Optics, \dots). Generally, because
-    except for the Hydrogen atom the time-independent Schr\"odinger equation
+    atoms are of interest (e.g. in quantum computing and information, quantum
+    simulation, Rydberg physics, quantum optics, \dots). Generally, because,
+    except for the Hydrogen atom, the time-independent Schr\"odinger equation
     cannot be solved analytically, there is the need to obtain the eigenenergies
     (atomic spectrum) and eigenstates numerically. The library \alkcalc is
     intended for this purpose and information is given in the various provided
     \texttt{README} files. However, there is no discussion on the theory behind
     the code.
 
-    \ind This document's purpose is to define the Hamiltonian which \alkcalc is
+    This document's purpose is to define the Hamiltonian which \alkcalc is
     designed to diagonalise. Moreover, it formally defines the numerically
     computed quantities and hence serves as a reference for the user. In
     particular, the final section is a reference manual or the library
     functions.
 
-    %%% SECTION: THEORY
+    %%% SECTION
     \section{Theory}
-    \label{sec:theory}
+    \label{sec:Theory}
 
-    \ind The starting point is an alkali-metal atom or alkaline-earth-metal ion.
-    We are interested in systems where all electrons are in closed shells except
+    We start by considering a single atom or ion. Then we describe the \ac{fem}
+    used to numerically solve the Schr\"odinger equation. Finally, we describe
+    how we compute radial matrix elements, oscillator strengths, and
+    state lifetimes.
+
+    %%% SUBSECTION
+    \subsection{Single-ion theory}
+    \label{subsec:SingleIonTheory}
+
+    The starting point is an alkali-metal atom or alkaline-earth-metal ion. We
+    are interested in systems where all electrons are in closed shells except
     for one (e.g., $\mathrm{^1H}$, $\mathrm{^{38}Rb}$, $\mathrm{^{88}Sr^+}$).
     This allows a Kepler-problem description for the `effective nucleus' (the
-    nucleus `screened' by the closed-shell electrons) and valence electron. To
-    be concrete, we study the Hamiltonian
+    nucleus `screened' by the closed-shell electrons) and the valence electron.
+    To be concrete, we study the Hamiltonian
     \begin{equation}
         H = \frac{\bm{p}^2}{2m}+V(\norm*{\bm{r}};\bm{L}^2,\bm{S}^2,\bm{J}^2)
     \,,
-    \end{equation}%
-    %
+    \end{equation}
     where $m=Mm_\mathrm{e}\slash(M+m_\mathrm{e})$ is the reduced mass of the
     system, composed of the electron's mass $m_\mathrm{e}$ and the atom's or
-    ion's mass $M$. The centre-of-mass motion is decoupled, such that
-    $\bm{r},\bm{p}$ are the relative canonical co-ordinates, i.e., $\bm{r}$ is
-    the distance vector between the centre-of-mass position of the effective
-    nucleus and the valence electron.  Moreover, $\bm{L}$, $\bm{S}$, and
-    $\bm{J}=\bm{L}+\bm{S}$ are the orbital angular momentum operator, the
-    electron's spin operator, and the total angular momentum operator,
-    respectively. The potential $V$ is not a simple Coulomb potential, but a
-    generalised potential which includes different contributions (these arise
-    when one starts with the full many-body electron Hamiltonian and
-    incorporates relativistic and quantum electrodynamics effects). Following
-    Refs.~\cite{aymar1996,marinescu1994,wilkinson2025} we write:
+    ion's mass $M$ without the valence electron. The centre-of-mass motion is
+    decoupled, such that $\bm{r},\bm{p}$ are the relative canonical
+    co-ordinates, i.e., $\bm{r}$ is the distance vector between the
+    centre-of-mass position of the effective nucleus and the valence electron.
+    Moreover, $\bm{L}$, $\bm{S}$, and $\bm{J}=\bm{L}+\bm{S}$ are the orbital
+    angular momentum operator, the electron's spin operator, and the total
+    angular momentum operator, respectively. The potential $V$ is not a simple
+    Coulomb potential, but a generalised potential which includes different
+    contributions (these arise when one starts with the full many-body electron
+    Hamiltonian and incorporates relativistic and quantum electrodynamics
+    effects). Following Refs.~\cite{aymar1996,marinescu1994,wilkinson2025} we
+    write:
     \begin{equation}
         V(\norm*{\bm{r}};\bm{L}^2,\bm{S}^2,\bm{J}^2)
         =
@@ -215,8 +220,7 @@
         +
         V_\mathrm{R}(\bm{r};\bm{L}^2,\bm{S}^2,\bm{J}^2)
     \,.
-    \end{equation}%
-    %
+    \end{equation}
     The first contribution is
     \begin{equation}
         V_\mathrm{C}(r)
@@ -231,8 +235,7 @@
         -
         k_4r^2\ee^{-k_3r}
     \,.
-    \end{equation}%
-    %
+    \end{equation}
     This is a modified Coulomb potential, adjusted for small radii due to the
     effective nucleus. Here, $Z$ is the nuclear charge, $Z_\mathrm{c}$ the
     nuclear charge of the effective nucleus, and the $k_j$ ($j=1,2,3,4$) are
@@ -246,9 +249,8 @@
         \frac{\alpha_\mathrm{d}}{2r^4}
         \bigg[1-\exp(-\frac{r^6}{r^6_\mathrm{c}})\bigg]
     \,,
-    \end{equation}%
-    %
-    which accounts for the polarization of the screened nucleus due to the
+    \end{equation}
+    which accounts for the polarisation of the screened nucleus due to the
     presence of the valence electron. Here, $r_\mathrm{c}$ is the effective
     nucleus' size and $\alpha_\mathrm{d}$ its polariseability. Finally,
     \begin{equation}\label{eq:vrIons}
@@ -260,8 +262,7 @@
     \,, \
         V_\mathrm{NR}(r) = V_\mathrm{C}(r) + V_\mathrm{P}(r)
     \,,
-    \end{equation}%
-    %
+    \end{equation}
     which describes (relativistic) coupling between the orbital angular momentum
     and the valence electrons' spin. In this expression, $V_\mathrm{NR}$ is the
     non-relativistic model potential and $c$ the speed of light. In
@@ -271,8 +272,7 @@
         V_\mathrm{R}(r)
         =
         \frac{\alpha}{2r^3} \bm{L}\cdot\bm{S}
-    \end{equation}%
-    %
+    \end{equation}
     is employed for atoms. Here, $\alpha$ is the fine-structure constant.
     However, we use the first, more precise, version for both ions and atoms.
     The spin-operator $\bm{S}$ in Eqs.~(\ref{eq:vrAtoms},\,\ref{eq:vrIons}) is
@@ -280,8 +280,7 @@
     \begin{equation}
         \bm{S} = \frac{\hbar}{2}\mqty[\sigma_x \\ \sigma_y \\ \sigma_z]
     \,,
-    \end{equation}%
-    %
+    \end{equation}
     with the Pauli matrices
     \begin{equation}
         \sigma_x = \mqty[0&1 \\ 1&0]
@@ -290,8 +289,7 @@
     \,, \
         \sigma_z = \mqty[1&0 \\ 0&-1]
     \,,
-    \end{equation}%
-    %
+    \end{equation}
     which is possible because we deal with a single electron, i.e., a particle
     with spin $1\slash{2}$. Moreover, we rewrite the product $\bm{L}\cdot\bm{S}$
     in terms of the total angular momentum operator $\bm{J}=\bm{L}+\bm{S}$:
@@ -300,8 +298,7 @@
         =
         \frac{1}{2}\big[\bm{J}^2-\bm{L}^2-\bm{S}^2\big]
     \,.
-    \end{equation}%
-    %
+    \end{equation}
     For further simplification the square of the momentum operator is expressed
     in spherical co-ordinates,
     \begin{equation}
@@ -313,8 +310,7 @@
         =
         -\frac{\hbar^2}{r^2}\pdv{r}(r^2\pdv{r})+\frac{\bm{L}^2}{r^2}
     \,.
-    \end{equation}%
-    %
+    \end{equation}
     The second contribution is the standard centrifugal energy contribution,
     analogously to the Kepler problem. With these simplification we rewrite the
     Hamiltonian as
@@ -329,17 +325,16 @@
         =
         \frac{\bm{L}^2}{2mr^2}+V(r;\bm{L}^2,\bm{S}^2,\bm{J}^2)
     \,.
-    \end{equation}%
-    %
+    \end{equation}
     The full Hilbert space this Hamiltonian acts on is split into an angular
     momentum factor and a radial one. By construction, a basis of the angular
     momentum Hilbert space is given by the states $\ket*{l,s,j,m_j}$, which are
     eigenstates of $\bm{L}^2$, $\bm{S}^2$, $\bm{J}^2$, and $J_z$, i.e.,
-    constitute the coupled basis, also called `fine-structure basis'. Note that
+    constitute the coupled basis, also called `fine-structure' basis. Note that
     it must be possible to construct an eigenbasis of $\bm{L}^2$, $\bm{S}^2$,
     $\bm{J}^2$, and $J_z$ simultaneously, because they commute pairwise. In
     particular, these states are constructed as linear combinations of the
-    fine-structure basis states $Y_{l,m_l}\otimes\bm{\chi}_{s,m_s}$, employing
+    uncoupled basis states $Y_{l,m_l}\otimes\bm{\chi}_{s,m_s}$, employing
     Clebsch-Gordan coefficients. Here,
     $Y_{l,m_l}\colon[0,\pii]\times[0,2\pii]\to\mathbb{C}$ are spherical
     harmonics defined as (the so-called `Condon-Shortley phase' we include in
@@ -351,8 +346,7 @@
         \sqrt{\frac{2l+1}{4\pii}\frac{(l-m_l)!}{(l+m_l)!}}
         P^{m_l}_l(\cos(\vartheta))\,\ee^{\ii m_l \varphi}
     \,,
-    \end{equation}%
-    %
+    \end{equation}
     where the associated Legendre polynomials
     $P^{m_l}_l\colon[-1,1]\to\mathbb{R}$ are defined for $l=0,1,2,\dots$ and
     $m_l=0,1,\dots,l-1,l$, via the recursion relation
@@ -363,32 +357,28 @@
         -
         (l+m_l-1) P^{m_l}_{l-2}(x)
     \,,
-    \end{equation}%
-    %
+    \end{equation}
     with starting point
     \begin{equation}
         P^{m_l}_{m_l}(x)
         =
         (-1)^{m_l}\frac{(2m_l)!}{2^{m_l}m_l!} (1-x^2)^{m_l\slash{2}}
     \,,
-    \end{equation}%
-    %
+    \end{equation}
     in combination with $P^{m_l}_l(x)=0$ for $l<m_j$. Negative values of $m_l$
     are treated with the relation
     \begin{equation}
         P^{-m_l}_l = (-1)^{m_l} \frac{(l-m_l)!}{(l+m_l)!}P^{m_l}_l
     \,.
-    \end{equation}%
-    %
+    \end{equation}
     Moreover, $\bm{\chi}_{s,m_s}$ are two-spinors defined as
     \begin{equation}\label{eq:twoSpinsors}
         \bm{\chi}_{\frac{1}{2},\frac{1}{2}}=\mqty[1 \\ 0]
     \,, \
         \bm{\chi}_{\frac{1}{2},-\frac{1}{2}}=\mqty[0 \\ 1]
     \,.
-    \end{equation}%
-    %
-    Explicitly, (for the case of interest $s=1\slash{2}$), we find the following
+    \end{equation}
+    Explicitly (for the case of interest $s=1\slash{2}$), we find the following
     expressions for the coupled basis states $\bm{\Phi}_{l,s,j,m_j}$:
     \begin{equation}\label{eq:coupledBasis}
         \bm{\Phi}_{l,s,j,m_j}
@@ -399,8 +389,7 @@
         \langle Y_{l,m_j+s}\otimes\bm{\chi}_{s,-s},\bm{\Phi}_{l,s,j,m_j} \rangle
         Y_{l,m_j+s}\otimes\bm{\chi}_{s,-s}
     \,,
-    \end{equation}%
-    %
+    \end{equation}
     where the scalar products are (possibly vanishing) Clebsch-Gordan
     coefficients. We further find that these states transform according to the
     irreducible representations of the group $\mathrm{SU}(2)$ under the action
@@ -424,8 +413,7 @@
         \equiv
         \bigoplus^j_{m_j=-j} H_{l,s,j}
     \,,
-    \end{equation}%
-    %
+    \end{equation}
     where (with the arbitrary choice $m_j=j$) we defined
     \begin{equation}
         H_{l,s,j}
@@ -436,8 +424,7 @@
         +
         V_\mathrm{eff}(r;\hbar^2l[l+1],\hbar^2s[s+1],\hbar^2j[j+1])
     \,.
-    \end{equation}%
-    %
+    \end{equation}
     We note that the fact that the matrix element does not depend on $m_j$ is a
     consequence of the $\mathrm{SU}(2)$-symmetry of the Hamiltonian. Therefore,
     exactly this is the reason for the energies being degenerate in the total
@@ -445,7 +432,7 @@
     no reason that the blocks $H_{l,s,j}$ are separate blocks for
     $l=j+1\slash{2}$ and $l=j-1\slash{2}$, because they correspond to the same
     irreducible representation $j$. However, the states we choose are already
-    chosen in a ways such that the blocks are already separated. In this case we
+    chosen in a way such that the blocks are already separated. In this case we
     know how we should choose the states already from the fact that the
     Hamiltonian explicitly depends on $\bm{L}$: if it would not be so obvious,
     we would not immediately know what the multiplicity index $l$ (and $s$)
@@ -456,30 +443,31 @@
     \begin{equation}\label{eq:radialEigenproblem}
         H_{l,s,j} R_{n,l,s,j} = E_{n,l,s,j} R_{n,l,s,j}
     \,,
-    \end{equation}%
-    %
+    \end{equation}
     where $R_{n,l,s}$ is the $n$-th (radial) eigenstate of $H_{l,s,j}$.
-    Therefore, if we manage to obtain $R_{n,l,s}$ the full spectrum is known.
+    Therefore, if we manage to obtain $R_{n,l,s,j}$ the full spectrum is known.
     Of course, resonances (states associated to the channel
     $\bm{\Phi}_{l,s,j,m_j}$ which are not bound) exist, but in the following we
     will focus on bound states.
 
-    \ind This is now the part where \alkcalc comes into play: the radial
-    eigenstates cannot be obtained analytically. \alkcalc provides a platform to
-    solve for these states numerically. To make the problem addressable by a
-    computer, we express the eigenproblem in terms of dimensionless quantities.
-    To this end we express the Hamiltonians $H_{l,s,j}$ in units of Hartree,
+    %%% SUBSECTION
+    \subsection{Numerical method}
+    \label{subsec:NumericalMathod}
+
+    The radial eigenstates, generally, cannot be obtained analytically.
+    \alkcalc provides a platform to solve for these states numerically. To make
+    the problem addressable by a computer, we express the eigenproblem in terms
+    of dimensionless quantities. To this end we express the Hamiltonians
+    $H_{l,s,j}$ in units of Hartree,
     $E_\mathrm{H}=1\slash{(4\pii\varepsilon_0a_\mathrm{B})}$, where
-    $a_\mathrm{B}=\hbar\slash{(m_\mathrm{e}c\alpha)}\approx52.9\,\mathrm{pm}$
-    ($m_\mathrm{e}$: electron mass) is Bohr's radius. The radial eigenfunctions
-    we parametrise as
+    $a_\mathrm{B}=\hbar\slash{(m_\mathrm{e}c\alpha)}\approx52.9\,\mathrm{pm}$ is
+    Bohr's radius. The radial eigenfunctions we parametrise as
     \begin{equation}\label{eq:fRconversion}
         R_{n,l,s,j}(r)
         =
         \frac{1}{\sqrt{\aB^3}}\frac{f_{n,l,s,j}(r\slash\aB)}{r\slash\aB}
         \,.
-    \end{equation}%
-    %
+    \end{equation}
     where $f_{n,l,s,j}$ is dimensionless. The eigenproblem in
     Eq.~\eqref{eq:radialEigenproblem} in the new eigenfunctions takes the form
     \begin{equation}\label{eq:eigenproblem}
@@ -495,21 +483,18 @@
         \bar{E}_{n,l,s,j}
         f_{n,l,s,j}(t)
     \,,
-    \end{equation}%
-    %
+    \end{equation}
     where we defined
     \begin{equation}
         C = \frac{1}{1+\me\slash{M}}
-    \end{equation}%
-    %
+    \end{equation}
     and the eigenenergies may be extracted from the relation
     \begin{equation}
         \frac{E_{l,s,j,n}}{E_\mathrm{H}}
         =
         \frac{\bar{E}_{n,l,s,j}}{C}
     \,.
-    \end{equation}%
-    %
+    \end{equation}
     Rewriting the normalisation condition in terms of the eigenfunctions
     $f_{n,l,s,j}$ leads to
     \begin{equation}\label{eq:normalisation}
@@ -522,35 +507,34 @@
         =
         \int^\infty_0\dd{t}f^2_{n,l,s,j}(t)
     \,.
-    \end{equation}%
-    %
+    \end{equation}
     Here we assumed that the (radial) eigenfunctions are real-valued, which is
     justified as the Hamiltonian is not only an hermitian but also a symmetric
     operator. In conclusion, computing the normalised eigenfunctions
     $f_{n,l,s,j}$ yields the (automatically normalised) radial eigenstates by
     employing Eq.~\eqref{eq:fRconversion} for the conversion.
 
-    \ind To solve the eigenproblem in Eq.~\eqref{eq:eigenproblem} numerically,
-    we employ a \ac{fem} instead of the conceptually (and programmatically) more
+    To solve the eigenproblem in Eq.~\eqref{eq:eigenproblem} numerically, we
+    employ a \ac{fem} instead of the conceptually (and programmatically) more
     simple \ac{fdm} for, mainly\footnote{It also helps to save some disk space,
     because one must store much less data to represent the eigenfunctions
     $f_{n,l,s,j}$. Typically, disk space is not a relevant factor these days,
     but we see no need to be unnecessarily wasteful with it either.}, one
     reason: With a \ac{fem} we are completely free in choosing the mesh (the
     position of the discretisation points) for the radial domain, while keeping
-    the associated finite dimensional matrix problem real and symmetric.  This
+    the associated finite-dimensional matrix problem real and symmetric. This
     is important because the problem we face presents itself with drastically
     different energy scales, introduced by the diverging potential: the
     eigenfunctions $f_{n,l,s,j}$ oscillate quickly for small arguments and
-    slowly for large ones, where the particle is almost free. Thus, a mesh
-    tailored to this behaviour leads to a significant reduction of computational
-    resources (the fast oscillation can be efficiently resolved without
-    introducing `too many' points in the slowly oscillating regime).
+    slowly for large ones, where the valence electron is almost free. Thus, a
+    mesh tailored to this behaviour leads to a significant reduction of
+    computational resources (the fast oscillation can be efficiently resolved
+    without introducing `too many' points in the slowly oscillating regime).
 
-    \ind The first step in setting up the \ac{fem} is to agree on a finite
-    closed interval $I=[0, t_\mathrm{tmax}]$, where $t_\mathrm{max}>0$ sets the
-    maximal value of the domain we consider. The value $t_\mathrm{max}$ must be
-    chosen large enough to ensure that the boundary condition
+    The first step in setting-up the \ac{fem} is to agree on a finite closed
+    interval $I=[0, t_\mathrm{tmax}]$, where $t_\mathrm{max}>0$ sets the maximal
+    value of the domain we consider. The value $t_\mathrm{max}$ must be chosen
+    large enough to ensure that the boundary condition
     $f_{n,l,s,j}(t\geq{t}_\mathrm{max})=0$ is fulfilled. This equal sign is
     actually never true, because the radial eigenstates asymptotically approach
     zero. However, if we reach zero up to machine precision, it is numerically
@@ -558,7 +542,7 @@
     be computed has support within this interval. The mesh we define as a family
     $(t_k)_{k=1,\dots,N-1}$ in $I$ with the properties $t_0=0$,
     $t_{N-1}=t_\mathrm{max}$, and $t_0<t_1<\dots<t_{N-2}<t_{N-1}$, where we say
-    $N\geq{3}$. Of course, typical values are $N\,{\sim}\,10^5\text{\,-\,}10^7$.
+    $N\geq{3}$. Of course, typical values are $N\,{\sim}\,10^5\text{-}10^7$.
     Next, we define the derived family of step sizes $(h_k)_{k=1,\dots,N-1}$,
     $h_k=t_k-t_{k-1}$. The elements $(\phi_k)_{k=0,\dots,N-1}$,
     $\phi_k\colon{I}\to[0,1]$, we define as
@@ -572,21 +556,19 @@
         \\  0                             \,, \ & \text{else}
         \end{cases}
     \,.
-    \end{equation}%
-    %
+    \end{equation}
     for $k=1,\dots,N-2$, and for $k=0$ and $k=N-1$ the Dirichlet boundary
     conditions $f_{n,l,s,j}(0)=f_{n,l,s,j}(t_\mathrm{max})$ lead to the
     canonical choice $\phi_0=\phi_{N-1}\equiv0$. To obtain a matrix problem
     which approximates Eq.~\eqref{eq:eigenproblem} we compute projections of it
-    onto the elements with the real scalar product (dummy functions
+    onto the elements with the real scalar product (`dummy' functions
     $\alpha,\beta\colon{I}\to\mathbb{R}$)
     \begin{equation}
         B(\alpha,\beta)
         =
         \int_I \dd{t} \alpha(t) \beta(t)
     \,.
-    \end{equation}%
-    %
+    \end{equation}
     To simplify the notation we fix the quantum numbers $n$, $l$, $s$, and $j$
     and say $f\equiv{f_{n,l,s,j}}$. Moreover, we collect all potential
     contributions into the new potential $v$, defined as
@@ -603,15 +585,13 @@
     \begin{equation}
         -\frac{1}{2}f''(t) + v(t) f(t) = \lambda f(t)
     \,.
-    \end{equation}%
-    %
+    \end{equation}
     Before we project this equation onto the elements, we approximately expand
     $f$ in them:
     \begin{equation}\label{eq:expansionOfState}
         f = \sum^{N-2}_{k=1} f_k \phi_k
     \,.
-    \end{equation}%
-    %
+    \end{equation}
     This expansion automatically fulfils the Dirichlet boundary conditions
     $f(0)=f(t_\mathrm{max})=0$. Projection, i.e., applying the map
     $B(\phi_k,\cdot)$ for all $k=1,\dots,N-2$, yields a matrix eigenproblem
@@ -620,14 +600,13 @@
     \begin{equation}\label{eq:matrixEigenproblem}
         (K+V) \bm{f} = \lambda M \bm{f}
     \,.
-    \end{equation}%
-    %
+    \end{equation}
     In this expression $M_{kk'}=B(\phi_k,\phi_{k'})$ is the so-called mass
     matrix, $K_{kk'}=B(\phi'_k,\phi'_{k'})\slash{2}$ the so-called stiffness
     matrix\footnote{Note that because the elements obey the Dirichlet boundary
     conditions $\phi_k(0)=\phi_k(t_\mathrm{max})=0$, $k=1,\dots,N-2$,
     integrating by parts allows to write
-    $B(\phi''_k,\phi_{k'})=-B(\phi'_k,\phi'_{k'})$.}
+    $B(\phi''_k,\phi_{k'})=-B(\phi'_k,\phi'_{k'})$.}, and
     $V_{kk'}=B(\phi_k,v\phi_{k'})$ the potential energy contribution. Each
     matrix is $(N-2)$-dimensional, since $k,k'=1,\dots,N-2$, and $M$ and $K$ can
     be computed analytically; in particular
@@ -640,8 +619,7 @@
               & h_3 & 2(h_3+h_4) & h_4 & \\
               & & \ddots & \ddots & h_{N-2} \\
               & & & h_{N-2} & 2(h_{N-2}+h_{N-1})]
-    \end{equation}%
-    %
+    \end{equation}
     and
     \begin{equation}
         K = \frac{1}{2}
@@ -654,8 +632,7 @@
                   & & & -\frac{1}{h_{N-2}} & \frac{1}{h_{N-2}}+\frac{1}{h_{N-1}}
                   ]
     \,.
-    \end{equation}%
-    %
+    \end{equation}
     Note that both of these matrices are symmetric. The potential matrix,
     generally, must be computed numerically. However, here we choose the simple
     approximation
@@ -665,8 +642,7 @@
         \frac{v(t_k)+v(t_{k'})}{2}
         M_{k{k'}}
     \,,
-    \end{equation}%
-    %
+    \end{equation}
     which is justified if the step size is small enough. Note that this
     particular choice of approximations keeps the matrix symmetric, such that
     $K+V$ is symmetric. Furthermore, $M$ represents a scalar product and is thus
@@ -674,7 +650,7 @@
     Eq.~\eqref{eq:matrixEigenproblem} can be efficiently solved with the Lanczos
     algorithm.
 
-    \ind Next, we express the normalisation condition in
+    Next, we express the normalisation condition in
     Eq.~\eqref{eq:normalisation} in terms of our elements and the vector
     $\bm{f}$. To this end we calculate
     \begin{equation}
@@ -690,13 +666,16 @@
         \overset{!}{=}
         1
     \,,
-    \end{equation}%
-    %
+    \end{equation}
     i.e., the length of $\bm{f}$ must be unity in the by the scalar product $M$
     induced norm $\norm*{\,\cdot\,}_M$.
 
-    \ind Finally, we compute radial matrix elements. To this end, we first
-    calculate for $p\in\mathbb{R}$ such that the integrals exist,
+    %%% SUBSECTION
+    \subsection{Radial matrix elements}
+    \label{subsec:RadialMatrixElements}
+
+    To compute radial matrix elements, we first calculate, for $p\in\mathbb{R}$
+    such that the integral exists,
     \begin{align}\label{eq:radialMatrixElement}
         \begin{split}
             \frac{r^{n,l,s,j;n',l',s',j'}_p}{\aB^p}
@@ -718,8 +697,7 @@
             B(f_{n,l,s,j}, \mathrm{id}^p f_{n',l',s',j'})
         \,.
         \end{split}
-    \end{align}%
-    %
+    \end{align}
     Here, `$\mathrm{id}$' denotes the identity on the non-negative real numbers.
     Next, we approximate this result with solutions to the matrix eigenproblem
     in Eq.~\eqref{eq:matrixEigenproblem}, i.e., we represent $f_{n,l,s,j}$ and
@@ -731,8 +709,7 @@
         \approx
         \bm{f}_{n,l,s,j}^\mathrm{T} R_p \bm{f}_{n',l',s',j'}
     \,,
-    \end{equation}%
-    %
+    \end{equation}
     where the components of the real symmetric matrix $R_p$ are defined as
     \begin{equation}
         (R_p)_{k,k'}
@@ -749,8 +726,7 @@
         0, & \text{else}
         \end{cases}
     \,.
-    \end{equation}%
-    %
+    \end{equation}
     To numerically compute the remaining integrals we use a two-point
     Gau\ss{i}an quadrature. This method approximates the integral as
     \cite{burden2011}:
@@ -773,18 +749,30 @@
     that for too large $p$ there can be numerical overflow or underflow when
     computing $t^p$. But, for 64-bit floating point arithmetic, $p=\pm10$ is
     easily possible (if the integral exists), such that, typically, all
-    practical cases are included. Explicitly, we could verify that for hydrogen
+    practical cases are included. Explicitly, we could verify that for Hydrogen
     the range $p=-2,\dots,10$ yields reasonably good results. Finally, we remark
     that one can improve on the precision by employing higher-order Gau\ss{i}an
     quadrature algorithms as described in \cite{burden2011}.
 
-    \clearpage%
+    %%% SUBSECTION
+    \subsection{Oscillator strengths}
+    \label{subsec:OscillatorStrengths}
 
-    %%% SECTION: MANUAL
+    The oscillator strength ...
+
+    %%% SUBSECTION
+    \subsection{State lifetimes}
+    \label{subsec:StateLifetimes}
+
+    To compute the lifetime of a fine-structure state ...
+
+    \clearpage
+
+    %%% SECTION
     \section{Manual}
-    \label{sec:manual}
+    \label{sec:Manual}
 
-    \ind Reference manual for the \alkcalc library functions. Prototypes for the
+    Reference manual for the \alkcalc library functions. Prototypes for the
     following functions are defined in the header `interface.d/alkcalc.h'.
 
     \sffamily%
@@ -881,8 +869,8 @@
             Eq.~\eqref{eq:expansionOfState}.\par%
             \texttt{double *t}: Array of length $N$, containing the mesh
             $(t_k)_{k=0,\dots,N-1}$.\par%
-            \texttt{double *h}: Array of length $N-1$, containing the family of
-            step sizes, $(h_k)_{k=1,\dots,N-1}$.\par%
+            \texttt{double *h}: Array of length $N-1$, containing the step
+            sizes, $(h_k)_{k=1,\dots,N-1}$.\par%
             \texttt{double *fnlsj}: Array of length $N-2$ containing the
             requested eigenvector $\bm{f}$. The components of $\bm{f}$ are the
             coefficients $f_k$ ($k=1,\dots,N-2$) defining the expansion in
