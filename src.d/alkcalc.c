@@ -21,6 +21,7 @@ static int64_t fac(int64_t);
 static int64_t euclid(int64_t, int64_t);
 static double complex Ylml(int32_t, int32_t, double, double);
 static double cgtofloat(alkcalc_cg);
+static double thermal_photon_occupation(double, double);
 
 /* -------------------------------------------------------------------------- *
  * Eigenenergy in units of Hartree (27.211386245981(30) eV Ref. [5])          *
@@ -454,21 +455,56 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
  * T       : Temperature of black-body excitation spectrum in Kelvin (K)      *
  * species : String specifying atom/ion species                               *
  * n       : Principal quantum number n = 1, 2, 3, ...                        *
+ * dn      : Consider up to (including) n+dn for absorption                   *
  * l       : Orbital angular momentum l = 1, 2, ..., n-1                      *
  * s       : Spin (Not an argument, since we always have s = 1/2!)            *
  * j       : Total angular momentum quantum number j = |l-1/2|, l+1/2         *
  * -------------------------------------------------------------------------- */
-double alkcalc_tau(double T, char *species, int32_t n, int32_t l, double j) {
+double alkcalc_tau(double T, char *species, int32_t n, int32_t dn, int32_t l,
+                   double j) {
 
-    int32_t lp1, lm1, nminlm1, nminlp1, np;
-    double kBT, tau, Ei, Eif, r;
+    int32_t nlp1, nlm1, nminlp1, nminlm1;
+    double En, Gamma, tau;
 
-    (double)j;
+    /* Get lowest n' such that E(n,l,s,l+s) < E(n',l',s,l'+s) is still true */
+    nminlp1 = 0;
+    nminlm1 = 0;
+    nlm1 = nlp1 = n;
+    En = alkcalc_Enlsj(species, n, l, j);
+    printf("%lf\n", En);
+    if (alkcalc_Enlsj(species, nlp1, l+1, l+.5) > En) { /* l'=l+1 */
+        nlp1--;
+        while ((alkcalc_Enlsj(species, nlp1, l+1, l+1.5) > En) && nminlp1 < nlp1)
+            nlp1--;
+        nlp1++;
+    } else {
+        nlp1++;
+        while (alkcalc_Enlsj(species, nlp1, l+1, l+1.5) < En) nlp1++;
+    }
+    if (!l) {nlm1 = -1; goto SkipedSState;}
+    if (alkcalc_Enlsj(species, nlp1, l-1, l-.5) > En) { /* l'=l+1 */
+        nlp1--;
+        while ((alkcalc_Enlsj(species, nlp1, l+1, l-.5) > En) && nminlm1 < nlp1)
+            nlp1--;
+        nlp1++;
+    } else {
+        nlp1++;
+        while (alkcalc_Enlsj(species, nlp1, l-1, l-.5) < En) nlp1++;
+    }
+SkipedSState:
 
-    /* Temperature factor in units of Hartree */
-    kBT = 3.166812e-6*T;
+    printf("%d\n", nlp1);
+    printf("%d\n", nlm1);
 
-    return 1.;
+    /* Absorption */
+    Gamma = 1.; /* FIXME !!! */
+
+    /* Emission */
+
+    /* Compute lifetime */
+    tau = 1./Gamma;
+
+    return tau;
 }
 
 /* -------------------------------------------------------------------------- *
@@ -675,4 +711,21 @@ static double complex Ylml(int32_t l, int32_t ml, double theta, double phi) {
 /* Convert symbolic Clebsch-Gordan coefficient into a floating-point number */
 static double cgtofloat(alkcalc_cg c) {
     return c.sign*sqrt(c.numerator/(double)c.denominator);
+}
+
+/* Thermal photon-occupation number at energy hnu and temperature T */
+static double thermal_photon_occupation(double hnu, double T) {
+
+    double kBT, r, n;
+
+    /* Temperature factor in units of Hartree */
+    kBT = 3.166811e-6*T; /* T in units of Kelvin (K) Ref. [5] */
+
+    /* Energy ratio */
+    r = hnu/kBT; /* hnu in units if Hartree */
+
+    /* Compute average number of photons (Plank's law) */
+    n = 1./(exp(r)-1.);
+
+    return n;
 }

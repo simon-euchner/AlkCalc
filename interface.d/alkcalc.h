@@ -170,10 +170,12 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
  * T       : Temperature of black-body excitation spectrum in Kelvin (K)      *
  * species : String specifying atom/ion species                               *
  * n       : Principal quantum number n = 1, 2, 3, ...                        *
+ * dn      : Consider up to (including) n+dn for absorption                   *
  * l       : Orbital angular momentum l = 1, 2, ..., n-1                      *
  * s       : Spin (Not an argument, since we always have s = 1/2!)            *
  * j       : Total angular momentum quantum number j = |l-1/2|, l+1/2         *
  * -------------------------------------------------------------------------- */
-double alkcalc_tau(double T, char *species, int32_t n, int32_t l, double j);
+double alkcalc_tau(double T, char *species, int32_t n, int32_t dn, int32_t l,
+                   double j);
 
 #endif
