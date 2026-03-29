@@ -709,7 +709,7 @@
             \frac{r^{n,l,s,j;n',l',s',j'}_p}{\aB^p}
             &\equiv
             \frac{1}{\aB^p} \langle R_{n,l,s,j},
-            \hat{r}^p R_{n',l',s',j'} \rangle
+            \mathrm{id}^p R_{n',l',s',j'} \rangle
             =
             \int^\infty_0 \dd{r} r^2
             R_{n,l,s,j}(r)
@@ -794,21 +794,23 @@
         f_{\mathrm{i}\to\mathrm{f}}
         =
         \sum^{j'}_{m'_j=-j'}
-        \frac{2}{3} E_\mathrm{f,i}
-        \abs*{\langle\bm{\Psi}_\mathrm{f},\bm{r}\bm{\Psi}_\mathrm{i}\rangle}^2
+        \frac{2}{3} \bar{E}_\mathrm{f,i}
+        \abs*{\langle\bm{\Psi}_\mathrm{f},
+                     \bm{r}\slash\aB\bm{\Psi}_\mathrm{i}\rangle}^2
     \,,
     \end{equation}
-    with the energy difference $E_\mathrm{f,i}=E_\mathrm{f}-E_\mathrm{i}$. Note
-    that we sum over the final $m'_j$, because we are interested in transitions
-    between the fine-structure states, without resolving the Zeeman levels. The
-    oscillator strength is a measure for how strongly the induced Hertzian
-    (electric) dipole oscillates: the radiated energy is large for spatially
-    large dipoles (captured by the matrix element) and fast oscillation
-    frequencies (captured by the energy difference). In principle, we already
-    have all the machinery to numerically compute this quantity, however, one
-    can reduce the expression to a much simpler form by using angular momentum
-    algebra, in particular, relations from \cite{varshalovic1988}. To simplify
-    the expression, we first use (Condon-Shortley phase)
+    with the energy difference
+    $\EH\bar{E}_\mathrm{f,i}=E_\mathrm{f}-E_\mathrm{i}$. Note that we sum over
+    the all final $m'_j$, because we are interested in transitions between the
+    fine-structure states without resolving the Zeeman sub-levels. The oscillator
+    strength is a measure for how strongly the induced Hertzian (electric)
+    dipole oscillates: the radiation power is large for spatially large dipoles
+    and fast oscillation frequencies, captured by the matrix element and energy
+    difference, respectively. In principle, we already have all the machinery
+    to numerically compute this quantity, however, one can reduce the expression
+    to a much simpler form by using angular momentum algebra, in particular,
+    relations from \cite{varshalovic1988}. To simplify the expression, we first
+    use (Condon-Shortley phase)
     \begin{equation}
         r_x
         =
@@ -827,8 +829,8 @@
     \begin{equation}
         f_{\mathrm{i}\to\mathrm{f}}
         =
-        \frac{4\pii}{3} \frac{2}{3} E_\mathrm{f,i}
-        \langle{R}_\mathrm{f},r^2R_\mathrm{i}\rangle^2
+        \frac{4\pii}{3} \frac{2}{3} \bar{E}_\mathrm{f,i}
+        \langle{r}R_\mathrm{f},r^2\slash\aB{r}R_\mathrm{i}\rangle^2
         \sum^{j'}_{m'_j=-j'}
         \sum^1_{q=-1}
         \abs*{\langle\bm{\Phi}_\mathrm{f},Y_{1,q}\bm{\Phi}_\mathrm{i}\rangle}^2
@@ -853,8 +855,8 @@
     \begin{equation}\label{eq:OscillatorStrengthSimplified}
         \sum_{m'_j} f_{\mathrm{i}\to\mathrm{f}}
         =
-        \frac{2}{3} E_\mathrm{f,i}
-        \abs*{\langle r R_{n',l',s,j'}, r^2 R_{n,l,s,j} \rangle}^2
+        \frac{2}{3} \bar{E}_\mathrm{f,i}
+        \abs*{\langle r R_{n',l',s,j'}, r^2\slash\aB R_{n,l,s,j} \rangle}^2
         a_l
     \,, \
         a_l
@@ -880,11 +882,11 @@
     \label{subsec:StateLifetimes}
 
     To compute the lifetime of a fine-structure state, we need to calculate the
-    so-called `Einstein-A coefficient' \cite{einstein1917,friedrich2017}. It is
-    a rate, that describes the number of spontaneous emissions per unit time.
-    Therefore, the total decay rate, at zero temperature is given by the sum
-    over all Einstein-A coefficients. In the dipole approximation this sum is
-    given by the expression \cite{friedrich2017}:
+    so-called `Einstein-A' coefficient \cite{einstein1917,friedrich2017}. It is
+    a rate, that describes the number of spontaneous emissions per unit time at
+    zero temperature. The total decay rate, at zero temperature, is given by the
+    sum over all Einstein-A coefficients. In the dipole approximation this sum
+    is given by the expression \cite{friedrich2017}:
     \begin{equation}\label{eq:DecayRateGeneralForm}
         A_\mathrm{i}
         =
@@ -893,29 +895,28 @@
     \,, \
         A_{\mathrm{i}\to\mathrm{f}}
         =
-        \frac{4}{3} \alpha^2 E^3_\mathrm{i,f}
+        \frac{\EH}{\hbar} \frac{4}{3} \alpha^2 \bar{E}^3_\mathrm{i,f}
         \sum_{u=x,y,z}
         \abs*{\langle\bm{\Psi}_\mathrm{f},r_u\bm{\Psi}_\mathrm{i}\rangle}^2
     \,.
     \end{equation}
-    In terms of the oscillator strength $f_{\mathrm{i}\to\mathrm{f}}$ this
-    expression simply becomes
+    In terms of the oscillator strength we obtain
     \begin{equation}
         A_\mathrm{i}
         =
-        2 \alpha^3
+        \frac{2\alpha^3\EH}{\hbar}
         \sum_{n',l',j'}
         E^2_\mathrm{i,f} f_{\mathrm{f}\to\mathrm{i}}
     \,.
     \end{equation}
     This is the rate of spontaneous emission which only appears for transitions
     where $E_\mathrm{i}>E_\mathrm{f}$. Note that, implicitly, this restricts the
-    quantum numbers the sum is running over. This is the correct decay rate only
-    in the zero temperature case. For finite temperature, spontaneous
-    transitions increasing the energy can also be driven, for sufficiently
-    strong thermal fluctuations. The background spectral density is given by
-    Plank's law, which yields for the average photon number at frequency
-    $\omega$ and temperature $T$:
+    quantum numbers the sum is running over. Further, this is the correct decay
+    rate only for zero temperature case. At finite temperature, spontaneous
+    transitions increasing the energy may be driven as well, if thermal
+    fluctuations are sufficiently strong. The background spectral density is
+    given by Plank's law, which yields for the average photon number at
+    frequency $\omega$ and temperature $T$:
     \begin{equation}
         n(\omega,T)
         =
@@ -926,23 +927,23 @@
     \cite{einstein1917} it follows that the total rate for decay out of the
     initial state is
     \begin{equation}
-        \Gamma
+        \frac{\hbar}{\EH}\Gamma
         =
         2\alpha^3
         \sum_{n',l',j'}
-        E^2_\mathrm{i,f} f_{\mathrm{f}\to\mathrm{i}}
-        (1+n(E_\mathrm{i,f},T))
+        \bar{E}^2_\mathrm{i,f} f_{\mathrm{f}\to\mathrm{i}}
+        (1+n(E_\mathrm{i,f}\slash\hbar,T))
         +
         \sum_{n',l',j'}
-        E^2_\mathrm{f,i} f_{\mathrm{i}\to\mathrm{f}}
-        (1+n(E_\mathrm{i,f},T))
+        \bar{E}^2_\mathrm{f,i} f_{\mathrm{i}\to\mathrm{f}}
+        (1+n(E_\mathrm{f,i}\slash\hbar,T))
     \,,
     \end{equation}
-    where each sum only runs over quantum numbers such that the associated
-    term is positive. This means, the first contribution is only over final
-    state with lower energy and the second one only over final states with
-    larger energy the initial state. With this formula the lifetime of a
-    fine-structure state can then be computed as $\tau=\Gamma^{-1}$.
+    where each sum only runs over quantum numbers such that the associated term
+    is positive. That is, the first sum is only over final states with lower,
+    and the second one only over final states with larger, energy than the
+    initial state. With this formula, the lifetime of a fine-structure state is
+    $\tau=\Gamma^{-1}$.
 
     \clearpage
 
@@ -1061,14 +1062,13 @@
         alkcalc\tus{rp}
     }{
         Radial matrix element with arbitrary power $p\in\mathbb{R}$ [see
-        Eq.~\eqref{eq:radialMatrixElement}]. Note that for too large and too
-        negative $p$ the result's numerical error increases due to the finite
-        precision used to compute differences of large numbers (catastrophic
-        cancellation). To check for validity, use $\mathrm{^1H}$ (Hydrogen atom)
-        and $\mathrm{^2He^+}$ (Helium ion) as a benchmark for atoms and ions,
-        respectively. It is the user's responsibility to ensure that the
+        Eq.~\eqref{eq:radialMatrixElement}]. For too large powers $\abs*{p}>10$,
+        the there is the risk of numerical over or underflow of the 64-bit
+        floating point arithmetic. Generally, $\mathrm{^1H}$ (Hydrogen atom) and
+        $\mathrm{^2He^+}$ (Helium ion) can be used as a benchmark for atoms and
+        ions, respectively. It is the user's responsibility to ensure that the
         integral associated to the desired matrix element exists. In case it
-        does not, the returned values is wrong and no error is thrown.
+        does not, the returned value is wrong and no error is thrown.
     }
         \sdocarg{char *species}{
             String to specify atom/ion species, e.g., \texttt{1H} for Hydrogen,
@@ -1300,69 +1300,62 @@
     {
         alkcalc\tus{fitof}
     }{
-        Oscillator strength for the transition between an initial state
-        $\psi_\mathrm{i}$ and a final state $\psi_\mathrm{f}$. The dimensionless
-        oscillator strength is defined as
-        \begin{equation}
-            f_{\mathrm{i\to{f}}}
-            =
-            \sum_{m_\mathrm{f}}
-            \frac{2}{3}
-            \frac{\me\omega_\mathrm{if}}{\hbar}
-            \norm*{\langle \psi_\mathrm{i}, \bm{r}\psi_\mathrm{f} \rangle}^2
-        \,,
-        \end{equation}
-        with the angular transition frequency
-        $\omega_\mathrm{if}=(E_\mathrm{f}-E_\mathrm{i})\slash\hbar$ and the
-        fine-structure energies $E_\mathrm{i}$ and $E_\mathrm{f}$ of the initial
-        and final state, respectively, which are computable with the provided
-        function \texttt{alkcalc\tus{E}nlsj}.
+        Oscillator strength, for the transition between an initial state
+        $\bm{\Psi}_\mathrm{i}$ and a final state $\bm{\Psi}_\mathrm{f}$, as
+        defined in Subsec.~\ref{subsec:OscillatorStrengths}, that is, it was
+        already summed over the magnetic quantum number $m'_j$ of the final
+        state.
     }
         \sdocarg{char *species}{
             String to specify atom/ion species, e.g., \texttt{1H} for Hydrogen,
             or \texttt{88SR+} for the $\mathrm{^{88}Sr^+}$ ion.
         }
         \sdocarg{int32\tus{t} ni}{
-            Principal quantum number of the initial state $\psi_\mathrm{i}$.
+            Principal quantum number of the initial state
+            $\bm{\Psi}_\mathrm{i}$.
         }
         \sdocarg{int32\tus{t} li}{
             Orbital angular momentum quantum number $l=1,2,\dots,n-1$ of the
-            initial state $\psi_\mathrm{i}$.
+            initial state $\bm{\Psi}_\mathrm{i}$.
         }
         \sdocarg{double si}{
-            Electron spin quantum number of the initial state $\psi_\mathrm{i}$.
-            Not an argument here, since $s=1\slash{2}$ is always assumed.
+            Electron spin quantum number of the initial state
+            $\bm{\Psi}_\mathrm{i}$. Not an argument here, since $s=1\slash{2}$
+            is always assumed.
         }
         \sdocarg{double ji}{
             Total angular momentum quantum number of the initial state
-            $\psi_\mathrm{i}$., $j$. Here, the following convention is applied:
+            $\bm{\Psi}_\mathrm{i}$, $j$. Here, the following convention is applied:
             For $j\in[k,k+1)$, $k=0,1,2,\dots$, the library internally uses the
             (half-integer) value $(2k+1)\slash{2}$. For instance, this means
             that for $j=0.49999$ and $j=0.50001$ the software internally uses
             $j=1\slash{2}$ in both cases.
         }
         \sdocarg{int32\tus{t} nf}{
-            Principal quantum number of the final state $\psi_\mathrm{f}$.
+            Principal quantum number of the final state $\bm{\Psi}_\mathrm{f}$.
         }
         \sdocarg{int32\tus{t} lf}{
             Orbital angular momentum quantum number $l=1,2,\dots,n-1$ of the
-            final state $\psi_\mathrm{f}$.
+            final state $\bm{\Psi}_\mathrm{f}$.
         }
         \sdocarg{double sf}{
-            Electron spin quantum number of the final state $\psi_\mathrm{f}$.
-            Not an argument here, since $s=1\slash{2}$ is always assumed.
+            Electron spin quantum number of the final state
+            $\bm{\Psi}_\mathrm{f}$. Not an argument here, since $s=1\slash{2}$
+            is always assumed.
         }
         \sdocarg{double jf}{
             Total angular momentum quantum number of the final state
-            $\psi_\mathrm{i}$., $j$. Here, the following convention is applied:
-            For $j\in[k,k+1)$, $k=0,1,2,\dots$, the library internally uses the
-            (half-integer) value $(2k+1)\slash{2}$. For instance, this means
-            that for $j=0.49999$ and $j=0.50001$ the software internally uses
-            $j=1\slash{2}$ in both cases.
+            $\bm{\Psi}_\mathrm{f}$, $j$. Here, the following convention is
+            applied: For $j\in[k,k+1)$, $k=0,1,2,\dots$, the library internally
+            uses the (half-integer) value $(2k+1)\slash{2}$. For instance, this
+            means that for $j=0.49999$ and $j=0.50001$ the software internally
+            uses $j=1\slash{2}$ in both cases.
         }
         \sdocret{double fitof}{
             $f_\mathrm{i\to{f}}$ is the oscillator strength of the selected
-            electronic transition.
+            electronic transition, summed over $m'_j$ of the final state. Note
+            that because of this sum, it is the same for all $m_j$ of this
+            initial state.
         }
     \end{sdocfun}%
     %
