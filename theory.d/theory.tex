@@ -923,17 +923,26 @@
     \,,
     \end{equation}
     where $k_\mathrm{B}$ is Boltzmann's constant. From Einstein's rate equations
-    \cite{einstein1917} it follows that the rate of photon emission is
+    \cite{einstein1917} it follows that the total rate for decay out of the
+    initial state is
     \begin{equation}
-        A_\mathrm{i}(T)
+        \Gamma
         =
-        A_\mathrm{i} (1+n(\omega,T))
-    \,.
+        2\alpha^3
+        \sum_{n',l',j'}
+        E^2_\mathrm{i,f} f_{\mathrm{f}\to\mathrm{i}}
+        (1+n(E_\mathrm{i,f},T))
+        +
+        \sum_{n',l',j'}
+        E^2_\mathrm{f,i} f_{\mathrm{i}\to\mathrm{f}}
+        (1+n(E_\mathrm{i,f},T))
+    \,,
     \end{equation}
-    ...
-
-
-
+    where each sum only runs over quantum numbers such that the associated
+    term is positive. This means, the first contribution is only over final
+    state with lower energy and the second one only over final states with
+    larger energy the initial state. With this formula the lifetime of a
+    fine-structure state can then be computed as $\tau=\Gamma^{-1}$.
 
     \clearpage
 
