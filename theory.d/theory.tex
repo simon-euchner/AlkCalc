@@ -53,6 +53,9 @@
 \usepackage{tikz,color,xcolor}
 \graphicspath{{./}}
 
+%%% TABLES
+\usepackage{booktabs}
+
 %%% ALIGN TEXT
 \usepackage{enumerate}
 
@@ -104,6 +107,7 @@
 \newcommand{\aB}{a_\mathrm{B}}
 \newcommand{\me}{m_\mathrm{e}}
 \newcommand{\EH}{E_\mathrm{H}}
+\newcommand{\kBT}{k_\mathrm{B}T}
 \newcommand{\alkcalc}{\texttt{AlkCalc} }
 \newcommand{\figref}[2]{Fig.~\hyperref[#1]{\ref{#1}(#2)}}
 \newcommand{\tus}{\rule{2mm}{.7pt}}
@@ -118,6 +122,30 @@
         $\langle$\texttt{euchner.se@gmail.com}$\rangle$}%
        }
 \date{20.08.2025}
+
+%%% TABLES
+\def\TabAngularFactors{
+    \begin{table}[t]
+        \centering
+        \begin{tabular}{lllc}
+            \toprule
+            $(l,j)$ & $\mapsto$ & $(l',j')$ & $a_L$ \\
+            \midrule
+            $(l,l+s)$ & $\mapsto$ & $(l+1,l+s)$  & $\frac{1}{(2l+3)(2l+1)}$ \\
+            $(l,l-s)$ & $\mapsto$ & $(l+1,l+s)$  & $\frac{l+1}{2l+1}$       \\
+            $(l,l+s)$ & $\mapsto$ & $(l+1,l+3s)$ & $\frac{l+2}{2l+3}$       \\
+            $(l,l-s)$ & $\mapsto$ & $(l-1,l-s)$  & $\frac{1}{(2l+1)(2l-1)}$ \\
+            $(l,l+s)$ & $\mapsto$ & $(l-1,l-s)$  & $\frac{l}{2l+1}$         \\
+            $(l,l-s)$ & $\mapsto$ & $(l-1,l-3s)$ & $\frac{l-1}{2l-1}$       \\
+            \bottomrule
+        \end{tabular}
+        \caption{\textbf{Angular factors.} Table containing the angular factors
+                 $a_l$ [see Eq.~\eqref{eq:OscillatorStrengthSimplified}] for
+                 computing oscillator strengths. Throughout this table,
+                 $s=1\slash{2}$.}
+        \label{tab:AngularFactors}
+    \end{table}
+}
 
 
 
@@ -758,13 +786,154 @@
     \subsection{Oscillator strengths}
     \label{subsec:OscillatorStrengths}
 
-    The oscillator strength ...
+    The so-called `oscillator strength', for a transition from an initial state
+    $\bm{\Psi}_\mathrm{i}\equiv\bm{\Psi}_{n',l',s,j',m'_j}$ to a final state
+    $\bm{\Psi}_\mathrm{f}\equiv\bm{\Psi}_{n,l,s,j,m_j}$ is
+    \cite{friedrich2017}
+    \begin{equation}
+        f_{\mathrm{i}\to\mathrm{f}}
+        =
+        \sum^{j'}_{m'_j=-j'}
+        \frac{2}{3} E_\mathrm{f,i}
+        \abs*{\langle\bm{\Psi}_\mathrm{f},\bm{r}\bm{\Psi}_\mathrm{i}\rangle}^2
+    \,,
+    \end{equation}
+    with the energy difference $E_\mathrm{f,i}=E_\mathrm{f}-E_\mathrm{i}$. Note
+    that we sum over the final $m'_j$, because we are interested in transitions
+    between the fine-structure states, without resolving the Zeeman levels. The
+    oscillator strength is a measure for how strongly the induced Hertzian
+    (electric) dipole oscillates: the radiated energy is large for spatially
+    large dipoles (captured by the matrix element) and fast oscillation
+    frequencies (captured by the energy difference). In principle, we already
+    have all the machinery to numerically compute this quantity, however, one
+    can reduce the expression to a much simpler form by using angular momentum
+    algebra, in particular, relations from \cite{varshalovic1988}. To simplify
+    the expression, we first use (Condon-Shortley phase)
+    \begin{equation}
+        r_x
+        =
+        \sqrt{\frac{2\pii}{3}} r (Y_{1,-1}-Y_{1,1})
+    \,, \
+        r_y
+        =
+        \ii \sqrt{\frac{2\pii}{3}} r (Y_{1,-1}+Y_{1,1})
+    \,, \
+        r_z
+        =
+        \sqrt{\frac{4\pii}{3}} r Y_{1,0}
+    \,.
+    \end{equation}
+    With this, the oscillator strength becomes
+    \begin{equation}
+        f_{\mathrm{i}\to\mathrm{f}}
+        =
+        \frac{4\pii}{3} \frac{2}{3} E_\mathrm{f,i}
+        \langle{R}_\mathrm{f},r^2R_\mathrm{i}\rangle^2
+        \sum^{j'}_{m'_j=-j'}
+        \sum^1_{q=-1}
+        \abs*{\langle\bm{\Phi}_\mathrm{f},Y_{1,q}\bm{\Phi}_\mathrm{i}\rangle}^2
+    \end{equation}
+    Employing relations from \cite[p.~236,244,260,445,496]{varshalovic1988} one
+    can show that the remaining matrix element is
+    \begin{equation}
+        \langle \bm{\Phi}_\mathrm{f}, Y_{1,q}\bm{\Phi}_\mathrm{i} \rangle
+        =
+        (-1)^{j'+j+1+l'+s-m'_j}
+        \sqrt{\frac{3}{4\pii}}
+        \mqty(j' & 1 & j \\ -m'_j & q & m_j)
+        \sqrt{(2j+1)(2j'+1)(2l+1)}
+        \bigg\{\mqty{l & s & j \\ j' & 1 & l'}\bigg\}
+        C^{l,0,1,0}_{l',0}
+    \,,
+    \end{equation}
+    expressed in terms of a Wigner $3jm$-symbol, a Wigner $6j$-symbol, and a
+    Clebsch-Gordan coefficient. With symmetry relations and a sum rule from
+    \cite[p.~236,259]{varshalovic1988} we can compute the sum over $q$ and
+    $m'_j$ in the expression for the oscillator strength, which yields
+    \begin{equation}\label{eq:OscillatorStrengthSimplified}
+        \sum_{m'_j} f_{\mathrm{i}\to\mathrm{f}}
+        =
+        \frac{2}{3} E_\mathrm{f,i}
+        \abs*{\langle r R_{n',l',s,j'}, r^2 R_{n,l,s,j} \rangle}^2
+        a_l
+    \,, \
+        a_l
+        =
+        l_\mathrm{max} (2j'+1)
+        \bigg\{\mqty{l & s & j \\ j' & 1 & l'}\bigg\}^2
+    \,,
+    \end{equation}
+    where $l_\mathrm{max}=\mathrm{max}(l,l')$. There are only six transitions
+    for which $a_l$ is non-zero. Using relations from
+    \cite[p.~298,300]{varshalovic1988} we arrive at the results shown in
+    Tab.~\ref{tab:AngularFactors}. With this is is now straight-forward to
+    compute the oscillator strengths numerically with a computer program. As a
+    final remark, note that the oscillator strength does not depend on $m_j$ any
+    more, i.e., by summing over final states, we find that the oscillators for
+    different $m_j$ all have the same strength.
+
+    %%% TABLE
+    \TabAngularFactors
 
     %%% SUBSECTION
     \subsection{State lifetimes}
     \label{subsec:StateLifetimes}
 
-    To compute the lifetime of a fine-structure state ...
+    To compute the lifetime of a fine-structure state, we need to calculate the
+    so-called `Einstein-A coefficient' \cite{einstein1917,friedrich2017}. It is
+    a rate, that describes the number of spontaneous emissions per unit time.
+    Therefore, the total decay rate, at zero temperature is given by the sum
+    over all Einstein-A coefficients. In the dipole approximation this sum is
+    given by the expression \cite{friedrich2017}:
+    \begin{equation}\label{eq:DecayRateGeneralForm}
+        A_\mathrm{i}
+        =
+        \sum_\mathrm{f}
+        A_{\mathrm{i}\to\mathrm{f}}
+    \,, \
+        A_{\mathrm{i}\to\mathrm{f}}
+        =
+        \frac{4}{3} \alpha^2 E^3_\mathrm{i,f}
+        \sum_{u=x,y,z}
+        \abs*{\langle\bm{\Psi}_\mathrm{f},r_u\bm{\Psi}_\mathrm{i}\rangle}^2
+    \,.
+    \end{equation}
+    In terms of the oscillator strength $f_{\mathrm{i}\to\mathrm{f}}$ this
+    expression simply becomes
+    \begin{equation}
+        A_\mathrm{i}
+        =
+        2 \alpha^3
+        \sum_{n',l',j'}
+        E^2_\mathrm{i,f} f_{\mathrm{f}\to\mathrm{i}}
+    \,.
+    \end{equation}
+    This is the rate of spontaneous emission which only appears for transitions
+    where $E_\mathrm{i}>E_\mathrm{f}$. Note that, implicitly, this restricts the
+    quantum numbers the sum is running over. This is the correct decay rate only
+    in the zero temperature case. For finite temperature, spontaneous
+    transitions increasing the energy can also be driven, for sufficiently
+    strong thermal fluctuations. The background spectral density is given by
+    Plank's law, which yields for the average photon number at frequency
+    $\omega$ and temperature $T$:
+    \begin{equation}
+        n(\omega,T)
+        =
+        \frac{1}{\exp(\hbar\omega\slash\kBT)-1}
+    \,,
+    \end{equation}
+    where $k_\mathrm{B}$ is Boltzmann's constant. From Einstein's rate equations
+    \cite{einstein1917} it follows that the rate of photon emission is
+    \begin{equation}
+        A_\mathrm{i}(T)
+        =
+        A_\mathrm{i} (1+n(\omega,T))
+    \,.
+    \end{equation}
+    ...
+
+
+
 
     \clearpage
 
@@ -889,9 +1058,8 @@
         cancellation). To check for validity, use $\mathrm{^1H}$ (Hydrogen atom)
         and $\mathrm{^2He^+}$ (Helium ion) as a benchmark for atoms and ions,
         respectively. It is the user's responsibility to ensure that the
-        integral associated to the desired matrix element exists. In case is
-        does not, the returned values is wrong and no error is thrown (see also
-        the discussion on p.~\pageref{page:divergingIntegral}).
+        integral associated to the desired matrix element exists. In case it
+        does not, the returned values is wrong and no error is thrown.
     }
         \sdocarg{char *species}{
             String to specify atom/ion species, e.g., \texttt{1H} for Hydrogen,
