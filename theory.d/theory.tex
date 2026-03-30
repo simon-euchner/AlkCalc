@@ -1198,6 +1198,7 @@
             Clebsch-Gordan coefficient.\par%
             \texttt{int64\tus{t} denominator}: Denominator, $\mu$, of the
             Clebsch-Gordan coefficient.\par%
+            \noindent
             The requested Clebsch-Gordan coefficient is given by
             $\sigma\sqrt{\nu\slash\mu}$. Euklid's algrithm is employed to reduce
             $\nu$ and $\mu$. This representation allows to obtain Clebsch-Gordan
@@ -1271,11 +1272,9 @@
         }
         \sdocarg{double j}{
             Total angular momentum quantum number
-            $j=\abs*{l-1\slash{2}},l+1\slash{2}$. Here, the following convention
-            is applied: For $j\in[k,k+1)$, $k=0,1,2,\dots$, the library
-            internally uses the (half-integer) value $(2k+1)\slash{2}$. For
-            instance, this means that for $j=0.49999$ and $j=0.50001$ the
-            software internally uses $j=1\slash{2}$ in both cases.
+            $j=\abs*{l-1\slash{2}},l+1\slash{2}$. Here, the same convention as
+            for the half-integer inputs in \texttt{alkcalc\tus{cj1m1j2m2j3m3}}
+            applies.
         }
         \sdocarg{double mj}{
             Magnetic quantum number of total angular momentum, $m_j$. Regarding
@@ -1325,11 +1324,10 @@
         }
         \sdocarg{double ji}{
             Total angular momentum quantum number of the initial state
-            $\bm{\Psi}_\mathrm{i}$, $j$. Here, the following convention is applied:
-            For $j\in[k,k+1)$, $k=0,1,2,\dots$, the library internally uses the
-            (half-integer) value $(2k+1)\slash{2}$. For instance, this means
-            that for $j=0.49999$ and $j=0.50001$ the software internally uses
-            $j=1\slash{2}$ in both cases.
+            $\bm{\Psi}_\mathrm{i}$, $j$. Total angular momentum quantum number
+            $j=\abs*{l-1\slash{2}},l+1\slash{2}$. Here, the same convention as
+            for the half-integer inputs in \texttt{alkcalc\tus{cj1m1j2m2j3m3}}
+            applies.
         }
         \sdocarg{int32\tus{t} nf}{
             Principal quantum number of the final state $\bm{\Psi}_\mathrm{f}$.
@@ -1345,11 +1343,8 @@
         }
         \sdocarg{double jf}{
             Total angular momentum quantum number of the final state
-            $\bm{\Psi}_\mathrm{f}$, $j$. Here, the following convention is
-            applied: For $j\in[k,k+1)$, $k=0,1,2,\dots$, the library internally
-            uses the (half-integer) value $(2k+1)\slash{2}$. For instance, this
-            means that for $j=0.49999$ and $j=0.50001$ the software internally
-            uses $j=1\slash{2}$ in both cases.
+            $\bm{\Psi}_\mathrm{f}$, $j$. Here, the convention for \texttt{ji}
+            (see above) is adopted.
         }
         \sdocret{double fitof}{
             $f_\mathrm{i\to{f}}$ is the oscillator strength of the selected
