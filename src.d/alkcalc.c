@@ -22,6 +22,7 @@ static int64_t euclid(int64_t, int64_t);
 static double complex Ylml(int32_t, int32_t, double, double);
 static double cgtofloat(alkcalc_cg);
 static double thermal_photon_occupation(double, double);
+static void nextrm(char *, int32_t *, int32_t *, int32_t, double);
 
 /* -------------------------------------------------------------------------- *
  * Eigenenergy in units of Hartree (27.211386245981(30) eV Ref. [5])          *
@@ -352,7 +353,7 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
         printf("%s\n", "ERROR: J MUST BE LARGER EQUAL ABSOLUTE VALUE OF MJ\n");
         exit(1);
     }
-    if ((J%2 && !(MJ%2)) || (MJ%2 && !(J%2))) { /* Ensure (half-)int. */
+    if (J%2 != MJ%2) { /* Ensure (half-)int. */
         printf("%s\n", "ERROR: HALF-INTEGER J(MJ) BUT INTEGER MJ(J)\n");
         exit(1);
     }
@@ -405,8 +406,8 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
 
     /* Apply selection rules */
     JI = CONVERT(ji); JF = CONVERT(jf);
-    if ( (JI < 0) || (JF < 0) || (li < 0) || (lf < 0) ) return 0;
-    if ( (INTEGER_ABS(JF-JI) > 2) || (INTEGER_ABS(lf-li) != 1) ) return 0.;
+    if (JI < 0 || JF < 0 || li < 0 || lf < 0) return 0;
+    if (INTEGER_ABS(JF-JI) > 2 || INTEGER_ABS(lf-li) != 1) return 0.;
 
     /* Energy difference between initial (i) and final (f) state in Hartree */
     Efi = alkcalc_Enlsj(species, nf, lf, jf)-alkcalc_Enlsj(species, ni, li, ji);
@@ -420,22 +421,22 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
         if ( (JI == llp1) && (JF == llp1) ) {
             al = 1./((llp1+2)*llp1);
         } else
-        if ( (JI == llm1) && (JF == llp1) ) {
+        if (JI == llm1 && JF == llp1) {
             al = (li+1.)/llp1;
         } else
-        if ( (JI == llp1) && (JF == llp1+2) ) {
+        if (JI == llp1 && JF == llp1+2) {
             al = (li+2.)/(llp1+2);
         } else {
             return 0;
         }
     } else { /* lf-li = -1 */
-        if ( (JI == llm1) && (JF == llm1) ) {
+        if (JI == llm1 && JF == llm1) {
             al = 1./(llp1*llm1);
         } else
-        if ( (JI == llp1) && (JF == llm1) ) {
+        if (JI == llp1 && JF == llm1) {
             al = (double)li/llp1;
         } else
-        if ( (JI == llm1) && (JF == llp1-2) ) {
+        if (JI == llm1 && JF == llp1-2) {
             al = (li-1.)/llm1;
         } else {
             return 0;
@@ -463,40 +464,33 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
 double alkcalc_tau(double T, char *species, int32_t n, int32_t dn, int32_t l,
                    double j) {
 
-    int32_t nlp1, nlm1, nminlp1, nminlm1;
+    int32_t lp, lm, nlp1, nlm1, nmnlp1, nmxlp1, nmnlm1, nmxlm1;
     double En, Gamma, tau;
 
     /* Get lowest n' such that E(n,l,s,l+s) < E(n',l',s,l'+s) is still true */
-    nminlp1 = 0;
-    nminlm1 = 0;
-    nlm1 = nlp1 = n;
+    lp = l+1; lm = l-1;
+    nextrm(species, &nmnlp1, &nmxlp1, lp, lp+.5);
     En = alkcalc_Enlsj(species, n, l, j);
-    printf("%lf\n", En);
-    if (alkcalc_Enlsj(species, nlp1, l+1, l+.5) > En) { /* l'=l+1 */
-        nlp1--;
-        while ((alkcalc_Enlsj(species, nlp1, l+1, l+1.5) > En) && nminlp1 < nlp1)
-            nlp1--;
+    nlp1 = (n < nmnlp1) ? nmnlp1: n;
+    if (alkcalc_Enlsj(species, nlp1, lp, lp+.5) > En) { /* l'=l+1 */
+        while (nmnlp1 < --nlp1 && alkcalc_Enlsj(species, nlp1, lp, lp+.5) > En);
         nlp1++;
     } else {
-        nlp1++;
-        while (alkcalc_Enlsj(species, nlp1, l+1, l+1.5) < En) nlp1++;
+        while (alkcalc_Enlsj(species, ++nlp1, lp, lp+.5) < En);
     }
-    if (!l) {nlm1 = -1; goto SkipedSState;}
-    if (alkcalc_Enlsj(species, nlp1, l-1, l-.5) > En) { /* l'=l+1 */
-        nlp1--;
-        while ((alkcalc_Enlsj(species, nlp1, l+1, l-.5) > En) && nminlm1 < nlp1)
-            nlp1--;
-        nlp1++;
+    if (!l) { nlm1 = -1; goto SkipedSState; }
+    nextrm(species, &nmnlm1, &nmxlm1, lm, lm+.5);
+    nlm1 = (n < nmnlm1) ? nmnlm1: n;
+    if (alkcalc_Enlsj(species, nlm1, lm, lm+.5) > En) { /* l'=l-1 */
+        while (nmnlm1 < --nlm1 && alkcalc_Enlsj(species, nlm1, lm, lm+.5) > En);
+        nlm1++;
     } else {
-        nlp1++;
-        while (alkcalc_Enlsj(species, nlp1, l-1, l-.5) < En) nlp1++;
+        while (alkcalc_Enlsj(species, ++nlm1, lm, lm+.5) < En);
     }
 SkipedSState:
 
-    printf("%d\n", nlp1);
     printf("%d\n", nlm1);
-    printf("%d\n", CONVERT(1.5));
-    printf("%d\n", 2*(int32_t)1.5+1);
+    printf("%d\n", nlp1);
 
     /* Absorption */
     Gamma = 1.; /* FIXME !!! */
@@ -730,4 +724,28 @@ static double thermal_photon_occupation(double hnu, double T) {
     n = 1./(exp(r)-1.);
 
     return n;
+}
+
+/* Fetch extremal principle quantum numbers */
+static void nextrm(char *species, int32_t *nmin, int32_t *nmax, int32_t l,
+                   double j) {
+
+    char file[LEN_PATH_TO_ALKCALC+101], filename[101];
+    int32_t jj;
+    FILE *fd;
+
+    /* Open file for reading */
+    jj = 2*(int32_t)j+1;
+    (void)sprintf(filename, "data.d/energies-%s-%02d-%02d.dat", species, l, jj);
+    (void)strcpy(file, PATH_TO_ALKCALC);
+    (void)strcat(file, filename);
+    if (!(fd = fopen(file, "r"))) {
+        printf("%s\n", "ERROR: REQUESTED ENERGY SERIES IS NOT AVAILABLE");
+        exit(1);
+    }
+
+    /* Extract information */
+    move(fd, 9);
+    (void)fscanf(fd, "MINIMAL PRINCIPAL QUANTUM NUMBER: %d\n", nmin);
+    (void)fscanf(fd, "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %d\n", nmax);
 }
