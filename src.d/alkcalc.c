@@ -464,24 +464,24 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
 double alkcalc_tau(double T, char *species, int32_t n, int32_t dn, int32_t l,
                    double j) {
 
-    int32_t lp, lm, nlp1, nlm1, nmnlp1, nmxlp1, nmnlm1, nmxlm1;
+    int32_t lp, lm, nlp1, nlm1, nmnlp1, nmxlp1, nmnlm1, nmxlm1, k;
     double En, Gamma, tau;
 
     /* Get lowest n' such that E(n,l,s,l+s) < E(n',l',s,l'+s) is still true */
     lp = l+1; lm = l-1;
-    nextrm(species, &nmnlp1, &nmxlp1, lp, lp+.5);
     En = alkcalc_Enlsj(species, n, l, j);
+    nextrm(species, &nmnlp1, &nmxlp1, lp, lp+.5); /* l'=l+1 */
     nlp1 = (n < nmnlp1) ? nmnlp1: n;
-    if (alkcalc_Enlsj(species, nlp1, lp, lp+.5) > En) { /* l'=l+1 */
+    if (alkcalc_Enlsj(species, nlp1, lp, lp+.5) > En) {
         while (nmnlp1 < --nlp1 && alkcalc_Enlsj(species, nlp1, lp, lp+.5) > En);
         nlp1++;
     } else {
         while (alkcalc_Enlsj(species, ++nlp1, lp, lp+.5) < En);
     }
-    if (!l) { nlm1 = -1; goto SkipedSState; }
+    if (!l) { nlm1 = -1; goto SkipedSState; } /* l'=l-1 */
     nextrm(species, &nmnlm1, &nmxlm1, lm, lm+.5);
     nlm1 = (n < nmnlm1) ? nmnlm1: n;
-    if (alkcalc_Enlsj(species, nlm1, lm, lm+.5) > En) { /* l'=l-1 */
+    if (alkcalc_Enlsj(species, nlm1, lm, lm+.5) > En) {
         while (nmnlm1 < --nlm1 && alkcalc_Enlsj(species, nlm1, lm, lm+.5) > En);
         nlm1++;
     } else {
@@ -489,13 +489,18 @@ double alkcalc_tau(double T, char *species, int32_t n, int32_t dn, int32_t l,
     }
 SkipedSState:
 
-    printf("%d\n", nlm1);
-    printf("%d\n", nlp1);
-
     /* Absorption */
-    Gamma = 1.; /* FIXME !!! */
+    Gamma = 0.; /* FIXME !!! */
 
     /* Emission */
+    for (k=nlp1-1; k>=nmnlp1; k--) {
+        Gamma += 1.;
+    }
+    if (l) {
+        for (k=nlm1-1; k>=nmnlm1; k--) {
+            Gamma += 1.;
+        }
+    }
 
     /* Compute lifetime */
     tau = 1./Gamma;

@@ -17,8 +17,8 @@ int main(int argc, char **argv)
     /* Define initial and final state */
     int n, dn, l;
     double j;
-    n = 20; dn = 0; l = 0; j = .5;
-    printf("tau = %1.8lf\n\n", alkcalc_tau(0., "88SR+", n, dn, l, j));
+    n = 50; dn = 0; l = 0; j = .5;
+    printf("tau = %1.8lf\n\n", alkcalc_tau(0., "40CA+", n, dn, l, j));
 
     printf("%s\n", "--- End");
 
