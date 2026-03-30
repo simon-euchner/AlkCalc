@@ -464,8 +464,8 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
 double alkcalc_tau(double T, char *species, int32_t n, int32_t dn, int32_t l,
                    double j) {
 
-    int32_t lp, lm, nlp1, nlm1, nmnlp1, nmxlp1, nmnlm1, nmxlm1, k;
-    double En, Gamma, tau;
+    int32_t lp, lm, nlp1, nlm1, nmnlp1, nmxlp1, nmnlm1, nmxlm1, k, jj;
+    double En, Gamma, tau, hnu, al[6], fftoi, nocc;
 
     /* Get lowest n' such that E(n,l,s,l+s) < E(n',l',s,l'+s) is still true */
     lp = l+1; lm = l-1;
@@ -489,21 +489,57 @@ double alkcalc_tau(double T, char *species, int32_t n, int32_t dn, int32_t l,
     }
 SkipedSState:
 
+    /* Precompute angular factors */
+    al[0] = 1./((2*l+3)*(2*l+1)); /* (l,l+s) -> (l+1,l+s)  */
+    al[1] = (l+1.)/(2*l+1);       /* (l,l-s) -> (l+1,l+s)  */
+    al[2] = (l+2.)/(2*l+3);       /* (l,l+s) -> (l+1,l+3s) */
+    al[3] = 1./((2*l+1)*(2*l-1)); /* (l,l-s) -> (l-1,l-s)  */
+    al[4] = l/(2*l+1.);           /* (l,l+s) -> (l-1,l-s)  */
+    al[5] = (l-1.)/(2*l-1);       /* (l,l-s) -> (l-1,l-3s) */
+
     /* Absorption */
     Gamma = 0.; /* FIXME !!! */
 
     /* Emission */
-    for (k=nlp1-1; k>=nmnlp1; k--) {
-        Gamma += 1.;
-    }
-    if (l) {
-        for (k=nlm1-1; k>=nmnlm1; k--) {
-            Gamma += 1.;
+    jj = 2*(int32_t)j+1;
+    if (jj == 2*l+1) { /* j=l+s */
+        for (k=nlp1-1; k>=nmnlp1; k--) { /* l'=l+1 */
+            hnu = En - alkcalc_Enlsj(species, k, lp, l+.5); /* j'=l+s */
+            fftoi = alkcalc_fitof(species, k, lp, l+.5, n, l, j);
+            nocc = thermal_photon_occupation(hnu, T);
+            Gamma += al[0]*hnu*hnu*fftoi*(1.+nocc);
+            hnu = En - alkcalc_Enlsj(species, k, lp, l+1.5); /* j'=l+3s */
+            fftoi = alkcalc_fitof(species, k, lp, l+1.5, n, l, j);
+            nocc = thermal_photon_occupation(hnu, T);
+            Gamma += al[2]*hnu*hnu*fftoi*(1.+nocc);
+        }
+        for (k=nlm1-1; k>=nmnlm1; k--) { /* l'=l-1 */
+            hnu = En - alkcalc_Enlsj(species, k, lm, l+.5); /* j'=l+s */
+            fftoi = alkcalc_fitof(species, n, l, j, k, lm, l-.5);
+            nocc = thermal_photon_occupation(hnu, T);
+            Gamma += al[4]*hnu*hnu*fftoi*(1.+nocc);
+        }
+    } else { /* j=l-s */
+        for (k=nlp1-1; k>=nmnlp1; k--) { /* l'=l+1 */
+            hnu = En - alkcalc_Enlsj(species, k, lp, l+.5); /* j'=l+s */
+            fftoi = alkcalc_fitof(species, n, l, j, k, lp, l+.5);
+            nocc = thermal_photon_occupation(hnu, T);
+            Gamma += al[1]*hnu*hnu*fftoi*(1.+nocc);
+        }
+        for (k=nlm1-1; k>=nmnlm1; k--) { /* l=l-1 */
+            hnu = En - alkcalc_Enlsj(species, k, lm, l-.5); /* j'=l-s */
+            fftoi = alkcalc_fitof(species, k, lm, l-.5, n, l, j);
+            nocc = thermal_photon_occupation(hnu, T);
+            Gamma += al[3]*hnu*hnu*fftoi*(1.+nocc);
+            hnu = En - alkcalc_Enlsj(species, k, lm, l-1.5); /* j'=l-3s */
+            fftoi = alkcalc_fitof(species, k, lm, l-1.5, n, l, j);
+            nocc = thermal_photon_occupation(hnu, T);
+            Gamma += al[5]*hnu*hnu*fftoi*(1.+nocc);
         }
     }
 
     /* Compute lifetime */
-    tau = 1./Gamma;
+    tau = 1./Gamma * .5*1./4.134138*1e-6*137*137*137;
 
     return tau;
 }
@@ -723,7 +759,7 @@ static double thermal_photon_occupation(double hnu, double T) {
     kBT = 3.166811e-6*T; /* T in units of Kelvin (K) Ref. [5] */
 
     /* Energy ratio */
-    r = hnu/kBT; /* hnu in units if Hartree */
+    r = hnu/kBT; /* hnu in units of Hartree */
 
     /* Compute average number of photons (Plank's law) */
     n = 1./(exp(r)-1.);
