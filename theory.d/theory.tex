@@ -955,6 +955,17 @@
     Reference manual for the \alkcalc library functions. Prototypes for the
     following functions are defined in the header `interface.d/alkcalc.h'.
 
+    There is always a decision to be made when dealing with half-integer quantum
+    numbers numerically. Here we agree on the following: say $q$ is a quantum
+    number that may take half-integer values, e.g., $j$, $m_j$. To `clean-up'
+    the numerical value we do $2q\mapsto[2.0\times{q}+0.5]$. The `floor'
+    function is defined as $[x]=k\in\mathbb{Z}$ ($x\in\mathbb{R}$), where $k$ is
+    the unique integer such that $x\in[k,k+1)$. In practice, this means that for
+    any $q\in[-0.25,0.25)$ we use $q=-1\slash{2}$, for $q\in[0.25,0.75)$ we use
+    $q=1\slash{2}$, and so on, in both the negative and positive direction. In
+    the following manual, this convention is applied to all quantum numbers that
+    can take half-integer values, unless states otherwise.
+
     \sffamily%
     \pagestyle{plain}%
     \vspace*{12mm}\par%
@@ -977,16 +988,12 @@
             Orbital angular momentum quantum number $l=0,1,\dots,n-1$.
         }
         \sdocarg{double s}{
-            Electron spin quantum number. Not an argument here, since
-            $s=1\slash{2}$ is always assumed.
+            Electron spin quantum number. Not an argument, as $s=1\slash{2}$ is
+            always assumed.
         }
         \sdocarg{double j}{
             Total angular momentum quantum number
-            $j=\abs*{l-1\slash{2}},l+1\slash{2}$. Here, the following convention
-            is applied: For $j\in[k,k+1)$, $k=0,1,2,\dots$, the library
-            internally uses the (half-integer) value $(2k+1)\slash{2}$. For
-            instance, this means that for $j=0.49999$ and $j=0.50001$ the
-            software internally uses $j=1\slash{2}$ in both cases.
+            $j=\abs*{l-1\slash{2}},l+1\slash{2}$.
         }
         \sdocret{double E}{
             $E$ is the eigenenergy specified by the quantum numbers $n$, $l$,
@@ -1006,11 +1013,10 @@
         \texttt{alkcalc\tus{state}\tus{free}}.
     }
         \sdocarg{char result}{
-            Character specifying if the discretisation data \texttt{t} and
-            \texttt{h} is returned (see RETURN down below). If the argument
-            \texttt{result} is equal to \texttt{f} (full), the full result is
-            returned, and if \texttt{result} is equal to \texttt{p} (partial),
-            \texttt{t=h=NULL}.
+            Character for deciding if discretisation data is returned; see
+            RETURN down below. If \texttt{result} is \texttt{f} (full), the full
+            result is returned, and if \texttt{result} is \texttt{p} (partial),
+            the discretisation data is not returned.
         }
         \sdocarg{char *species}{
             String to specify atom/ion species, e.g., \texttt{1H} for Hydrogen,
@@ -1023,38 +1029,31 @@
             Orbital angular momentum quantum number $l=0,1,\dots,n-1$.
         }
         \sdocarg{double s}{
-            Electron spin quantum number. Not an argument here, since
-            $s=1\slash{2}$ is always assumed.
+            Electron spin quantum number. Not an argument, as $s=1\slash{2}$ is
+            always assumed.
         }
         \sdocarg{double j}{
             Total angular momentum quantum number
-            $j=\abs*{l-1\slash{2}},l+1\slash{2}$. Here, the following convention
-            is applied: For $j\in[k,k+1)$, $k=0,1,2,\dots$, the library
-            internally uses the (half-integer) value $(2k+1)\slash{2}$. For
-            instance, this means that for $j=0.49999$ and $j=0.50001$ the
-            software internally uses $j=1\slash{2}$ in both cases.
+            $j=\abs*{l-1\slash{2}},l+1\slash{2}$.
         }
         \sdocret{alkcalc\tus{state} *f}{
             \texttt{f} contains eight members: \texttt{N}, \texttt{dim},
             \texttt{t}, \texttt{h}, and \texttt{fnlsj}.\par%
-            \texttt{int32\tus{t} N}: Number of discretisation points $N$ in the
-            mesh, i.e., if $N=10$, the interval $[0,t_\mathrm{max}]$ is split
-            into $N-1=10-1=9$ intervals.\par%
+            \texttt{int32\tus{t} N}: Number of points, $N$, to discretise the
+            interval $[0,t_\mathrm{max}]$ (see Sec.~\ref{sec:Theory}).\par%
             \texttt{int32\tus{t} n}: Principal quantum number.\par%
             \texttt{int32\tus{t} l}: Orbital angular momentum quantum
             number.\par%
             \texttt{double j}: Total angular momentum quantum number.\par%
-            \texttt{int32\tus{t} dim}: Dimension of eigenproblem, i.e., $N-2$,
-            which is the number of elements appearing in the expansion in
-            Eq.~\eqref{eq:expansionOfState}.\par%
+            \texttt{int32\tus{t} dim}: Dimension of eigenproblem, i.e.,
+            $\text{\texttt{dim}}=N-2$ [see
+            Eq.~\eqref{eq:expansionOfState}].\par%
             \texttt{double *t}: Array of length $N$, containing the mesh
-            $(t_k)_{k=0,\dots,N-1}$.\par%
-            \texttt{double *h}: Array of length $N-1$, containing the step
-            sizes, $(h_k)_{k=1,\dots,N-1}$.\par%
-            \texttt{double *fnlsj}: Array of length $N-2$ containing the
-            requested eigenvector $\bm{f}$. The components of $\bm{f}$ are the
-            coefficients $f_k$ ($k=1,\dots,N-2$) defining the expansion in
-            Eq.~\eqref{eq:expansionOfState}.
+            $(t_k)_{k=0,\dots,N-1}$ (see Sec.~\ref{sec:Theory}).\par%
+            \texttt{double *h}: Array of length $N-1$, containing the steps
+            $(h_k)_{k=1,\dots,N-1}$ (see Sec.~\ref{sec:Theory}).\par%
+            \texttt{double *fnlsj}: \texttt{dim}-dimensional eigenvector
+            $\bm{f}$ [see Eq.~\eqref{eq:expansionOfState}].
         }
     \end{sdocfun}%
     %
@@ -1062,14 +1061,14 @@
     {
         alkcalc\tus{rp}
     }{
-        Radial matrix element with arbitrary power $p\in\mathbb{R}$ [see
-        Eq.~\eqref{eq:radialMatrixElement}]. For too large powers $\abs*{p}>10$,
-        the there is the risk of numerical over or underflow of the 64-bit
-        floating point arithmetic. Generally, $\mathrm{^1H}$ (Hydrogen atom) and
-        $\mathrm{^2He^+}$ (Helium ion) can be used as a benchmark for atoms and
-        ions, respectively. It is the user's responsibility to ensure that the
-        integral associated to the desired matrix element exists. In case it
-        does not, the returned value is wrong and no error is thrown.
+        Radial matrix element of $r^p$, $p\in\mathbb{R}$ [see
+        Eq.~\eqref{eq:radialMatrixElement}]. For $\abs*{p}\gtrsim10$ there is
+        the risk of numerical over or underflow of the 64-bit floating-point
+        arithmetic. It is the user's responsibility to ensure that the integral
+        associated to the desired matrix element exists. In case it does not,
+        the returned value is wrong and no error is thrown. $\mathrm{^1H}$
+        (Hydrogen atom) and $\mathrm{^2He^+}$ (Helium ion) can be used to
+        benchmark atoms and ions, respectively.
     }
         \sdocarg{char *species}{
             String to specify atom/ion species, e.g., \texttt{1H} for Hydrogen,
@@ -1082,16 +1081,11 @@
             Orbital angular momentum quantum number $l=0,1,\dots,n-1$ of bra.
         }
         \sdocarg{double sb}{
-            Electron spin quantum number of bra. Not an argument here, since
-            $s=1\slash{2}$ is always assumed.
+            Electron spin quantum number. Not an argument, as $s=1\slash{2}$ is
+            always assumed.
         }
         \sdocarg{double jb}{
-            Total angular momentum quantum number of bra, $j$. Here, the
-            following convention is applied: For $j\in[k,k+1)$, $k=0,1,2,\dots$,
-            the library internally uses the (half-integer) value
-            $(2k+1)\slash{2}$. For instance, this means that for $j=0.49999$ and
-            $j=0.50001$ the software internally uses $j=1\slash{2}$ in both
-            cases.
+            Total angular momentum quantum number of bra, $j$.
         }
         \sdocarg{double p}{
             Power of radius operator; cf. Eq.~\eqref{eq:radialMatrixElement}.
@@ -1106,18 +1100,16 @@
             Orbital angular momentum quantum number $l=0,1,\dots,n-1$ of ket.
         }
         \sdocarg{double sk}{
-            Electron spin quantum number of ket. Not an argument here, since
-            $s=1\slash{2}$ is always assumed.
+            Electron spin quantum number. Not an argument, as $s=1\slash{2}$ is
+            always assumed.
         }
         \sdocarg{double jk}{
-            Total angular momentum quantum number of ket, $j$. Here, the
-            convention for \texttt{jb} (see above) is adopted.
+            Total angular momentum quantum number of ket, $j$.
         }
         \sdocret{double rp}{
-            \texttt{rp} is the matrix element $r^{n,l,s,j;n',l',s',j'}_p$ in
-            Eq.~\eqref{eq:radialMatrixElement} in units of $\aB^p$, where $\aB$
-            is Bohr's radius. Quantum numbers without(with) a prime correspond
-            to the quantum numbers of the bra(ket).
+            $r^{n,l,s,j;n',l',s',j'}_p$ in Eq.~\eqref{eq:radialMatrixElement} in
+            units of $\aB^p$, where $\aB$ is Bohr's radius. Quantum numbers with
+            a prime correspond to the bra, and the ones without one, to the ket.
         }
     \end{sdocfun}%
     %
@@ -1125,19 +1117,12 @@
     {
         alkcalc\tus{cj1m1j2m2jmj}
     }{
-        Clebsch-Gordan coefficients,
-        \begin{equation}
-            C^{j_1,m_1,j_2,m_2}_{j, m_j}
-            =
-            \braket*{j_1,m_1;j_2,m_2}{j_1,j_2,j,m_j}
-        \,,
-        \end{equation}%
-        %
-        where $j$ is the total angular momentum composed of the two individual
-        ones $j_1$ and $j_2$. To fix the phase uniquely, we adopt the
-        Condon-Shortley sign convention, that is, the Clebsch-Gordan
-        coefficients with $m_j=j_1+j_2$ are positive. In particular, for the
-        case $j_1=l$ and $j_2=s$,
+        Clebsch-Gordan coefficients, $C^{j_1,m_1,j_2,m_2}_{j,m_j}=\braket*{j_1,
+        m_1;j_2,m_2}{j_1,j_2,j,m_j}$, where $j$ is the total angular momentum
+        composed of the two individual ones $j_1$ and $j_2$. To fix the phase
+        uniquely, we adopt the Condon-Shortley sign convention, that is, the
+        Clebsch-Gordan coefficients with $m_j=j_1+j_2$ are positive. In
+        particular, for the case $j_1=l$ and $j_2=s$,
         \begin{equation}\label{eq:definitionCGC}
             C^{l,m_l,s,m_s}_{j,m_j}
             =
@@ -1146,8 +1131,7 @@
             \bm{\Phi}_{l,s,j,m_j}
             \rangle
         \,,
-        \end{equation}%
-        %
+        \end{equation}
         with the states $Y_{l,m_l}\otimes\bm{\chi}_{s,m_s}$ of the uncoupled
         basis and the coupled basis states $\bm{\Phi}_{l,s,j,m}$; see
         Eqs.~(\ref{eq:sphericalHarmonics},\,\ref{eq:twoSpinsors}), and
@@ -1156,21 +1140,7 @@
         well as numerically. The function returns zero in case the arguments do
         not make sense, e.g., if $j_1<m_1$; or if $j_1$ is half-integer and
         $m_1$ is integer; or if $j$ does not lay between (including bounds)
-        $\abs*{j_1-j_2}$ and $\abs*{j_1+j_2}$. The arguments to this function
-        are defined as double precision floating point numbers, in order to
-        represent half-integer values. For numerical stability and definiteness
-        the arguments (positive as well as negative) are read with the following
-        convention: for $a=j_1,m_1,j_2,m_2,j,m_j$ the value
-        $a=1\slash{2}\lfloor{2a+1\slash{2}}\rfloor$ is used, with
-        $\lfloor{x}\rfloor=\mathrm{argmin}\{\abs*{x-z}\colon{z}\in\mathbb{Z},
-        z\leq{x}\}$. This might seem somewhat convoluted, but simply means that
-        for $-0.25\leq{a}<0.25$ we take $a=0$; for $0.25\leq{a}<0.75$ we take
-        $a=1\slash{2}$; for $0.75\leq{a}<1.25$ we take $a=1$; and so on (in both
-        positive and negative direction). This makes sure that the finite
-        precision of double precision floating point numbers does not play a
-        role; i.e., it does not matter if one puts $a=0.5$ or $a=0.500001$ or
-        $a=0.499998$ as an argument --- $a=1\slash{2}$ is used internally in any
-        case.
+        $\abs*{j_1-j_2}$ and $\abs*{j_1+j_2}$.
     }
         \sdocarg{double j1}{
             Angular momentum quantum number of first factor.
@@ -1211,7 +1181,7 @@
     {
         alkcalc\tus{YlmlXsms}
     }{
-        Angular factor of the full eigenstate in the uncoupled basis, i.e., the
+        Angular factor of the full state in the uncoupled basis, i.e., the
         two-component spinor $Y_{l,m_l}(\vartheta,\varphi)\bm{\chi}_{s,ms}$.
         The input quantum numbers are checked for inconsistencies and an error
         is thrown in case one is detected. The angles $\vartheta$ and $\varphi$
@@ -1226,8 +1196,8 @@
             Magnetic quantum number of orbital angular momentum.
         }
         \sdocarg{double s}{
-            Electron spin quantum number. Not an argument here, since
-            $s=1\slash{2}$ is always assumed.
+            Electron spin quantum number. Not an argument, as $s=1\slash{2}$ is
+            always assumed.
         }
         \sdocarg{double ms}{
             Magnetic quantum number of electron spin, $m_s$. For any $m_s<0$
@@ -1241,9 +1211,9 @@
             Azimuthal angle (Azimut), $\varphi$, in range $[0,2\pii]$.
         }
         \sdocret{alkcalc\tus{spinor} s}{
-            \texttt{s} has two components and represents a two-component spinor:
-            \texttt{u} is the spin-up ($m_s=1\slash{2}$) component and
-            \texttt{d} is the spin-down ($m_s=-1\slash{2}$) component.
+            \texttt{s} has two components: \texttt{u} and \texttt{v}.\par%
+            \texttt{u} is the spin-up ($m_s=1\slash{2}$) component.\par%
+            \texttt{d} is the spin-down ($m_s=-1\slash{2}$) component.\par%
         }
     \end{sdocfun}%
     %
@@ -1260,7 +1230,7 @@
         $[0,2\pii]$, respectively. This condition is checked up to floating
         point machine precision (type \texttt{double}) and an error will be
         thrown in case either condition is not obeyed. To compute the resulting
-        two-component spinor Clebsch-Gordon coefficients are needed, for which
+        two-component spinor, Clebsch-Gordon coefficients are needed, for which
         the sign convention detailed in Eq.~\eqref{eq:definitionCGC} is
         employed.
     }
@@ -1268,20 +1238,15 @@
             Orbital angular momentum quantum number $l=0,1,\dots,n-1$.
         }
         \sdocarg{double s}{
-            Electron spin quantum number. Not an argument here, since
-            $s=1\slash{2}$ is always assumed.
+            Electron spin quantum number. Not an argument, as $s=1\slash{2}$ is
+            always assumed.
         }
         \sdocarg{double j}{
             Total angular momentum quantum number
-            $j=\abs*{l-1\slash{2}},l+1\slash{2}$. Here, the same convention as
-            for the half-integer inputs in \texttt{alkcalc\tus{cj1m1j2m2j3m3}}
-            applies.
+            $j=\abs*{l-1\slash{2}},l+1\slash{2}$.
         }
         \sdocarg{double mj}{
-            Magnetic quantum number of total angular momentum, $m_j$. Regarding
-            the floating point representation of half-integers, the same
-            convention as for the total angular momentum quantum number $j$ (see
-            above) is employed.
+            Magnetic quantum number of total angular momentum, $m_j$.
         }
         \sdocarg{double theta}{
             Polar angle (Zenitwinkel), $\vartheta$, in range $[0,\pii]$.
@@ -1290,9 +1255,9 @@
             Azimuthal angle (Azimut), $\varphi$, in range $[0,2\pii]$.
         }
         \sdocret{alkcalc\tus{spinor} s}{
-            \texttt{s} has two components and represents a two-component spinor:
-            \texttt{u} is the spin-up ($m_s=1\slash{2}$) component and
-            \texttt{d} is the spin-down ($m_s=-1\slash{2}$) component.
+            \texttt{s} has two components: \texttt{u} and \texttt{v}.\par%
+            \texttt{u} is the spin-up ($m_s=1\slash{2}$) component.\par%
+            \texttt{d} is the spin-down ($m_s=-1\slash{2}$) component.\par%
         }
     \end{sdocfun}%
     %
@@ -1300,11 +1265,10 @@
     {
         alkcalc\tus{fitof}
     }{
-        Oscillator strength, for the transition between an initial state
+        Oscillator strength for the transition between an initial state
         $\bm{\Psi}_\mathrm{i}$ and a final state $\bm{\Psi}_\mathrm{f}$, as
         defined in Subsec.~\ref{subsec:OscillatorStrengths}, that is, it was
-        already summed over the magnetic quantum number $m'_j$ of the final
-        state.
+        already summed over the magnetic quantum number of the final state.
     }
         \sdocarg{char *species}{
             String to specify atom/ion species, e.g., \texttt{1H} for Hydrogen,
@@ -1319,16 +1283,12 @@
             initial state $\bm{\Psi}_\mathrm{i}$.
         }
         \sdocarg{double si}{
-            Electron spin quantum number of the initial state
-            $\bm{\Psi}_\mathrm{i}$. Not an argument here, since $s=1\slash{2}$
-            is always assumed.
+            Electron spin quantum number. Not an argument, as $s=1\slash{2}$ is
+            always assumed.
         }
         \sdocarg{double ji}{
             Total angular momentum quantum number of the initial state
-            $\bm{\Psi}_\mathrm{i}$, $j$. Total angular momentum quantum number
-            $j=\abs*{l-1\slash{2}},l+1\slash{2}$. Here, the same convention as
-            for the half-integer inputs in \texttt{alkcalc\tus{cj1m1j2m2j3m3}}
-            applies.
+            $\bm{\Psi}_\mathrm{i}$, $j$.
         }
         \sdocarg{int32\tus{t} nf}{
             Principal quantum number of the final state $\bm{\Psi}_\mathrm{f}$.
@@ -1344,13 +1304,12 @@
         }
         \sdocarg{double jf}{
             Total angular momentum quantum number of the final state
-            $\bm{\Psi}_\mathrm{f}$, $j$. Here, the convention for \texttt{ji}
-            (see above) is adopted.
+            $\bm{\Psi}_\mathrm{f}$, $j$.
         }
         \sdocret{double fitof}{
             $f_\mathrm{i\to{f}}$ is the oscillator strength of the selected
             electronic transition, summed over $m'_j$ of the final state. Note
-            that because of this sum, it is the same for all $m_j$ of this
+            that because of this sum, it is the same for all $m_j$ of the
             initial state.
         }
     \end{sdocfun}%
