@@ -37,13 +37,13 @@ static void nextrm(char *, int32_t *, int32_t *, int32_t, double);
 double alkcalc_Enlsj(char *species, int32_t n, int32_t l, double j) {
 
     char file[LEN_PATH_TO_ALKCALC+101], filename[101];
-    int32_t jj, nl, nmax, dummy;
+    int32_t J, nl, nmax, dummy;
     double E;
     FILE *fd;
 
     /* Open file for reading */
-    jj = 2*(int32_t)j+1;
-    (void)sprintf(filename, "data.d/energies-%s-%02d-%02d.dat", species, l, jj);
+    J = CONVERT(j);
+    (void)sprintf(filename, "data.d/energies-%s-%02d-%02d.dat", species, l, J);
     (void)strcpy(file, PATH_TO_ALKCALC);
     (void)strcat(file, filename);
     if (!(fd = fopen(file, "r"))) {
@@ -88,14 +88,14 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
                              double j) {
 
     char file[LEN_PATH_TO_STATES+101], filename[101];
-    int32_t jj, N, dim, dummy, k;
+    int32_t J, N, dim, dummy, k;
     double *t, *h, *fnlsj;
     FILE *fd;
     alkcalc_state *state;
 
     /* Open file with requested state */
-    jj = 2*(int32_t)j+1;
-    (void)sprintf(filename, "state-%s-%03d-%02d-%02d.dat", species, n, l, jj);
+    J = CONVERT(j);
+    (void)sprintf(filename, "state-%s-%03d-%02d-%02d.dat", species, n, l, J);
     (void)strcpy(file, PATH_TO_STATES);
     (void)strcat(file, filename);
     if (!(fd = fopen(file, "r"))) {
@@ -134,7 +134,7 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
     fclose(fd); fd = NULL;
 
     /* Add quantum numbers to result */
-    state->n = n; state->l = l; state->j = jj/2.;
+    state->n = n; state->l = l; state->j = J/2.;
 
     /* Read in discretisation data (if requested, i.e., if result = 'f') */
     if (result == 'p') return state;
@@ -401,13 +401,13 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
 double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
                      int32_t nf, int32_t lf, double jf) {
 
-    int32_t jji, jjf, llp1, llm1;
+    int32_t JI, JF, llp1, llm1;
     double Efi, r, al, fitof;
 
     /* Apply selection rules */
-    jji = 2*(int32_t)ji+1; jjf = 2*(int32_t)jf+1;
-    if (jji < 0 || jjf < 0 || li < 0 || lf < 0) return 0;
-    if (INTEGER_ABS(jjf-jji) > 2 || INTEGER_ABS(lf-li) != 1) return 0.;
+    JI = CONVERT(ji); JF = CONVERT(jf);
+    if (JI < 0 || JF < 0 || li < 0 || lf < 0) return 0;
+    if (INTEGER_ABS(JF-JI) > 2 || INTEGER_ABS(lf-li) != 1) return 0.;
 
     /* Energy difference between initial (i) and final (f) state in Hartree */
     Efi = alkcalc_Enlsj(species, nf, lf, jf)-alkcalc_Enlsj(species, ni, li, ji);
@@ -418,25 +418,25 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
     /* Angular factor */
     llp1 = 2*li+1; llm1 = 2*li-1;
     if (lf == li+1) { /* lf-li = 1 */
-        if (jji == llp1 && jjf == llp1) {
+        if (JI == llp1 && JF == llp1) {
             al = 1./((llp1+2.)*llp1);
         } else
-        if (jji == llm1 && jjf == llp1) {
+        if (JI == llm1 && JF == llp1) {
             al = (li+1.)/llp1;
         } else
-        if (jji == llp1 && jjf == llp1+2) {
+        if (JI == llp1 && JF == llp1+2) {
             al = (li+2.)/(llp1+2);
         } else {
             return 0;
         }
     } else { /* lf-li = -1 */
-        if (jji == llm1 && jjf == llm1) {
+        if (JI == llm1 && JF == llm1) {
             al = 1./(llp1*llm1);
         } else
-        if (jji == llp1 && jjf == llm1) {
+        if (JI == llp1 && JF == llm1) {
             al = (double)li/llp1;
         } else
-        if (jji == llm1 && jjf == llm1-2) {
+        if (JI == llm1 && JF == llm1-2) {
             al = (li-1.)/llm1;
         } else {
             return 0;
@@ -464,7 +464,7 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
 double alkcalc_tau(double T, char *species, int32_t n, int32_t dn, int32_t l,
                    double j) {
 
-    int32_t lp, lm, nmnlp1, nmxlp1, nlp1, nmnlm1, nmxlm1, nlm1, jj, k;
+    int32_t lp, lm, nmnlp1, nmxlp1, nlp1, nmnlm1, nmxlm1, nlm1, J, k;
     double En, Gamma, jp, jm, hnu, fftoi, nocc, tau;
 
     /* Get lowest n' such that E(n,l,s,l+s) < E(n',l',s,l'+s) is still true */
@@ -493,8 +493,8 @@ SkipedSState:
     Gamma = 0.;
 
     /* Emission */
-    jj = 2*(int32_t)j+1; jp = l+.5; jm = l-.5;
-    if (jj == 2*l+1) { /* j=l+s */
+    J = CONVERT(j); jp = l+.5; jm = l-.5;
+    if (J == 2*l+1) { /* j=l+s */
 
         /* l'=l+1 */
         for (k=nlp1-1; k>=nmnlp1; k--) {
@@ -541,12 +541,10 @@ SkipedSState:
             Gamma += hnu*hnu*fftoi*(1.+nocc);
 
             /* j'=l-3s */
-            if (l > 1) {
-                hnu = En-alkcalc_Enlsj(species, k, lm, jm-1.);
-                fftoi = -alkcalc_fitof(species, n, l, j, k, lm, jm-1.);
-                nocc = thermal_photon_occupation(hnu, T);
-                Gamma += hnu*hnu*fftoi*(1.+nocc);
-            }
+            hnu = En-alkcalc_Enlsj(species, k, lm, jm-1.);
+            fftoi = -alkcalc_fitof(species, n, l, j, k, lm, jm-1.);
+            nocc = thermal_photon_occupation(hnu, T);
+            Gamma += hnu*hnu*fftoi*(1.+nocc);
         }
     }
 
