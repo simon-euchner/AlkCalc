@@ -514,15 +514,16 @@ SkipedSState:
             Gamma += al[2]*hnu*hnu*fftoi*(1.+nocc);
         }
         for (k=nlm1-1; k>=nmnlm1; k--) { /* l'=l-1 */
-            hnu = En - alkcalc_Enlsj(species, k, lm, l+.5); /* j'=l+s */
-            fftoi = alkcalc_fitof(species, n, l, j, k, lm, l-.5);
+            printf("%lf\n", 1.);
+            hnu = En - alkcalc_Enlsj(species, k, lm, l-.5); /* j'=l+s */
+            fftoi = alkcalc_fitof(species, k, lm, l-.5, n, l, j);
             nocc = thermal_photon_occupation(hnu, T);
             Gamma += al[4]*hnu*hnu*fftoi*(1.+nocc);
         }
     } else { /* j=l-s */
         for (k=nlp1-1; k>=nmnlp1; k--) { /* l'=l+1 */
             hnu = En - alkcalc_Enlsj(species, k, lp, l+.5); /* j'=l+s */
-            fftoi = alkcalc_fitof(species, n, l, j, k, lp, l+.5);
+            fftoi = alkcalc_fitof(species, k, lp, l+.5, n, l, j);
             nocc = thermal_photon_occupation(hnu, T);
             Gamma += al[1]*hnu*hnu*fftoi*(1.+nocc);
         }
@@ -539,7 +540,7 @@ SkipedSState:
     }
 
     /* Compute lifetime */
-    tau = 1./Gamma * .5*1./4.134138*1e-6*137*137*137;
+    tau = 1./(32.13001173*Gamma);
 
     return tau;
 }
@@ -550,7 +551,7 @@ SkipedSState:
 
 /* Move file descriptor down by 'nlines' lines                                */
 static void move(FILE *fd, int32_t nlines) {
-    int32_t k; char c;
+    int32_t k, c;
     for (k=0; k<nlines; k++) {
         while ((c = fgetc(fd)) != '\n' && c != EOF);
         if (c == EOF) break;
@@ -753,7 +754,10 @@ static double cgtofloat(alkcalc_cg c) {
 /* Thermal photon-occupation number at energy hnu and temperature T */
 static double thermal_photon_occupation(double hnu, double T) {
 
-    double kBT, r, n;
+    double kBT, r, nocc;
+
+    /* Handle zero-temperature case */
+    if (T == 0.) return 0.; /* This comparison here is fine */
 
     /* Temperature factor in units of Hartree */
     kBT = 3.166811e-6*T; /* T in units of Kelvin (K) Ref. [5] */
@@ -762,9 +766,9 @@ static double thermal_photon_occupation(double hnu, double T) {
     r = hnu/kBT; /* hnu in units of Hartree */
 
     /* Compute average number of photons (Plank's law) */
-    n = 1./(exp(r)-1.);
+    nocc = 1./(exp(r)-1.);
 
-    return n;
+    return nocc;
 }
 
 /* Fetch extremal principle quantum numbers */

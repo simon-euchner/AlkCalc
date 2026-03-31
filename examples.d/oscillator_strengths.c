@@ -20,7 +20,7 @@ int main(int argc, char **argv)
     double ji, jf;
     ni = 5; li = 0; ji = .5;
     nf = ni; lf = 1; jf = .5;
-    printf("fitof = %1.8lf\n\n", alkcalc_fitof("88SR+", ni, li, ji, nf, lf, jf));
+    printf("fitof = %1.8lf\n\n", alkcalc_fitof("85RB", ni, li, ji, nf, lf, jf));
 
     printf("%s\n", "--- End");
 
