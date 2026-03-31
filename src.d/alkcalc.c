@@ -541,10 +541,12 @@ SkipedSState:
             Gamma += hnu*hnu*fftoi*(1.+nocc);
 
             /* j'=l-3s */
-            hnu = En-alkcalc_Enlsj(species, k, lm, jm-1.);
-            fftoi = -alkcalc_fitof(species, n, l, j, k, lm, jm-1.);
-            nocc = thermal_photon_occupation(hnu, T);
-            Gamma += hnu*hnu*fftoi*(1.+nocc);
+            if (l > 1) { /* P(j=1/2) -> S(j'=-1/2) is not possible */
+                hnu = En-alkcalc_Enlsj(species, k, lm, jm-1.);
+                fftoi = -alkcalc_fitof(species, n, l, j, k, lm, jm-1.);
+                nocc = thermal_photon_occupation(hnu, T);
+                Gamma += hnu*hnu*fftoi*(1.+nocc);
+            }
         }
     }
 
@@ -788,12 +790,12 @@ static void nextrm(char *species, int32_t *nmin, int32_t *nmax, int32_t l,
                    double j) {
 
     char file[LEN_PATH_TO_ALKCALC+101], filename[101];
-    int32_t jj;
+    int32_t J;
     FILE *fd;
 
     /* Open file for reading */
-    jj = 2*(int32_t)j+1;
-    (void)sprintf(filename, "data.d/energies-%s-%02d-%02d.dat", species, l, jj);
+    J = CONVERT(j);
+    (void)sprintf(filename, "data.d/energies-%s-%02d-%02d.dat", species, l, J);
     (void)strcpy(file, PATH_TO_ALKCALC);
     (void)strcat(file, filename);
     if (!(fd = fopen(file, "r"))) {
