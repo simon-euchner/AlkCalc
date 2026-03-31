@@ -401,13 +401,13 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
 double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
                      int32_t nf, int32_t lf, double jf) {
 
-    int32_t JI, JF, llp1, llm1;
+    int32_t jji, jjf, llp1, llm1;
     double Efi, r, al, fitof;
 
     /* Apply selection rules */
-    JI = CONVERT(ji); JF = CONVERT(jf);
-    if (JI < 0 || JF < 0 || li < 0 || lf < 0) return 0;
-    if (INTEGER_ABS(JF-JI) > 2 || INTEGER_ABS(lf-li) != 1) return 0.;
+    jji = 2*(int32_t)ji+1; jjf = 2*(int32_t)jf+1;
+    if (jji < 0 || jjf < 0 || li < 0 || lf < 0) return 0;
+    if (INTEGER_ABS(jjf-jji) > 2 || INTEGER_ABS(lf-li) != 1) return 0.;
 
     /* Energy difference between initial (i) and final (f) state in Hartree */
     Efi = alkcalc_Enlsj(species, nf, lf, jf)-alkcalc_Enlsj(species, ni, li, ji);
@@ -418,25 +418,25 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
     /* Angular factor */
     llp1 = 2*li+1; llm1 = 2*li-1;
     if (lf == li+1) { /* lf-li = 1 */
-        if ( (JI == llp1) && (JF == llp1) ) {
-            al = 1./((llp1+2)*llp1);
+        if (jji == llp1 && jjf == llp1) {
+            al = 1./((llp1+2.)*llp1);
         } else
-        if (JI == llm1 && JF == llp1) {
+        if (jji == llm1 && jjf == llp1) {
             al = (li+1.)/llp1;
         } else
-        if (JI == llp1 && JF == llp1+2) {
+        if (jji == llp1 && jjf == llp1+2) {
             al = (li+2.)/(llp1+2);
         } else {
             return 0;
         }
     } else { /* lf-li = -1 */
-        if (JI == llm1 && JF == llm1) {
+        if (jji == llm1 && jjf == llm1) {
             al = 1./(llp1*llm1);
         } else
-        if (JI == llp1 && JF == llm1) {
+        if (jji == llp1 && jjf == llm1) {
             al = (double)li/llp1;
         } else
-        if (JI == llm1 && JF == llp1-2) {
+        if (jji == llm1 && jjf == llm1-2) {
             al = (li-1.)/llm1;
         } else {
             return 0;
@@ -464,8 +464,8 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
 double alkcalc_tau(double T, char *species, int32_t n, int32_t dn, int32_t l,
                    double j) {
 
-    int32_t lp, lm, nlp1, nlm1, nmnlp1, nmxlp1, nmnlm1, nmxlm1, k, jj;
-    double En, Gamma, tau, hnu, al[6], fftoi, nocc;
+    int32_t lp, lm, nmnlp1, nmxlp1, nlp1, nmnlm1, nmxlm1, nlm1, jj, k;
+    double En, Gamma, jp, jm, hnu, fftoi, nocc, tau;
 
     /* Get lowest n' such that E(n,l,s,l+s) < E(n',l',s,l'+s) is still true */
     lp = l+1; lm = l-1;
@@ -478,7 +478,7 @@ double alkcalc_tau(double T, char *species, int32_t n, int32_t dn, int32_t l,
     } else {
         while (alkcalc_Enlsj(species, ++nlp1, lp, lp+.5) < En);
     }
-    if (!l) { nlm1 = -1; goto SkipedSState; } /* l'=l-1 */
+    if (!l) { nlm1 = -1; nmnlm1 = 0; goto SkipedSState; } /* l'=l-1 */
     nextrm(species, &nmnlm1, &nmxlm1, lm, lm+.5);
     nlm1 = (n < nmnlm1) ? nmnlm1: n;
     if (alkcalc_Enlsj(species, nlm1, lm, lm+.5) > En) {
@@ -489,55 +489,69 @@ double alkcalc_tau(double T, char *species, int32_t n, int32_t dn, int32_t l,
     }
 SkipedSState:
 
-    /* Precompute angular factors */
-    al[0] = 1./((2*l+3)*(2*l+1)); /* (l,l+s) -> (l+1,l+s)  */
-    al[1] = (l+1.)/(2*l+1);       /* (l,l-s) -> (l+1,l+s)  */
-    al[2] = (l+2.)/(2*l+3);       /* (l,l+s) -> (l+1,l+3s) */
-    al[3] = 1./((2*l+1)*(2*l-1)); /* (l,l-s) -> (l-1,l-s)  */
-    al[4] = l/(2*l+1.);           /* (l,l+s) -> (l-1,l-s)  */
-    al[5] = (l-1.)/(2*l-1);       /* (l,l-s) -> (l-1,l-3s) */
-
-    /* Absorption */
-    Gamma = 0.; /* FIXME !!! */
+    /* Initialise rate to zero */
+    Gamma = 0.;
 
     /* Emission */
-    jj = 2*(int32_t)j+1;
+    jj = 2*(int32_t)j+1; jp = l+.5; jm = l-.5;
     if (jj == 2*l+1) { /* j=l+s */
-        for (k=nlp1-1; k>=nmnlp1; k--) { /* l'=l+1 */
-            hnu = En - alkcalc_Enlsj(species, k, lp, l+.5); /* j'=l+s */
-            fftoi = alkcalc_fitof(species, k, lp, l+.5, n, l, j);
+
+        /* l'=l+1 */
+        for (k=nlp1-1; k>=nmnlp1; k--) {
+
+            /* j'=l+s */
+            hnu = En-alkcalc_Enlsj(species, k, lp, jp);
+            fftoi = -alkcalc_fitof(species, n, l, j, k, lp, jp);
             nocc = thermal_photon_occupation(hnu, T);
-            Gamma += al[0]*hnu*hnu*fftoi*(1.+nocc);
-            hnu = En - alkcalc_Enlsj(species, k, lp, l+1.5); /* j'=l+3s */
-            fftoi = alkcalc_fitof(species, k, lp, l+1.5, n, l, j);
+            Gamma += hnu*hnu*fftoi*(1.+nocc);
+
+            /* j'=l+3s */
+            hnu = En-alkcalc_Enlsj(species, k, lp, jp+1.);
+            fftoi = -alkcalc_fitof(species, n, l, j, k, lp, jp+1.);
             nocc = thermal_photon_occupation(hnu, T);
-            Gamma += al[2]*hnu*hnu*fftoi*(1.+nocc);
+            Gamma += hnu*hnu*fftoi*(1.+nocc);
         }
-        for (k=nlm1-1; k>=nmnlm1; k--) { /* l'=l-1 */
-            printf("%lf\n", 1.);
-            hnu = En - alkcalc_Enlsj(species, k, lm, l-.5); /* j'=l+s */
-            fftoi = alkcalc_fitof(species, k, lm, l-.5, n, l, j);
+
+        /* l'=l-1 */
+        for (k=nlm1-1; k>=nmnlm1; k--) {
+
+            /* j'=l-s */
+            hnu = En-alkcalc_Enlsj(species, k, lm, jm);
+            fftoi = -alkcalc_fitof(species, n, l, j, k, lm, jm);
             nocc = thermal_photon_occupation(hnu, T);
-            Gamma += al[4]*hnu*hnu*fftoi*(1.+nocc);
+            Gamma += hnu*hnu*fftoi*(1.+nocc);
         }
     } else { /* j=l-s */
+
         for (k=nlp1-1; k>=nmnlp1; k--) { /* l'=l+1 */
-            hnu = En - alkcalc_Enlsj(species, k, lp, l+.5); /* j'=l+s */
-            fftoi = alkcalc_fitof(species, k, lp, l+.5, n, l, j);
+
+            /* j'=l+s */
+            hnu = En-alkcalc_Enlsj(species, k, lp, jp);
+            fftoi = -alkcalc_fitof(species, n, l, j, k, lp, jp);
             nocc = thermal_photon_occupation(hnu, T);
-            Gamma += al[1]*hnu*hnu*fftoi*(1.+nocc);
+            Gamma += hnu*hnu*fftoi*(1.+nocc);
         }
+
         for (k=nlm1-1; k>=nmnlm1; k--) { /* l=l-1 */
-            hnu = En - alkcalc_Enlsj(species, k, lm, l-.5); /* j'=l-s */
-            fftoi = alkcalc_fitof(species, k, lm, l-.5, n, l, j);
+
+            /* j'=l-s */
+            hnu = En-alkcalc_Enlsj(species, k, lm, jm);
+            fftoi = -alkcalc_fitof(species, n, l, j, k, lm, jm);
             nocc = thermal_photon_occupation(hnu, T);
-            Gamma += al[3]*hnu*hnu*fftoi*(1.+nocc);
-            hnu = En - alkcalc_Enlsj(species, k, lm, l-1.5); /* j'=l-3s */
-            fftoi = alkcalc_fitof(species, k, lm, l-1.5, n, l, j);
-            nocc = thermal_photon_occupation(hnu, T);
-            Gamma += al[5]*hnu*hnu*fftoi*(1.+nocc);
+            Gamma += hnu*hnu*fftoi*(1.+nocc);
+
+            /* j'=l-3s */
+            if (l > 1) {
+                hnu = En-alkcalc_Enlsj(species, k, lm, jm-1.);
+                fftoi = -alkcalc_fitof(species, n, l, j, k, lm, jm-1.);
+                nocc = thermal_photon_occupation(hnu, T);
+                Gamma += hnu*hnu*fftoi*(1.+nocc);
+            }
         }
     }
+
+    /* Absorption */
+    Gamma += 0.; /* FIXME !!! */
 
     /* Compute lifetime */
     tau = 1./(32.13001173*Gamma);
@@ -793,4 +807,7 @@ static void nextrm(char *species, int32_t *nmin, int32_t *nmax, int32_t l,
     move(fd, 9);
     (void)fscanf(fd, "MINIMAL PRINCIPAL QUANTUM NUMBER: %d\n", nmin);
     (void)fscanf(fd, "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %d\n", nmax);
+
+    /* Clean up */
+    fclose(fd); fd = NULL;
 }

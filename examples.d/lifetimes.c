@@ -18,7 +18,7 @@ int main(int argc, char **argv)
     char *species = "88SR+";
     int n, dn, l;
     double j, T;
-    n = 5; dn = 0; l = 1; j = .5; T = 1e-12;
+    n = 6; dn = 0; l = 1; j = .5; T = 0.;
     printf("tau = %1.8lf\n\n", alkcalc_tau(T, species, n, dn, l, j));
 
     printf("%s\n", "--- End");
