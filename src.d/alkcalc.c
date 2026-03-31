@@ -489,14 +489,12 @@ double alkcalc_tau(double T, char *species, int32_t n, int32_t dn, int32_t l,
     }
 SkipedSState:
 
-    /* Initialise rate to zero */
+    /* Compute decay rate Gamma */
     Gamma = 0.;
-
-    /* Emission */
     J = CONVERT(j); jp = l+.5; jm = l-.5;
     if (J == 2*l+1) { /* j=l+s */
 
-        /* l'=l+1 */
+        /* Emission: l'=l+1 */
         for (k=nlp1-1; k>=nmnlp1; k--) {
 
             /* j'=l+s */
@@ -512,7 +510,7 @@ SkipedSState:
             Gamma += hnu*hnu*fftoi*(1.+nocc);
         }
 
-        /* l'=l-1 */
+        /* Emission: l'=l-1 */
         for (k=nlm1-1; k>=nmnlm1; k--) {
 
             /* j'=l-s */
@@ -521,9 +519,38 @@ SkipedSState:
             nocc = thermal_photon_occupation(hnu, T);
             Gamma += hnu*hnu*fftoi*(1.+nocc);
         }
+
+        /* Absorption: l'=l+1 */
+        for (k=nlp1; k<nlp1+dn; k++) {
+
+            /* j'=l+s */
+            hnu = alkcalc_Enlsj(species, k, lp, jp)-En;
+            fftoi = alkcalc_fitof(species, n, l, j, k, lp, jp);
+            nocc = thermal_photon_occupation(hnu, T);
+            Gamma += hnu*hnu*fftoi*nocc;
+
+            /* j'=l+3s */
+            hnu = alkcalc_Enlsj(species, k, lp, jp+1.)-En;
+            fftoi = alkcalc_fitof(species, n, l, j, k, lp, jp+1.);
+            nocc = thermal_photon_occupation(hnu, T);
+            Gamma += hnu*hnu*fftoi*nocc;
+        }
+
+        /* Absorption: l'=l-1 */
+        if (l) {
+            for (k=nlm1; k<nlm1+dn; k++) {
+
+                /* j'=l-s */
+                hnu = alkcalc_Enlsj(species, k, lm, jm)-En;
+                fftoi = alkcalc_fitof(species, n, l, j, k, lm, jm);
+                nocc = thermal_photon_occupation(hnu, T);
+                Gamma += hnu*hnu*fftoi*nocc;
+            }
+        }
     } else { /* j=l-s */
 
-        for (k=nlp1-1; k>=nmnlp1; k--) { /* l'=l+1 */
+        /* Emission: l'=l+1 */
+        for (k=nlp1-1; k>=nmnlp1; k--) {
 
             /* j'=l+s */
             hnu = En-alkcalc_Enlsj(species, k, lp, jp);
@@ -532,7 +559,8 @@ SkipedSState:
             Gamma += hnu*hnu*fftoi*(1.+nocc);
         }
 
-        for (k=nlm1-1; k>=nmnlm1; k--) { /* l=l-1 */
+        /* Emission: l=l-1 */
+        for (k=nlm1-1; k>=nmnlm1; k--) {
 
             /* j'=l-s */
             hnu = En-alkcalc_Enlsj(species, k, lm, jm);
@@ -548,10 +576,37 @@ SkipedSState:
                 Gamma += hnu*hnu*fftoi*(1.+nocc);
             }
         }
-    }
 
-    /* Absorption */
-    Gamma += 0.; /* FIXME !!! */
+        /* Absorbtion: l'=l+1 */
+        for (k=nlp1; k<nmnlp1+dn; k++) {
+
+            /* j'=l+s */
+            hnu = alkcalc_Enlsj(species, k, lp, jp)-En;
+            fftoi = alkcalc_fitof(species, n, l, j, k, lp, jp);
+            nocc = thermal_photon_occupation(hnu, T);
+            Gamma += hnu*hnu*fftoi*nocc;
+        }
+
+        /* Absorbtion: l=l-1 */
+        if (l) {
+            for (k=nlm1; k<nmnlm1+dn; k++) {
+
+                /* j'=l-s */
+                hnu = alkcalc_Enlsj(species, k, lm, jm)-En;
+                fftoi = alkcalc_fitof(species, n, l, j, k, lm, jm);
+                nocc = thermal_photon_occupation(hnu, T);
+                Gamma += hnu*hnu*fftoi*nocc;
+
+                /* j'=l-3s */
+                if (l > 1) { /* P(j=1/2) -> S(j'=-1/2) is not possible */
+                    hnu = alkcalc_Enlsj(species, k, lm, jm-1.)-En;
+                    fftoi = alkcalc_fitof(species, n, l, j, k, lm, jm-1.);
+                    nocc = thermal_photon_occupation(hnu, T);
+                    Gamma += hnu*hnu*fftoi*nocc;
+                }
+            }
+        }
+    }
 
     /* Compute lifetime */
     tau = 1./(32.13001173*Gamma);
@@ -768,16 +823,13 @@ static double cgtofloat(alkcalc_cg c) {
 /* Thermal photon-occupation number at energy hnu and temperature T */
 static double thermal_photon_occupation(double hnu, double T) {
 
-    double kBT, r, nocc;
+    double r, nocc;
 
-    /* Handle zero-temperature case */
-    if (T == 0.) return 0.; /* This comparison here is fine */
+    /* Ratio of photon energy (Hartree) and thermal energy */
+    r = hnu/(3.166811e-6*T); /* T in units of Kelvin (K) Ref. [5] */
 
-    /* Temperature factor in units of Hartree */
-    kBT = 3.166811e-6*T; /* T in units of Kelvin (K) Ref. [5] */
-
-    /* Energy ratio */
-    r = hnu/kBT; /* hnu in units of Hartree */
+    /* Check for overflow and return mathematical limit */
+    if (r > 100.) return 0.; /* FIXME !!! */
 
     /* Compute average number of photons (Plank's law) */
     nocc = 1./(exp(r)-1.);
