@@ -176,6 +176,6 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
  * j       : Total angular momentum quantum number j = |l-1/2|, l+1/2         *
  * -------------------------------------------------------------------------- */
 double alkcalc_tau(double T, char *species, int32_t n, int32_t dn, int32_t l,
-                   double j) {
+                   double j);
 
 #endif
