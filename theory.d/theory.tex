@@ -926,7 +926,7 @@
     where $k_\mathrm{B}$ is Boltzmann's constant. From Einstein's rate equations
     \cite{einstein1917} it follows that the total rate for decay out of the
     initial state is
-    \begin{equation}
+    \begin{equation}\label{eq:LifetimeFormula}
         \frac{\hbar}{\EH}\Gamma
         =
         2\alpha^3
@@ -999,8 +999,8 @@
             $E$ is the eigenenergy specified by the quantum numbers $n$, $l$,
             $s=1\slash{2}$, and $j$.
         }
-    \end{sdocfun}%
-    %
+    \end{sdocfun}
+
     \begin{sdocfun}
     {
         alkcalc\tus{fnlsj}
@@ -1055,8 +1055,8 @@
             \texttt{double *fnlsj}: \texttt{dim}-dimensional eigenvector
             $\bm{f}$ [see Eq.~\eqref{eq:expansionOfState}].
         }
-    \end{sdocfun}%
-    %
+    \end{sdocfun}
+
     \begin{sdocfun}
     {
         alkcalc\tus{rp}
@@ -1111,8 +1111,8 @@
             units of $\aB^p$, where $\aB$ is Bohr's radius. Quantum numbers with
             a prime correspond to the bra, and the ones without one, to the ket.
         }
-    \end{sdocfun}%
-    %
+    \end{sdocfun}
+
     \begin{sdocfun}
     {
         alkcalc\tus{cj1m1j2m2jmj}
@@ -1175,8 +1175,8 @@
             $\nu$ and $\mu$. This representation allows to obtain Clebsch-Gordan
             coefficients symbolically as well as numerically.
         }
-    \end{sdocfun}%
-    %
+    \end{sdocfun}
+
     \begin{sdocfun}
     {
         alkcalc\tus{YlmlXsms}
@@ -1215,8 +1215,8 @@
             \texttt{u} is the spin-up ($m_s=1\slash{2}$) component.\par%
             \texttt{d} is the spin-down ($m_s=-1\slash{2}$) component.\par%
         }
-    \end{sdocfun}%
-    %
+    \end{sdocfun}
+
     \begin{sdocfun}
     {
         alkcalc\tus{Philsjmj}
@@ -1259,8 +1259,8 @@
             \texttt{u} is the spin-up ($m_s=1\slash{2}$) component.\par%
             \texttt{d} is the spin-down ($m_s=-1\slash{2}$) component.\par%
         }
-    \end{sdocfun}%
-    %
+    \end{sdocfun}
+
     \begin{sdocfun}
     {
         alkcalc\tus{fitof}
@@ -1312,8 +1312,54 @@
             that because of this sum, it is the same for all $m_j$ of the
             initial state.
         }
-    \end{sdocfun}%
-    %
+    \end{sdocfun}
+
+    \begin{sdocfun}
+    {
+        alkcalc\tus{tau}
+    }{
+        Lifetime of the fine-structure state $\bm{\Psi}_{n,l,s,j,m_j}$ in
+        nanoseconds. Note that, since the oscillator-strengths [see
+        Eq.~\eqref{eq:OscillatorStrengthSimplified}] do not depend on $m_j$,
+        also the lifetimes do not depend on it [see
+        Eq.~\eqref{eq:LifetimeFormula}].
+    }
+        \sdocarg{char *species}{
+            String to specify atom/ion species, e.g., \texttt{1H} for Hydrogen,
+            or \texttt{88SR+} for the $\mathrm{^{88}Sr^+}$ ion.
+        }
+        \sdocarg{int32\tus{t} n}{
+            Principal quantum number.
+        }
+        \sdocarg{int32\tus{t} n}{
+            Range for principal quantum number. At zero temperature, this
+            argument is not used. For finite temperature, the absorption
+            processes in Eq.~\eqref{eq:LifetimeFormula} allow `decay' to states
+            with higher energy. In principle, one needs to take into account all
+            transitions to these states, of which there are infinitely many.
+            Here, we only take into account \texttt{dn} levels above
+            $\bm{\Psi}_{n,l,s,j,m_j}$ to truncate the series, for both
+            $l'=l\pm1$. In other words, the sum in
+            Eq.~\eqref{eq:LifetimeFormula}, taking into account absorption,
+            contains $2\times\text{\texttt{dn}}$ terms for $l>0$ and \texttt{dn}
+            for $l=0$.
+        }
+        \sdocarg{int32\tus{t} l}{
+            Orbital angular momentum quantum number $l=0,1,\dots,n-1$.
+        }
+        \sdocarg{double s}{
+            Electron spin quantum number. Not an argument, as $s=1\slash{2}$ is
+            always assumed.
+        }
+        \sdocarg{double j}{
+            Total angular momentum quantum number
+            $j=\abs*{l-1\slash{2}},l+1\slash{2}$.
+        }
+        \sdocret{double tau}{
+            $\tau$ is the lifetime of the fine-structure state
+            $\bm{\Psi}_{n,l,s,j,m_j}$ (independent of $m_j$) in nanoseconds.
+        }
+    \end{sdocfun}
 
     %%% BIBLIOGRAPHY
     \newpage
