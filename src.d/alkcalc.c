@@ -827,7 +827,7 @@ static double cgtofloat(alkcalc_cg c) {
 /* Thermal photon-occupation number at energy hnu and temperature T */
 static double thermal_photon_occupation(double hnu, double T) {
 
-    double r;
+    double r, x;
 
     /* Ratio of photon and thermal energy                                     *
      *                                                                        *
@@ -836,9 +836,9 @@ static double thermal_photon_occupation(double hnu, double T) {
     r = hnu/(3.166811e-6*T); /* For Boltzmann's constant see Ref. [5] */
 
     /* Compute photon occupation number according to Planck's law */
-    if (T <= 0.) return 0.; /* Zero-temperature case */
-    if (r > 35.) return exp(-r); /* Low temperature limit */
-    if (r < 1e-4) return 1./r-.5+1./12.*r; /* High temperature limit */
+    if (T <= 0.) return 0.; /* Zero T case */
+    if (r < cbrt(720.*DBL_EPSILON)) return 1./r-.5+1./12.*r; /* High T */
+    if (r > -1./3.*log(DBL_EPSILON)) { x = exp(-r); return x+x*x; } /* Low T */
     return 1./expm1(r); /* Intermediate regime */
 }
 

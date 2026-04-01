@@ -15,10 +15,10 @@ int main(int argc, char **argv)
     printf("%s\n", "--- Example: Lifetimes\n");
 
     /* Define initial and final state */
-    char *species = "88SR+";
+    char *species = "85RB";
     int n, dn, l;
     double j, T;
-    n = 6; dn = 0; l = 1; j = .5; T = 0.;
+    n = 30; dn = 0; l = 0; j = .5; T = 0.;
     printf("tau = %1.8lf\n\n", alkcalc_tau(T, species, n, dn, l, j));
 
     printf("%s\n", "--- End");
