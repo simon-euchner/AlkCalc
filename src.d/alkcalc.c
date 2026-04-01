@@ -577,7 +577,7 @@ SkipedSState:
             }
         }
 
-        /* Absorbtion: l'=l+1 */
+        /* Absorption: l'=l+1 */
         for (k=nlp1; k<nmnlp1+dn; k++) {
 
             /* j'=l+s */
@@ -587,7 +587,7 @@ SkipedSState:
             Gamma += hnu*hnu*fftoi*nocc;
         }
 
-        /* Absorbtion: l=l-1 */
+        /* Absorption: l=l-1 */
         if (l) {
             for (k=nlm1; k<nmnlm1+dn; k++) {
 
