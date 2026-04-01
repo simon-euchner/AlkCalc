@@ -68,7 +68,7 @@ typedef struct _AlkcalcSpinor {
  *                                                                            *
  * species : String specifying atom/ion species                               *
  * n       : Principal quantum number n = 1, 2, 3, ...                        *
- * l       : Orbital angular momentum l = 1, 2, ..., n-1                      *
+ * l       : Orbital angular momentum l = 0, 1, ..., n-1                      *
  * s       : Spin (Not an argument, since we always have s = 1/2!)            *
  * j       : Total angular momentum quantum number j = |l-1/2|, l+1/2         *
  * -------------------------------------------------------------------------- */
@@ -82,7 +82,7 @@ double alkcalc_Enlsj(char *species, int32_t n, int32_t l, double j);
  * result  : 'f': full result; 'p': partial result (only 'fnlsj' not NULL)    *
  * species : String specifying atom/ion species                               *
  * n       : Principal quantum number n = 1, 2, 3, ...                        *
- * l       : Orbital angular momentum l = 1, 2, ..., n-1                      *
+ * l       : Orbital angular momentum l = 0, 1, ..., n-1                      *
  * s       : Spin (Not an argument, since we always have s = 1/2!)            *
  * j       : Total angular momentum quantum number j = |l-1/2|, l+1/2         *
  * -------------------------------------------------------------------------- */
@@ -100,12 +100,12 @@ void alkcalc_state_free(alkcalc_state *state);
  *                                                                            *
  * species : String specifying atom/ion species                               *
  * nb      : Principal quantum number of bra                                  *
- * lb      : Orbital angular momentum l = 1, 2, ..., n-1 of bra               *
+ * lb      : Orbital angular momentum l = 0, 1, ..., n-1 of bra               *
  * sb      : Spin of bra (Not an argument, since we always have s = 1/2!)     *
  * jb      : Total angular momentum quantum number j = |l-1/2|, l+1/2 of bra  *
  * p       : Power of radius operator in matrix element                       *
  * nk      : Principal quantum number of ket                                  *
- * lk      : Orbital angular momentum l = 1, 2, ..., n-1, of ket              *
+ * lk      : Orbital angular momentum l = 0, 1, ..., n-1, of ket              *
  * sk      : Spin of ket (Not an argument, since we always have s = 1/2!)     *
  * jk      : Total angular momentum quantum number j = |l-1/2|, l+1/2, of ket *
  * -------------------------------------------------------------------------- */
@@ -122,7 +122,7 @@ alkcalc_cg alkcalc_cj1m1j2m2jmj(double j1, double m1, double j2, double m2,
  * Angular eigenstate in uncoupled basis (dimensionless)                      *
  * (see 'theory.d/theory.pdf', section 'Manual')                              *
  *                                                                            *
- * l       : Orbital angular momentum l = 1, 2, ..., n-1                      *
+ * l       : Orbital angular momentum l = 0, 1, ..., n-1                      *
  * ml      : Magnetic quantum number, ml = -l, ..., l                         *
  * s       : Spin (Not an argument, since we always have s = 1/2!)            *
  * ms      : Spin-projection quantum number ms = -1/2, 1/2                    *
@@ -136,7 +136,7 @@ alkcalc_spinor alkcalc_YlmlXsms(int32_t l, int32_t ml, double ms, double theta,
  * Angular eigenstate in coupled basis (dimensionless)                        *
  * (see 'theory.d/theory.pdf', section 'Manual')                              *
  *                                                                            *
- * l       : Orbital angular momentum l = 1, 2, ..., n-1                      *
+ * l       : Orbital angular momentum l = 0, 1, ..., n-1                      *
  * s       : Spin (Not an argument, since we always have s = 1/2!)            *
  * j       : Total angular momentum quantum number j = |l-1/2|, l+1/2         *
  * mj      : Total magnetic quantum number, mj = -j, ..., j                   *
@@ -152,11 +152,11 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
  *                                                                            *
  * species : String specifying atom/ion species                               *
  * ni      : Principal quantum number of initial state (i)                    *
- * li      : Orbital angular momentum l = 1, 2, ..., n-1 of (i)               *
+ * li      : Orbital angular momentum l = 0, 1, ..., n-1 of (i)               *
  * si      : Spin of (i) (Not an argument, since we always have s = 1/2!)     *
  * ji      : Total angular momentum quantum number j = |l-1/2|, l+1/2  of (i) *
  * nf      : Principal quantum number of final state (f)                      *
- * lf      : Orbital angular momentum l = 1, 2, ..., n-1 of (f)               *
+ * lf      : Orbital angular momentum l = 0, 1, ..., n-1 of (f)               *
  * sf      : Spin of (f) (Not an argument, since we always have s = 1/2!)     *
  * jf      : Total angular momentum quantum number j = |l-1/2|, l+1/2, of (f) *
  * -------------------------------------------------------------------------- */
@@ -171,11 +171,11 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
  * species : String specifying atom/ion species                               *
  * n       : Principal quantum number n = 1, 2, 3, ...                        *
  * dn      : Consider up to (including) n+dn for absorption                   *
- * l       : Orbital angular momentum l = 1, 2, ..., n-1                      *
+ * l       : Orbital angular momentum l = 0, 1, ..., n-1                      *
  * s       : Spin (Not an argument, since we always have s = 1/2!)            *
  * j       : Total angular momentum quantum number j = |l-1/2|, l+1/2         *
  * -------------------------------------------------------------------------- */
 double alkcalc_tau(double T, char *species, int32_t n, int32_t dn, int32_t l,
-                   double j);
+                   double j) {
 
 #endif
