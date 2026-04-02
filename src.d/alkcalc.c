@@ -6,6 +6,8 @@
 
 #include "../interface.d/alkcalc.h"
 
+#include <time.h> // REMOVEME FIXME !!!
+
 #define CONVERT(X) (int32_t)floor(2.*(X)+.5)
 #define INTEGER_ABS(X) (((X) > 0) ? (X): -1*(X))
 #define MAX(X, Y) ((X) > (Y)) ? (X): (Y)
@@ -23,6 +25,9 @@ static double complex Ylml(int32_t, int32_t, double, double);
 static double cgtofloat(alkcalc_cg);
 static double thermal_photon_occupation(double, double);
 static void nextrm(char *, int32_t *, int32_t *, int32_t, double);
+
+/* FIXME !!! PUT AT CORRECT POSITION */
+static inline double parse(const char *, int32_t);
 
 /* -------------------------------------------------------------------------- *
  * Eigenenergy in units of Hartree (27.211386245981(30) eV Ref. [5])          *
@@ -127,8 +132,25 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
     }
     state->fnlsj = fnlsj = (double *)malloc(dim*sizeof(double));
 
-    /* Read in components of radial eigenstate in basis of elements */
-    for (k=0; k<dim; (void)fscanf(fd, "%lf\n", fnlsj+k++));
+    clock_t t0, t1;
+    /* --- NEW ------------------------------------------------------------- */
+    char *buffer = (char *)malloc(dim*22-1); /* Decide if we put sizeof(char) */
+    t0 = clock();
+    (void)fread(buffer, 1, dim*22-1, fd);
+    for (k=0; k<dim; k++) state->fnlsj[k] = parse(buffer+22*k, 15);
+    t1 = clock();
+    free(buffer); buffer = NULL;
+    /* --- NEW ------------------------------------------------------------- */
+    printf("%1.14E ms\n", (double)(t1-t0)/CLOCKS_PER_SEC*1000);
+
+    //clock_t t0, t1;
+    //t0 = clock();
+    ///* --- OLD ------------------------------------------------------------- */
+    ///* Read in components of radial eigenstate in basis of elements */
+    //for (k=0; k<dim; (void)fscanf(fd, "%lf\n", fnlsj+k++));
+    ///* --- OLD ------------------------------------------------------------- */
+    //t1 = clock();
+    //printf("%1.14E ms\n", (double)(t1-t0)/CLOCKS_PER_SEC*1000);
 
     /* Close file */
     fclose(fd); fd = NULL;
@@ -148,7 +170,26 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
     }
     move(fd, 8);
     (void)fscanf(fd, "%d %lf\n", &dummy, t);
-    for (k=0; k<N-1; k++) (void)fscanf(fd, "%d %lf %lf\n", &dummy, t+k+1, h+k);
+
+    /* --- NEW ------------------------------------------------------------- */
+    buffer = (char *)malloc((N-1)*53-1);
+    char *bfr = buffer;
+    //if ((N-1)*53-1 != fread(buffer, 1, (N-1)*53-1, fd)) exit(1);
+    (void)fread(buffer, 1, (N-1)*53-1, fd);
+    for (k=0; k<N-1; k++) {
+        bfr += 9;
+        state->t[k+1] = parse(bfr, 15);
+        bfr += 22;
+        state->h[k] = parse(bfr, 15);
+        //printf("%lf\n", state->h[k]);
+        bfr += 22; /* Shifts outside of range: final \n not there FIXME!!!*/
+    }
+    free(buffer); buffer = NULL;
+    /* --- NEW ------------------------------------------------------------- */
+
+    ///* --- OLD ------------------------------------------------------------- */
+    //for (k=0; k<N-1; k++) (void)fscanf(fd, "%d %lf %lf\n", &dummy, t+k+1, h+k);
+    ///* --- OLD ------------------------------------------------------------- */
 
     /* Close file */
     fclose(fd); fd = NULL;
@@ -867,4 +908,36 @@ static void nextrm(char *species, int32_t *nmin, int32_t *nmax, int32_t l,
 
     /* Clean up */
     fclose(fd); fd = NULL;
+}
+
+/* FIXME !!! PUT AT CORRECT POSITION */
+static inline double parse(const char *str, int32_t ndig) {
+
+    int8_t s, i;
+    int32_t k;
+    uint64_t p10, dec;
+    double r;
+
+    /* Get sign */
+    s = (str[0] == '-') ? -1: 1;
+
+    /* Leading integer */
+    i = str[1]-'0';
+
+    /* Get decimal places */
+    p10 = 1; dec = str[3]-'0'; /* First digit */
+    for (k=4; k<ndig+2; k++) { p10 *= 10; dec = 10*dec + str[k]-'0'; }
+
+    /* Result without power */
+    r = s*(i+(double)dec*.1/p10);
+
+    /* Get exponent */
+    s = (str[ndig+3] == '-') ? -1: 1;
+    i = s*((str[ndig+4]-'0')*10+(str[ndig+5]-'0'));
+
+    /* Add power to result */
+    while (i-- > 0) r *= 10.;
+    while (++i < 0) r *= .1;
+
+    return r;
 }
