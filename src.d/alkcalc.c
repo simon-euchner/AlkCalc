@@ -13,6 +13,7 @@
 #define COMPLEX(X, Y) ((X)+(Y)*I)
 
 static void move(FILE *, int32_t);
+static inline double parse(const char *, int32_t);
 static alkcalc_cg w3jm(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);
 static int64_t s64imul(int64_t, int64_t);
 static int64_t ns64imul(int32_t, int64_t *);
@@ -87,8 +88,8 @@ double alkcalc_Enlsj(char *species, int32_t n, int32_t l, double j) {
 alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
                              double j) {
 
-    char file[LEN_PATH_TO_STATES+101], filename[101];
-    int32_t J, N, dim, dummy, k;
+    char file[LEN_PATH_TO_STATES+101], filename[101], *buffer, *bfr;
+    int32_t J, N, dim, dummy, ndi, ndf, a, b, c, d, k;
     double *t, *h, *fnlsj;
     FILE *fd;
     alkcalc_state *state;
@@ -108,7 +109,7 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
     (void)fscanf(fd, "NUMBER OF DISCRETISATION POINTS: %d\n", &N);
     move(fd, 2);
 
-    /* Allocate memory */
+    /* Allocate memory for result */
     state = (alkcalc_state *)malloc(sizeof(alkcalc_state));
     state->dim = dim = (state->N = N)-2;
     switch (result) {
@@ -127,8 +128,21 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
     }
     state->fnlsj = fnlsj = (double *)malloc(dim*sizeof(double));
 
-    /* Read in components of radial eigenstate in basis of elements */
-    for (k=0; k<dim; (void)fscanf(fd, "%lf\n", fnlsj+k++));
+    /* Number of digits                                                       *
+     *                                                                        *
+     * The number of digits used per integer (ndi) and floating-point value   *
+     * (ndf) in the data files 'states-...' and 'discretisation-...'. For     *
+     * instance, if the floating-point values are of the form '+1.23E+45',    *
+     * ndf=3. If the integers, numbering the discretisation points, are of    *
+     * the form '0123', ndi=4. The integers a, b, c, and d repeatedly appear  *
+     * in the code. They only dependent on ndi and ndf.                       */
+    ndi = 8; ndf = 15;
+    a = ndf+7; b = dim*a-1; c = ndi+1; d = (N-1)*(ndi+1+2*a)-1;
+
+    /* Read in radial eigenstate */
+    (void)fread(buffer = (char *)malloc(b), 1, b, fd);
+    for (k=0; k<dim; k++) state->fnlsj[k] = parse(buffer+a*k, ndf);
+    free(buffer); buffer = NULL;
 
     /* Close file */
     fclose(fd); fd = NULL;
@@ -148,7 +162,15 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
     }
     move(fd, 8);
     (void)fscanf(fd, "%d %lf\n", &dummy, t);
-    for (k=0; k<N-1; k++) (void)fscanf(fd, "%d %lf %lf\n", &dummy, t+k+1, h+k);
+    (void)fread(bfr = buffer = (char *)malloc(d), 1, d, fd);
+    for (k=0; k<N-2; k++) {
+        state->t[k+1] = parse(bfr += c, ndf);
+        state->h[k] = parse(bfr += a, ndf);
+        bfr += a;
+    }
+    state->t[N-2+1] = parse(bfr += c, ndf);
+    state->h[N-2] = parse(bfr += a, ndf);
+    free(buffer); buffer = NULL;
 
     /* Close file */
     fclose(fd); fd = NULL;
@@ -629,6 +651,38 @@ static void move(FILE *fd, int32_t nlines) {
         while ((c = fgetc(fd)) != '\n' && c != EOF);
         if (c == EOF) break;
     }
+}
+
+/* Optimised parser for reading data files quickly                            */
+static inline double parse(const char *str, int32_t nd) {
+
+    int8_t s, i;
+    int32_t k;
+    uint64_t p10, dec;
+    double r;
+
+    /* Get sign */
+    s = (str[0] == '-') ? -1: 1;
+
+    /* Leading integer */
+    i = str[1]-'0';
+
+    /* Get decimal places */
+    p10 = 1; dec = str[3]-'0'; /* First digit */
+    for (k=4; k<nd+2; k++) { p10 *= 10; dec = 10*dec + str[k]-'0'; }
+
+    /* Result without power */
+    r = s*(i+(double)dec*.1/p10);
+
+    /* Get exponent */
+    s = (str[nd+3] == '-') ? -1: 1;
+    i = s*((str[nd+4]-'0')*10+(str[nd+5]-'0'));
+
+    /* Add power to result */
+    while (i-- > 0) r *= 10.;
+    while (++i < 0) r *= .1;
+
+    return r;
 }
 
 /* Wigner's 3jm symbols (arguments must be TWICE the desired arguments)       */
