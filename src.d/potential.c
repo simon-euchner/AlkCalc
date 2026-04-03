@@ -74,7 +74,7 @@ static double VR(double, vint_data *, double, double);
 void vint_initpar(double *rpar, int32_t *ipar) {
 
     char id[101];
-    int32_t c;
+    int c;
     double dummy;
     FILE *fd;
 
@@ -99,6 +99,7 @@ void vint_initpar(double *rpar, int32_t *ipar) {
         while ((c = fgetc(fd)) != '\n');
     if (c == 'Z') {
         printf("ERROR: REQUESTED QUANTUM NUMBER 'L=%c' IS NOT KNOWN\n", l);
+        exit(1);
     } else {
         (void)fgetc(fd);
         (void)fscanf(fd, "%lf %lf %lf %lf %lf %d\n",
@@ -141,7 +142,7 @@ void vint_initpar(double *rpar, int32_t *ipar) {
 /* Move filepointer to next dollar sign and get identifier                    */
 static void move(FILE *fd, char *id) {
 
-    int32_t c;
+    int c;
 
     while ((c = fgetc(fd)) != EOF && c != '$');
     if (c != EOF) {
