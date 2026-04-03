@@ -35,7 +35,7 @@
 } while (0)
 
 /* Data type to store data for eigensolver */
-typedef struct _EigensolverData {
+typedef struct eigensolver_data_s {
     int32_t dim, *perm_r, *perm_c, ipar[4], info;
     double *Mdata, rpar[10], runtime;
     SuperMatrix B, L, U;

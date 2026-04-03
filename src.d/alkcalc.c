@@ -510,7 +510,7 @@ SkipedSState:
         for (k = nlp1 - 1; k >= nmnlp1; k--) {
 
             /* j' = l + s */
-            hnu = En -nalkcalc_Enlsj(species, k, lp, jp);
+            hnu = En - alkcalc_Enlsj(species, k, lp, jp);
             fftoi = -alkcalc_fitof(species, n, l, j, k, lp, jp);
             nocc = thermal_photon_occupation(hnu, T);
             Gamma += hnu * hnu * fftoi * (1. + nocc);

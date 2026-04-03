@@ -48,7 +48,7 @@
 /* -------------------------------------------------------------------------- *
  * Data type for radial eigenstates                                           *
  * -------------------------------------------------------------------------- */
-typedef struct _AlkcalcState {
+typedef struct alkcalc_state_s {
     int32_t N; /* Number of discretisation points */
     int32_t dim; /* Dimension of 'fnlsj', dim = N-2 */
     int32_t n; /* Prinzipal quantum number */
@@ -64,7 +64,7 @@ typedef struct _AlkcalcState {
  * following real number:                                                     *
  *     sign * sqrt( numerator / denominator )                                 *
  * -------------------------------------------------------------------------- */
-typedef struct _AlkcalcCg {
+typedef struct alkcalc_cg_s {
     int8_t sign;
     int64_t numerator;
     int64_t denominator;
@@ -73,7 +73,7 @@ typedef struct _AlkcalcCg {
 /* -------------------------------------------------------------------------- *
  * Data type for two-component spinors                                        *
  * -------------------------------------------------------------------------- */
-typedef struct _AlkcalcSpinor {
+typedef struct alkcalc_spinor_s {
     double complex u; /* First (spin-up) spinor component */
     double complex d; /* Second (spin-down= spinor component */
 } alkcalc_spinor;
