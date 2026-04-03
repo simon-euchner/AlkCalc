@@ -49,17 +49,16 @@ double alkcalc_Enlsj(char *species, int32_t n, int32_t l, double j) {
 
     /* Extract energy */
     move(fd, 9);
-    (void)fscanf(fd, "MINIMAL PRINCIPAL QUANTUM NUMBER: %" SCNd32 "\n", &nl);
+    (void)fscanf(fd, "MINIMAL PRINCIPAL QUANTUM NUMBER: %" SCNd32, &nl);
     if (n < nl) {
         ERROR("REQUESTED EIGENENERGY DOES NOT EXIST");
     }
-    (void)fscanf(fd, "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" SCNd32 "\n",
-                 &nmax);
+    (void)fscanf(fd, "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" SCNd32, &nmax);
     if (nmax < n) {
         ERROR("REQUESTED EIGENENERGY NOT AVAILABLE");
     }
     move(fd, n + 1);
-    (void)fscanf(fd, "%" SCNd32 "     %lf\n", &dummy, &E);
+    (void)fscanf(fd, "%" SCNd32 "     %lf", &dummy, &E);
 
     /* Clean up */
     fclose(fd); fd = NULL;
@@ -101,7 +100,7 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
 
     /* Read in metadata and move file pointer to data */
     move(fd, 7);
-    (void)fscanf(fd, "NUMBER OF DISCRETISATION POINTS: %" SCNd32 "\n", &N);
+    (void)fscanf(fd, "NUMBER OF DISCRETISATION POINTS: %" SCNd32, &N);
     move(fd, 2);
 
     /* Allocate memory for result */
@@ -154,7 +153,7 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
         ERROR("REQUESTED DISCRETISATION DATA DOES NOT EXIST");
     }
     move(fd, 8);
-    (void)fscanf(fd, "%" SCNd32 " %lf\n", &dummy, t);
+    (void)fscanf(fd, "%" SCNd32 " %lf", &dummy, t);
     (void)fread(bfr = buffer = (char *)malloc(d), 1, d, fd);
     for (k = 0; k < N - 2; k++) {
         state->t[k + 1] = parse(bfr += c, ndf);
@@ -916,9 +915,8 @@ static void nextrm(char *species, int32_t *nmin, int32_t *nmax, int32_t l,
 
     /* Extract information */
     move(fd, 9);
-    (void)fscanf(fd, "MINIMAL PRINCIPAL QUANTUM NUMBER: %" SCNd32 "\n", nmin);
-    (void)fscanf(fd, "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" SCNd32 "\n",
-                 nmax);
+    (void)fscanf(fd, "MINIMAL PRINCIPAL QUANTUM NUMBER: %" SCNd32, nmin);
+    (void)fscanf(fd, "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" SCNd32, nmax);
 
     /* Clean up */
     fclose(fd); fd = NULL;

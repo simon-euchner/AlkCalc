@@ -99,14 +99,14 @@ void vint_initpar(double *rpar, int32_t *ipar) {
         ERROR("REQUESTED QUANTUM NUMBER 'L = %c' IS NOT KNOWN", l);
     } else {
         (void)fgetc(fd);
-        (void)fscanf(fd, "%lf %lf %lf %lf %lf %" SCNd32 "\n",
-                     rpar, rpar + 1, rpar + 2, rpar + 3, rpar + 4, ipar + 3);
+        (void)fscanf(fd, "%lf %lf %lf %lf %lf %" SCNd32, rpar, rpar + 1,
+                     rpar + 2, rpar + 3, rpar + 4, ipar + 3);
     }
     while ((c = fgetc(fd)) != 'Z');
-    (void)fscanf(fd, "%" SCNd32 "\n", ipar);
-    (void)fscanf(fd, "ZC %" SCNd32 "\n", ipar + 1);
-    (void)fscanf(fd, "ALPHAD %lf\n", rpar + 5);
-    (void)fscanf(fd, "M %lf(%lf)\n", rpar + 6, &dummy);
+    (void)fscanf(fd, "%" SCNd32, ipar);
+    (void)fscanf(fd, "ZC %" SCNd32, ipar + 1);
+    (void)fscanf(fd, "ALPHAD %lf", rpar + 5);
+    (void)fscanf(fd, "M %lf(%lf)", rpar + 6, &dummy);
     /* IMPORTANT: Here is the position in the code where the mass correction, *
      * i.e., the fact that the reduced mass is NOT the electron's mass, can   *
      * be accounted for. However, we do not actually include the mass         *
@@ -130,7 +130,7 @@ void vint_initpar(double *rpar, int32_t *ipar) {
         default: break;
     }
     rpar[8] = .5 * (2 * (int32_t)j + 1);
-    (void)fscanf(fd, "EGS %lf\n", rpar + 9);
+    (void)fscanf(fd, "EGS %lf", rpar + 9);
 
     /* Close file */
     fclose(fd); fd = NULL;
@@ -144,7 +144,7 @@ static void move(FILE *fd, char *id) {
     while ((c = fgetc(fd)) != EOF && c != '$');
     if (c != EOF) {
         (void)fgetc(fd);
-        (void)fscanf(fd, "ID %s\n", id);
+        (void)fscanf(fd, "ID %s", id);
         while ((c = fgetc(fd)) != '\n');
         while ((c = fgetc(fd)) != '\n');
     } else {
