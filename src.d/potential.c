@@ -10,7 +10,7 @@
  *     Vint = VC + VP + VR                                                    *
  *                                                                            *
  * Here, VC is a modified Coulomb potential, VP accounts for polarisation of  *
- * the sceened ionic core due to the valence electron, and VR is the          *
+ * the screened ionic core due to the valence electron, and VR is the         *
  * relativistic spin-orbit coupling. For more information refer to            *
  * Refs. [4,6,9,10] and references therein.                                   *
  *                                                                            *
@@ -36,8 +36,8 @@
 /* -------------------------------------------------------------------------- *
  * Parameters for potential                                                   *
  *                                                                            *
- * dparam : double precision parameters                                       *
- * iparam : integer parameters                                                *
+ * rpar: double precision parameters                                          *
+ * ipar: integer parameters                                                   *
  *                                                                            *
  * Information on parameters                                                  *
  *                                                                            *
@@ -111,14 +111,14 @@ void vint_initpar(double *rpar, int32_t *ipar) {
      * i.e., the fact that the reduced mass is NOT the electron's mass, can   *
      * be accounted for. However, we do not actually include the mass         *
      * correction here, because the model parameters that we use (see         *
-     * Refs. [6,8]) are computed WITHOUT this correction. This we close from  *
-     * the fact that the computed ground state energies fit the ideal values  *
-     * for the ionisation energy better if we omit the mass correction. If    *
-     * one employs model parameters that include the mass correction, the     *
-     * currently commented-out version for the constant C, that is the value  *
-     * of rpar[7], should be used. Everything else will be handled            *
+     * Refs. [6,8]) are computed WITHOUT this correction. This we conclude    *
+     * from the fact that the computed ground state energies better fit the   *
+     * ideal ionisation energy, if we omit the mass correction. If one        *
+     * employs model parameters that include the mass correction, the         *
+     * currently commented-out version for the constant C, i.e., the value of *
+     * rpar[7], should be employed. Everything else will be handled           *
      * automatically.                                                         */
-    /* rpar[7] = 1./(1.+ME/rpar[6]); */
+    /* rpar[7] = 1. / (1. + ME / rpar[6]); */
     rpar[7] = 1.;
     switch (l) {
         case 'S': ipar[2] =  0; break;
@@ -129,7 +129,7 @@ void vint_initpar(double *rpar, int32_t *ipar) {
         case 'H': ipar[2] =  5; break;
         default: break;
     }
-    rpar[8] = .5*(2*(int32_t)j+1);
+    rpar[8] = .5 * (2 * (int32_t)j + 1);
     (void)fscanf(fd, "EGS %lf\n", rpar+9);
 
     /* Close file */
@@ -187,9 +187,9 @@ static double VC(double r, vint_data *data) {
     Z  = ipar[0];
     Zc = ipar[1];
 
-    Zn = Zc + (Z-Zc)*exp(-k1*r) + (k2-k4*r)*r*exp(-k3*r);
+    Zn = Zc + (Z - Zc) * exp(-k1 * r) + (k2 - k4 * r) * r * exp(-k3 * r);
 
-    result = -Zn/r;
+    result = -Zn / r;
 
     return result;
 }
@@ -204,7 +204,7 @@ static double VP(double r, vint_data *data) {
     rc      = rpar[4];
     alphaD  = rpar[5];
 
-    result = -.5*alphaD/pow(r, 4.)*(1.-exp(-pow(r/rc, 6.)));
+    result = -.5 * alphaD / pow(r, 4.) * (1. - exp(-pow(r / rc, 6.)));
 
     return result;
 }
@@ -213,7 +213,7 @@ static double VP(double r, vint_data *data) {
 static double VR(double r, vint_data *data, double vc, double vp) {
 
     /* In 'theory.d/theory.pdf' the variable K is called N. Here, it is named *
-     * N to avoid clash with the global variables in 'interface.d/settings.h'.*/
+     * K to avoid clash with the global variables in 'interface.d/settings.h'.*/
 
     int32_t *ipar, Z, Zc, lo;
     double *rpar, k1, k2, k3, k4, rc, alphaD, C, jt, alphaM, xpnt6, VNR, K,
@@ -235,16 +235,18 @@ static double VR(double r, vint_data *data, double vc, double vp) {
     Zc     = ipar[1];
     lo     = ipar[2]; /* Orbital angular momentum */
 
-    alphaM   = FC/C;
-    xpnt6    = exp(-pow(r/rc, 6.));
-    VNR      = vc+vp;
-    K        = 1.-.5*FC*alphaM*VNR; K = K*K;
-    aBdZndr  = -(Z-Zc)*k1*exp(-k1*r)+((1.-k3*r)*k2-(2.-k3*r)*r*k4)*exp(-k3*r);
-    aBdVCdr  = -(aBdZndr+vc)/r;
-    aBdVPdr  = -4./r*vp-3.*alphaD/pow(rc, 6.)*r*xpnt6;
-    aBdVNRdr = aBdVCdr+aBdVPdr;
+    alphaM   = FC / C;
+    xpnt6    = exp(-pow(r / rc, 6.));
+    VNR      = vc + vp;
+    K        = 1. - .5 * FC * alphaM * VNR; K = K * K;
+    aBdZndr  = -(Z - Zc) * k1 * exp(-k1 * r)
+             + ((1. - k3 * r) * k2 - (2. - k3 * r) * r * k4) * exp(-k3 * r);
+    aBdVCdr  = -(aBdZndr + vc) / r;
+    aBdVPdr  = -4. / r * vp - 3. * alphaD / pow(rc, 6.) * r * xpnt6;
+    aBdVNRdr = aBdVCdr + aBdVPdr;
 
-    result = .25*alphaM*alphaM*aBdVNRdr/(r*K)*(jt*(jt+1.)-lo*(lo+1.)-.75);
+    result = .25 * alphaM * alphaM * aBdVNRdr / (r*K)
+           * (jt * (jt + 1.) - lo * (lo + 1.) - .75);
 
     return result;
 }

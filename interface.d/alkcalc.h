@@ -33,11 +33,11 @@
 /* -------------------------------------------------------------------------- *
  * Macros for numerical applications and error handling                       *
  * -------------------------------------------------------------------------- */
-#define CONVERT(X) (int32_t)floor(2.*(X)+.5)
-#define INTEGER_ABS(X) (((X) > 0) ? (X): -1*(X))
+#define CONVERT(X) (int32_t)floor(2. * (X) + .5)
+#define INTEGER_ABS(X) (((X) > 0) ? (X): -1 * (X))
 #define MAX(X, Y) ((X) > (Y)) ? (X): (Y)
 #define MIN(X, Y) ((X) > (Y)) ? (Y): (X)
-#define COMPLEX(X, Y) ((X)+(Y)*I)
+#define COMPLEX(X, Y) ((X) + (Y) * I)
 #define ERROR(...) do { \
     fprintf(stderr, "ERROR (%s:%d): ", __FILE__, __LINE__); \
     fprintf(stderr, __VA_ARGS__); \
@@ -54,8 +54,8 @@ typedef struct _AlkcalcState {
     int32_t n; /* Prinzipal quantum number */
     int32_t l; /* Orbital angular momentum quantum number */
     double j; /* Total angular momentum quantum number */
-    double *t; /* Discretisation points, t[0]=0, ..., t[N-1]=tmax */
-    double *h; /* Stepsizes, h[0]=t1-t0, ..., h[N-2]=tN-1-tN-2 */
+    double *t; /* Discretisation points, t[0] = 0, ..., t[N-1] = tmax */
+    double *h; /* Stepsizes, h[0] = t1 - t0, ..., h[N-2] = tN-1 - tN-2 */
     double *fnlsj; /* Radial eigenstate in basis of elements, dimension 'dim' */
 } alkcalc_state;
 

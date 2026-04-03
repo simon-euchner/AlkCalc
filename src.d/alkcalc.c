@@ -31,7 +31,7 @@ static void nextrm(char *, int32_t *, int32_t *, int32_t, double);
  * -------------------------------------------------------------------------- */
 double alkcalc_Enlsj(char *species, int32_t n, int32_t l, double j) {
 
-    char file[LEN_PATH_TO_ALKCALC+101], filename[101];
+    char file[LEN_PATH_TO_ALKCALC + 101], filename[101];
     int32_t J, nl, nmax, dummy;
     double E;
     FILE *fd;
@@ -55,7 +55,7 @@ double alkcalc_Enlsj(char *species, int32_t n, int32_t l, double j) {
     if (nmax < n) {
         ERROR("REQUESTED EIGENENERGY NOT AVAILABLE");
     }
-    move(fd, n+1);
+    move(fd, n + 1);
     (void)fscanf(fd, "%d     %lf\n", &dummy, &E);
 
     /* Clean up */
@@ -79,7 +79,7 @@ double alkcalc_Enlsj(char *species, int32_t n, int32_t l, double j) {
 alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
                              double j) {
 
-    char file[LEN_PATH_TO_STATES+101], filename[101], *buffer, *bfr;
+    char file[LEN_PATH_TO_STATES + 101], filename[101], *buffer, *bfr;
     int32_t J, N, dim, dummy, ndi, ndf, a, b, c, d, k;
     double *t, *h, *fnlsj;
     FILE *fd;
@@ -101,11 +101,11 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
 
     /* Allocate memory for result */
     state = (alkcalc_state *)malloc(sizeof(alkcalc_state));
-    state->dim = dim = (state->N = N)-2;
+    state->dim = dim = (state->N = N) - 2;
     switch (result) {
         case 'f':
-            state->t = t = (double *)malloc(N*sizeof(double));
-            state->h = h = (double *)malloc((N-1)*sizeof(double));
+            state->t = t = (double *)malloc(N * sizeof(double));
+            state->h = h = (double *)malloc((N - 1) * sizeof(double));
             break;
         case 'p':
             state->t = t = NULL;
@@ -115,7 +115,7 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
             ERROR("INVALID ARGUMENT FOR 'RESULT'");
             break;
     }
-    state->fnlsj = fnlsj = (double *)malloc(dim*sizeof(double));
+    state->fnlsj = fnlsj = (double *)malloc(dim * sizeof(double));
 
     /* Number of digits                                                       *
      *                                                                        *
@@ -130,14 +130,14 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
 
     /* Read in radial eigenstate */
     (void)fread(buffer = (char *)malloc(b), 1, b, fd);
-    for (k=0; k<dim; k++) state->fnlsj[k] = parse(buffer+a*k, ndf);
+    for (k = 0; k < dim; k++) { state->fnlsj[k] = parse(buffer+a*k, ndf); }
     free(buffer); buffer = NULL;
 
     /* Close file */
     fclose(fd); fd = NULL;
 
     /* Add quantum numbers to result */
-    state->n = n; state->l = l; state->j = J/2.;
+    state->n = n; state->l = l; state->j = J / 2.;
 
     /* Read in discretisation data (if requested, i.e., if result = 'f') */
     if (result == 'p') { return state; }
@@ -151,13 +151,13 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
     move(fd, 8);
     (void)fscanf(fd, "%d %lf\n", &dummy, t);
     (void)fread(bfr = buffer = (char *)malloc(d), 1, d, fd);
-    for (k=0; k<N-2; k++) {
-        state->t[k+1] = parse(bfr += c, ndf);
+    for (k = 0; k < N - 2; k++) {
+        state->t[k + 1] = parse(bfr += c, ndf);
         state->h[k] = parse(bfr += a, ndf);
         bfr += a;
     }
-    state->t[N-2+1] = parse(bfr += c, ndf);
-    state->h[N-2] = parse(bfr += a, ndf);
+    state->t[N - 2 + 1] = parse(bfr += c, ndf);
+    state->h[N - 2] = parse(bfr += a, ndf);
     free(buffer); buffer = NULL;
 
     /* Close file */
@@ -208,36 +208,43 @@ double alkcalc_rp(char *species, int32_t nb, int32_t lb, double jb, double p,
 
     /* Allocate memory for matrix Rp */
     Rpd = (double *)malloc((dim = bra->dim)*sizeof(double)); /* Diagonal */
-    Rpo = (double *)malloc((dim-1)*sizeof(double)); /* Off-diagonal */
+    Rpo = (double *)malloc((dim - 1)*sizeof(double)); /* Off-diagonal */
 
     /* Compute components of matrix Rp (diagonal [d] and off-diagonal [o]) */
-    isr3 = 1./sqrt(3.);
-    for (k=1; k<dim; k++) {
+    isr3 = 1. / sqrt(3.);
+    for (k = 1; k < dim; k++) {
 
         /* Discretisation data */
-        tkm1 = t[k-1]; tk = t[k]; tkp1 = t[k+1]; hk = h[k-1]; hkp1 = h[k];
+        tkm1 = t[k - 1]; tk = t[k]; tkp1 = t[k + 1]; hk = h[k - 1]; hkp1 = h[k];
 
         /* Integral for (Rp)k,kp1 */
-        tm = .5*(tk+tkp1-isr3*hkp1); tp = .5*(tk+tkp1+isr3*hkp1);
+        tm = .5 * (tk + tkp1 - isr3 * hkp1);
+        tp = .5 * (tk + tkp1 + isr3 * hkp1);
         pm = pow(tm, p); pp = pow(tp, p);
-        I1 = .5*((tkp1-tm)*(tm-tk)*pm+(tkp1-tp)*(tp-tk)*pp)/hkp1;
-        Rpo[k-1] = I1;
+        I1 = .5 * ((tkp1 - tm) * (tm - tk) * pm
+           + (tkp1 - tp) * (tp - tk) * pp) / hkp1;
+        Rpo[k - 1] = I1;
 
         /* Integrals for (Rp)k,k */
-        I2 = .5*((tkp1-tm)*(tkp1-tm)*pm+(tkp1-tp)*(tkp1-tp)*pp)/hkp1;
-        tm = .5*(tkm1+tk-isr3*hk); tp = .5*(tkm1+tk+isr3*hk);
+        I2 = .5 * ((tkp1 - tm) * (tkp1 - tm) * pm
+           + (tkp1 - tp) * (tkp1 - tp) * pp) / hkp1;
+        tm = .5 * (tkm1 + tk - isr3 * hk); tp = .5 * (tkm1 + tk + isr3 * hk);
         pm = pow(tm, p); pp = pow(tp, p);
-        I3 = .5*((tm-tkm1)*(tm-tkm1)*pm+(tp-tkm1)*(tp-tkm1)*pp)/hk;
-        Rpd[k-1] = I2 + I3;
+        I3 = .5 * ((tm - tkm1) * (tm - tkm1) * pm
+           + (tp - tkm1) * (tp - tkm1) * pp) / hk;
+        Rpd[k - 1] = I2 + I3;
     }
-    tkm1 = t[dim-1]; tk = t[dim]; tkp1 = t[dim+1]; hk = h[dim-1]; hkp1 = h[dim];
-    tm = .5*(tk+tkp1-isr3*hkp1); tp = .5*(tk+tkp1+isr3*hkp1);
+    tkm1 = t[dim - 1]; tk = t[dim]; tkp1 = t[dim + 1];
+    hk = h[dim - 1]; hkp1 = h[dim];
+    tm = .5 * (tk + tkp1 - isr3 * hkp1); tp = .5 * (tk + tkp1 + isr3 * hkp1);
     pm = pow(tm, p); pp = pow(tp, p);
-    I2 = .5*((tkp1-tm)*(tkp1-tm)*pm+(tkp1-tp)*(tkp1-tp)*pp)/hkp1;
-    tm = .5*(tkm1+tk-isr3*hk); tp = .5*(tkm1+tk+isr3*hk);
+    I2 = .5 * (   (tkp1 - tm) * (tkp1 - tm) * pm
+                + (tkp1 - tp) * (tkp1 - tp) * pp ) / hkp1;
+    tm = .5 * (tkm1 + tk - isr3 * hk); tp = .5 * (tkm1 + tk + isr3 * hk);
     pm = pow(tm, p); pp = pow(tp, p);
-    I3 = .5*((tm-tkm1)*(tm-tkm1)*pm+(tp-tkm1)*(tp-tkm1)*pp)/hk;
-    Rpd[dim-1] = I2 + I3;
+    I3 = .5 * (   (tm - tkm1) * (tm - tkm1) * pm
+                + (tp - tkm1) * (tp - tkm1) * pp ) / hk;
+    Rpd[dim - 1] = I2 + I3;
 
     /* Avoid warning by compiler because Rpo[0] is not initialised if dim is  *
      * less than 2, i.e., if N < 4. Practically, this of course not a         *
@@ -247,15 +254,16 @@ double alkcalc_rp(char *species, int32_t nb, int32_t lb, double jb, double p,
      * presented to the user in 'interface.d/settings.c'.                     */
     f = bra->fnlsj; g = ket->fnlsj;
     if (dim < 2) {
-        Rpo[0] = 0.; rp = f[0]*Rpd[0]*g[0];
+        Rpo[0] = 0.; rp = f[0] * Rpd[0] * g[0];
     } else {
-        rp = f[0]*(Rpd[0]*g[0]+Rpo[0]*g[1]);
+        rp = f[0] * (Rpd[0] * g[0] + Rpo[0] * g[1]);
     }
 
     /* Compute matrix element */
-    for (k=1; k<dim-1; k++)
-        rp += f[k]*(Rpo[k-1]*g[k-1]+Rpd[k]*g[k]+Rpo[k]*g[k+1]);
-    rp += f[dim-1]*(Rpo[dim-2]*g[dim-2]+Rpd[dim-1]*g[dim-1]);
+    for (k = 1; k < dim - 1; k++)
+        rp += f[k] * (   Rpo[k - 1] * g[k - 1]
+                       + Rpd[k] * g[k] + Rpo[k] * g[k + 1] );
+    rp += f[dim-1] * (Rpo[dim - 2] * g[dim - 2] + Rpd[dim - 1] * g[dim - 1]);
 
     /* Clean up */
     alkcalc_state_free(bra); bra = NULL;
@@ -284,8 +292,8 @@ alkcalc_cg alkcalc_cj1m1j2m2jmj(double j1, double m1, double j2, double m2,
     result = w3jm(J1, M1, J2, M2, J, -MJ);
 
     /* Add phase and scaling factor */
-    result.sign *= (((-J1+J2-MJ)/2)%2) ? -1: 1;
-    result.numerator = s64imul(result.numerator, J+1);
+    result.sign *= (((-J1 + J2 - MJ) / 2) % 2) ? -1: 1;
+    result.numerator = s64imul(result.numerator, J + 1);
 
     /* Clean up result */
     gcd = euclid(result.numerator, result.denominator);
@@ -355,14 +363,14 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
     alkcalc_spinor spinor;
 
     /* Check input validity */
-    ll = 2*l; J = CONVERT(j); MJ = CONVERT(mj);
+    ll = 2 * l; J = CONVERT(j); MJ = CONVERT(mj);
     if (J < INTEGER_ABS(MJ)) { /* Ensure mj <= j */
         ERROR("J MUST BE LARGER EQUAL ABSOLUTE VALUE OF MJ");
     }
-    if (J%2 != MJ%2) { /* Ensure (half-)int. */
+    if (J % 2 != MJ % 2) { /* Ensure (half-)int. */
         ERROR("HALF-INTEGER J(MJ) BUT INTEGER MJ(J)");
     }
-    if (J != ll-1 && J != ll+1) { /* Ensure |l-1/2| <= j <= l+1/2 */
+    if (J != ll - 1 && J != ll + 1) { /* Ensure |l-1/2| <= j <= l+1/2 */
         ERROR("J MUST BE |L-1/2| OR L+1/2");
     }
     if (theta < 0 || PI < theta) {
@@ -373,12 +381,12 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
     }
 
     /* Compute Clebsch-Gordan coefficients (spin up [u] and down [d]) */
-    cgu = cgtofloat(alkcalc_cj1m1j2m2jmj(l, mj-.5, .5, .5, j, mj));
-    cgd = cgtofloat(alkcalc_cj1m1j2m2jmj(l, mj+.5, .5, -.5, j, mj));
+    cgu = cgtofloat(alkcalc_cj1m1j2m2jmj(l, mj - .5, .5, .5, j, mj));
+    cgd = cgtofloat(alkcalc_cj1m1j2m2jmj(l, mj + .5, .5, -.5, j, mj));
 
     /* Compute spherical harmonics */
-    yu = Ylml(l, (MJ-1)/2, theta, phi);
-    yd = Ylml(l, (MJ+1)/2, theta, phi);
+    yu = Ylml(l, (MJ - 1) / 2, theta, phi);
+    yd = Ylml(l, (MJ + 1) / 2, theta, phi);
 
     /* Assemble result */
     spinor.u = cgu*yu; spinor.d = cgd*yd;
@@ -418,35 +426,35 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
     r = alkcalc_rp(species, ni, li, ji, 1., nf, lf, jf);
 
     /* Angular factor */
-    llp1 = 2*li+1; llm1 = 2*li-1;
-    if (lf == li+1) { /* lf-li = 1 */
+    llp1 = 2 * li + 1; llm1 = 2 * li - 1;
+    if (lf == li + 1) { /* lf - li = 1 */
         if (JI == llp1 && JF == llp1) {
-            al = 1./((llp1+2.)*llp1);
+            al = 1. / ((llp1 + 2.) * llp1);
         } else
         if (JI == llm1 && JF == llp1) {
-            al = (li+1.)/llp1;
+            al = (li + 1.) / llp1;
         } else
-        if (JI == llp1 && JF == llp1+2) {
-            al = (li+2.)/(llp1+2);
+        if (JI == llp1 && JF == llp1 + 2) {
+            al = (li + 2.) / (llp1 + 2);
         } else {
             return 0;
         }
-    } else { /* lf-li = -1 */
+    } else { /* lf - li = -1 */
         if (JI == llm1 && JF == llm1) {
-            al = 1./(llp1*llm1);
+            al = 1. / (llp1 * llm1);
         } else
         if (JI == llp1 && JF == llm1) {
-            al = (double)li/llp1;
+            al = (double)li / llp1;
         } else
-        if (JI == llm1 && JF == llm1-2) {
-            al = (li-1.)/llm1;
+        if (JI == llm1 && JF == llm1 - 2) {
+            al = (li - 1.) / llm1;
         } else {
             return 0;
         }
     }
 
     /* Assemble result */
-    fitof = 2./3. * Efi * r*r * al;
+    fitof = 2. / 3. * Efi * r*r * al;
 
     return fitof;
 }
@@ -470,141 +478,143 @@ double alkcalc_tau(double T, char *species, int32_t n, int32_t dn, int32_t l,
     double En, Gamma, jp, jm, hnu, fftoi, nocc, tau;
 
     /* Get lowest n' such that E(n,l,s,l+s) < E(n',l',s,l'+s) is still true */
-    lp = l+1; lm = l-1;
+    lp = l + 1; lm = l - 1;
     En = alkcalc_Enlsj(species, n, l, j);
-    nextrm(species, &nmnlp1, &nmxlp1, lp, lp+.5); /* l'=l+1 */
+    nextrm(species, &nmnlp1, &nmxlp1, lp, lp + .5); /* l' = l + 1 */
     nlp1 = (n < nmnlp1) ? nmnlp1: n;
-    if (alkcalc_Enlsj(species, nlp1, lp, lp+.5) > En) {
-        while (nmnlp1 < --nlp1 && alkcalc_Enlsj(species, nlp1, lp, lp+.5) > En);
+    if (alkcalc_Enlsj(species, nlp1, lp, lp + .5) > En) {
+        while (    nmnlp1 < --nlp1
+                && alkcalc_Enlsj(species, nlp1, lp, lp + .5) > En );
         nlp1++;
     } else {
-        while (alkcalc_Enlsj(species, ++nlp1, lp, lp+.5) < En);
+        while (alkcalc_Enlsj(species, ++nlp1, lp, lp + .5) < En);
     }
-    if (!l) { nlm1 = -1; nmnlm1 = 0; goto SkipedSState; } /* l'=l-1 */
-    nextrm(species, &nmnlm1, &nmxlm1, lm, lm+.5);
+    if (!l) { nlm1 = -1; nmnlm1 = 0; goto SkipedSState; } /* l' = l - 1 */
+    nextrm(species, &nmnlm1, &nmxlm1, lm, lm + .5);
     nlm1 = (n < nmnlm1) ? nmnlm1: n;
-    if (alkcalc_Enlsj(species, nlm1, lm, lm+.5) > En) {
-        while (nmnlm1 < --nlm1 && alkcalc_Enlsj(species, nlm1, lm, lm+.5) > En);
+    if (alkcalc_Enlsj(species, nlm1, lm, lm + .5) > En) {
+        while (    nmnlm1 < --nlm1
+                && alkcalc_Enlsj(species, nlm1, lm, lm + .5) > En );
         nlm1++;
     } else {
-        while (alkcalc_Enlsj(species, ++nlm1, lm, lm+.5) < En);
+        while (alkcalc_Enlsj(species, ++nlm1, lm, lm + .5) < En);
     }
 SkipedSState:
 
     /* Compute decay rate Gamma */
     Gamma = 0.;
-    J = CONVERT(j); jp = l+.5; jm = l-.5;
-    if (J == 2*l+1) { /* j=l+s */
+    J = CONVERT(j); jp = l + .5; jm = l - .5;
+    if (J == 2 * l + 1) { /* j = l + s */
 
-        /* Emission: l'=l+1 */
-        for (k=nlp1-1; k>=nmnlp1; k--) {
+        /* Emission: l' = l + 1 */
+        for (k = nlp1 - 1; k >= nmnlp1; k--) {
 
-            /* j'=l+s */
-            hnu = En-alkcalc_Enlsj(species, k, lp, jp);
+            /* j' = l + s */
+            hnu = En -nalkcalc_Enlsj(species, k, lp, jp);
             fftoi = -alkcalc_fitof(species, n, l, j, k, lp, jp);
             nocc = thermal_photon_occupation(hnu, T);
-            Gamma += hnu*hnu*fftoi*(1.+nocc);
+            Gamma += hnu * hnu * fftoi * (1. + nocc);
 
-            /* j'=l+3s */
-            hnu = En-alkcalc_Enlsj(species, k, lp, jp+1.);
-            fftoi = -alkcalc_fitof(species, n, l, j, k, lp, jp+1.);
+            /* j' = l + 3s */
+            hnu = En - alkcalc_Enlsj(species, k, lp, jp + 1.);
+            fftoi = -alkcalc_fitof(species, n, l, j, k, lp, jp + 1.);
             nocc = thermal_photon_occupation(hnu, T);
-            Gamma += hnu*hnu*fftoi*(1.+nocc);
+            Gamma += hnu * hnu * fftoi * (1. + nocc);
         }
 
-        /* Emission: l'=l-1 */
-        for (k=nlm1-1; k>=nmnlm1; k--) {
+        /* Emission: l' = l - 1 */
+        for (k = nlm1-1; k >= nmnlm1; k--) {
 
             /* j'=l-s */
             hnu = En-alkcalc_Enlsj(species, k, lm, jm);
             fftoi = -alkcalc_fitof(species, n, l, j, k, lm, jm);
             nocc = thermal_photon_occupation(hnu, T);
-            Gamma += hnu*hnu*fftoi*(1.+nocc);
+            Gamma += hnu * hnu * fftoi * (1. + nocc);
         }
 
-        /* Absorption: l'=l+1 */
-        for (k=nlp1; k<nlp1+dn; k++) {
+        /* Absorption: l' = l + 1 */
+        for (k = nlp1; k < nlp1 + dn; k++) {
 
             /* j'=l+s */
-            hnu = alkcalc_Enlsj(species, k, lp, jp)-En;
+            hnu = alkcalc_Enlsj(species, k, lp, jp) - En;
             fftoi = alkcalc_fitof(species, n, l, j, k, lp, jp);
             nocc = thermal_photon_occupation(hnu, T);
-            Gamma += hnu*hnu*fftoi*nocc;
+            Gamma += hnu * hnu * fftoi * nocc;
 
             /* j'=l+3s */
-            hnu = alkcalc_Enlsj(species, k, lp, jp+1.)-En;
-            fftoi = alkcalc_fitof(species, n, l, j, k, lp, jp+1.);
+            hnu = alkcalc_Enlsj(species, k, lp, jp + 1.) - En;
+            fftoi = alkcalc_fitof(species, n, l, j, k, lp, jp + 1.);
             nocc = thermal_photon_occupation(hnu, T);
-            Gamma += hnu*hnu*fftoi*nocc;
+            Gamma += hnu * hnu * fftoi * nocc;
         }
 
-        /* Absorption: l'=l-1 */
+        /* Absorption: l' = l - 1 */
         if (l) {
-            for (k=nlm1; k<nlm1+dn; k++) {
+            for (k = nlm1; k < nlm1 + dn; k++) {
 
                 /* j'=l-s */
-                hnu = alkcalc_Enlsj(species, k, lm, jm)-En;
+                hnu = alkcalc_Enlsj(species, k, lm, jm) - En;
                 fftoi = alkcalc_fitof(species, n, l, j, k, lm, jm);
                 nocc = thermal_photon_occupation(hnu, T);
-                Gamma += hnu*hnu*fftoi*nocc;
+                Gamma += hnu * hnu * fftoi * nocc;
             }
         }
-    } else { /* j=l-s */
+    } else { /* j = l - s */
 
-        /* Emission: l'=l+1 */
-        for (k=nlp1-1; k>=nmnlp1; k--) {
+        /* Emission: l' = l + 1 */
+        for (k = nlp1 - 1; k >= nmnlp1; k--) {
 
             /* j'=l+s */
             hnu = En-alkcalc_Enlsj(species, k, lp, jp);
             fftoi = -alkcalc_fitof(species, n, l, j, k, lp, jp);
             nocc = thermal_photon_occupation(hnu, T);
-            Gamma += hnu*hnu*fftoi*(1.+nocc);
+            Gamma += hnu * hnu * fftoi * (1. + nocc);
         }
 
-        /* Emission: l=l-1 */
-        for (k=nlm1-1; k>=nmnlm1; k--) {
+        /* Emission: l = l - 1 */
+        for (k = nlm1 - 1; k >= nmnlm1; k--) {
 
             /* j'=l-s */
-            hnu = En-alkcalc_Enlsj(species, k, lm, jm);
+            hnu = En - alkcalc_Enlsj(species, k, lm, jm);
             fftoi = -alkcalc_fitof(species, n, l, j, k, lm, jm);
             nocc = thermal_photon_occupation(hnu, T);
-            Gamma += hnu*hnu*fftoi*(1.+nocc);
+            Gamma += hnu * hnu * fftoi * (1. + nocc);
 
-            /* j'=l-3s */
+            /* j' = l - 3s */
             if (l > 1) { /* P(j=1/2) -> S(j'=-1/2) is not possible */
-                hnu = En-alkcalc_Enlsj(species, k, lm, jm-1.);
-                fftoi = -alkcalc_fitof(species, n, l, j, k, lm, jm-1.);
+                hnu = En - alkcalc_Enlsj(species, k, lm, jm - 1.);
+                fftoi = -alkcalc_fitof(species, n, l, j, k, lm, jm - 1.);
                 nocc = thermal_photon_occupation(hnu, T);
-                Gamma += hnu*hnu*fftoi*(1.+nocc);
+                Gamma += hnu * hnu * fftoi * (1. + nocc);
             }
         }
 
-        /* Absorption: l'=l+1 */
-        for (k=nlp1; k<nmnlp1+dn; k++) {
+        /* Absorption: l' = l + 1 */
+        for (k = nlp1; k < nmnlp1 + dn; k++) {
 
             /* j'=l+s */
-            hnu = alkcalc_Enlsj(species, k, lp, jp)-En;
+            hnu = alkcalc_Enlsj(species, k, lp, jp) - En;
             fftoi = alkcalc_fitof(species, n, l, j, k, lp, jp);
             nocc = thermal_photon_occupation(hnu, T);
             Gamma += hnu*hnu*fftoi*nocc;
         }
 
-        /* Absorption: l=l-1 */
+        /* Absorption: l = l - 1 */
         if (l) {
-            for (k=nlm1; k<nmnlm1+dn; k++) {
+            for (k = nlm1; k < nmnlm1 + dn; k++) {
 
-                /* j'=l-s */
-                hnu = alkcalc_Enlsj(species, k, lm, jm)-En;
+                /* j' = l - s */
+                hnu = alkcalc_Enlsj(species, k, lm, jm) - En;
                 fftoi = alkcalc_fitof(species, n, l, j, k, lm, jm);
                 nocc = thermal_photon_occupation(hnu, T);
-                Gamma += hnu*hnu*fftoi*nocc;
+                Gamma += hnu * hnu * fftoi * nocc;
 
                 /* j'=l-3s */
                 if (l > 1) { /* P(j=1/2) -> S(j'=-1/2) is not possible */
-                    hnu = alkcalc_Enlsj(species, k, lm, jm-1.)-En;
-                    fftoi = alkcalc_fitof(species, n, l, j, k, lm, jm-1.);
+                    hnu = alkcalc_Enlsj(species, k, lm, jm - 1.) - En;
+                    fftoi = alkcalc_fitof(species, n, l, j, k, lm, jm - 1.);
                     nocc = thermal_photon_occupation(hnu, T);
-                    Gamma += hnu*hnu*fftoi*nocc;
+                    Gamma += hnu * hnu * fftoi * nocc;
                 }
             }
         }
@@ -612,10 +622,10 @@ SkipedSState:
 
     /* Compute lifetime in units of nanoseconds                               *
      *                                                                        *
-     * The conversion factor used below is 2 x alpha**3 x EH / hbar, where    *
+     * The conversion factor used below is 2 * alpha**3 x EH / hbar, where    *
      * alpha is the fine-structure constant, EH is the Hartree, and hbar is   *
      * is the reduced Planck constant; for their values, see Ref. [5].        */
-    tau = 1./(32.1300103*Gamma);
+    tau = 1. / (32.1300103 * Gamma);
 
     return tau;
 }
@@ -628,7 +638,7 @@ SkipedSState:
 static void move(FILE *fd, int32_t nlines) {
     int c;
     int32_t k;
-    for (k=0; k<nlines; k++) {
+    for (k = 0; k < nlines; k++) {
         while ((c = fgetc(fd)) != '\n' && c != EOF);
         if (c == EOF) { break; };
     }
@@ -646,18 +656,18 @@ static inline double parse(const char *str, int32_t nd) {
     s = (str[0] == '-') ? -1: 1;
 
     /* Leading integer */
-    i = str[1]-'0';
+    i = str[1] - '0';
 
     /* Get decimal places */
-    p10 = 1; dec = str[3]-'0'; /* First digit */
-    for (k=4; k<nd+2; k++) { p10 *= 10; dec = 10*dec + str[k]-'0'; }
+    p10 = 1; dec = str[3] - '0'; /* First digit */
+    for (k = 4; k < nd + 2; k++) { p10 *= 10; dec = 10 * dec + str[k] - '0'; }
 
     /* Result without power */
-    r = s*(i+(double)dec*.1/p10);
+    r = s * (i + (double)dec * .1 / p10);
 
     /* Get exponent */
-    s = (str[nd+3] == '-') ? -1: 1;
-    i = s*((str[nd+4]-'0')*10+(str[nd+5]-'0'));
+    s = (str[nd + 3] == '-') ? -1: 1;
+    i = s*((str[nd + 4] - '0') * 10 + (str[nd + 5] - '0'));
 
     /* Add power to result */
     while (i-- > 0) r *= 10.;
@@ -674,9 +684,9 @@ static alkcalc_cg w3jm(int32_t j1, int32_t m1, int32_t j2, int32_t m2,
      * desired argument, i.e., the following equatility between Wigner's 3jm  *
      * symbols and the function 'w3jm' holds:                                 *
      *                                                                        *
-     *        / j1 j2 j3  \                                                   *
-     *       |            | = w3jm(2*j1, 2*m1, 2*j2, 2*m2, 2*j3, 2*m3)        *
-     *       \  m1 m2 m3 /                                                    *
+     *   / j1 j2 j3  \                                                        *
+     *  |            | = w3jm(2 * j1, 2 * m1, 2 * j2, 2 * m2, 2 * j3, 2 * m3) *
+     *  \  m1 m2 m3 /                                                         *
      *                                                                        *
      * This allows to work with integers throughout this function.            */
 
@@ -688,54 +698,54 @@ static alkcalc_cg w3jm(int32_t j1, int32_t m1, int32_t j2, int32_t m2,
     result.sign = 1; result.numerator = 0; result.denominator = 1;
 
     /* Check if ji and mi (i=1,2,3) are compatible */
-    if (   (j1%2 && !(m1%2)) || (m1%2 && !(j1%2))
-        || (j2%2 && !(m2%2)) || (m2%2 && !(j2%2))
-        || (j3%2 && !(m3%2)) || (m3%2 && !(j3%2))) { return result; }
+    if (    (j1 % 2 && !(m1 % 2)) || (m1 % 2 && !(j1 % 2))
+         || (j2 % 2 && !(m2 % 2)) || (m2 % 2 && !(j2 % 2))
+         || (j3 % 2 && !(m3 % 2)) || (m3 % 2 && !(j3 % 2)) ) { return result; }
 
     /* Kronecker delta */
-    if (m1+m2+m3) { return result; }
+    if (m1 + m2 + m3) { return result; }
 
     /* Phase */
-    phase = (((j1-j2-m3)/2)%2) ? -1: 1;
+    phase = (((j1 - j2 - m3) / 2) % 2) ? -1: 1;
 
     /* Compute factorials in prefactors of sum */
-    f[0] = fac((j1+j2-j3)/2);
-    f[1] = fac((j1-j2+j3)/2);
-    f[2] = fac((-j1+j2+j3)/2);
-    f[3] = s64imul(fac((j1-m1)/2), fac((j1+m1)/2));
-    f[4] = s64imul(fac((j2-m2)/2), fac((j2+m2)/2));
-    f[5] = s64imul(fac((j3-m3)/2), fac((j3+m3)/2));
-    f[6] = fac((j1+j2+j3)/2+1); /* Used later */
+    f[0] = fac((j1 + j2 - j3) / 2);
+    f[1] = fac((j1 - j2 + j3) / 2);
+    f[2] = fac((-j1 + j2 + j3) / 2);
+    f[3] = s64imul(fac((j1 -m1) / 2), fac((j1 + m1) / 2));
+    f[4] = s64imul(fac((j2 -m2) / 2), fac((j2 + m2) / 2));
+    f[5] = s64imul(fac((j3 -m3) / 2), fac((j3 + m3) / 2));
+    f[6] = fac((j1 + j2 + j3) / 2 + 1); /* Used later */
     if (!(fs = ns64imul(6, f))) { return result; }
 
     /* Bounds for summation */
-    K = MAX(0, MAX((j2-j3-m1)/2, (j1-j3+m2)/2));
-    N = MIN((j1+j2-j3)/2, MIN((j1-m1)/2, (j2+m2)/2));
+    K = MAX(0, MAX((j2 - j3 - m1) / 2, (j1 - j3 + m2) / 2));
+    N = MIN((j1 + j2 - j3) / 2, MIN((j1 - m1) / 2, (j2 + m2) / 2));
 
     /* Summation */
     if (N < K) { return result; }
     A = (int64_t *)malloc((N-K+1)*sizeof(int64_t));
-    for (k=K; k<N+1; k++) {
-        s = (k%2) ? -1: 1;
+    for (k = K; k < N + 1; k++) {
+        s = (k % 2) ? -1: 1;
         g[0] = fac(k);
-        g[1] = fac((j1+j2-j3)/2-k);
-        g[2] = fac((j1-m1)/2-k);
-        g[3] = fac((j2+m2)/2-k);
-        g[4] = fac((j3-j2+m1)/2+k);
-        g[5] = fac((j3-j1-m2)/2+k);
-        A[k-K] = s64imul(s, ns64imul(6, g)); /* Denominators of summands */
+        g[1] = fac((j1 + j2 - j3) / 2 - k);
+        g[2] = fac((j1 - m1) / 2 - k);
+        g[3] = fac((j2 + m2) / 2 - k);
+        g[4] = fac((j3 - j2 + m1) / 2 + k);
+        g[5] = fac((j3 - j1 - m2) / 2 + k);
+        A[k - K] = s64imul(s, ns64imul(6, g)); /* Denominators of summands */
     }
     SN = 0; /* Numerator of sum */
-    for (k=0; k<N-K+1; k++) {
+    for (k = 0; k < N - K + 1; k++) {
         m = 1;
-        for (l=0; l<N-K+1; l++) {
+        for (l = 0; l < N - K + 1; l++) {
             if (l == k) { continue; }
             m = s64imul(m, A[l]);
         }
         SN = s64iadd(SN, m);
     }
     SD = 1; /* Denominator of sum */
-    for (k=0; k<N-K+1; k++) SD = s64imul(SD, A[k]);
+    for (k = 0; k < N - K + 1; k++) { SD = s64imul(SD, A[k]); }
     free(A);
 
     /* Assemble result */
@@ -756,10 +766,10 @@ static int64_t s64imul(int64_t a, int64_t b) {
     if (b == INT64_MIN) {
         if (a == 1) { return b; } else { goto s64imulOverflow; }
     }
-    if (   (a > 0 && b > 0 && a <= INT64_MAX/b)
-        || (a < 0 && b < 0 && -a <= INT64_MAX/(-b))
-        || (a > 0 && b < 0 && -a >= INT64_MIN/(-b))
-        || (a < 0 && b > 0 && -b >= INT64_MIN/(-a))) {
+    if (   (a > 0 && b > 0 && a <= INT64_MAX / b)
+        || (a < 0 && b < 0 && -a <= INT64_MAX/ (-b))
+        || (a > 0 && b < 0 && -a >= INT64_MIN/ (-b))
+        || (a < 0 && b > 0 && -b >= INT64_MIN/ (-a))) {
         return a*b;
     }
 s64imulOverflow:
@@ -769,7 +779,7 @@ s64imulOverflow:
 /* Secure 64-bit integer multiplication (n times)                             */
 static int64_t ns64imul(int32_t n, int64_t *a) {
     int32_t k; int64_t result = 1;
-    for (k=0; k<n; result = s64imul(result, a[k++]));
+    for (k = 0; k < n; result = s64imul(result, a[k++]));
     return result;
 }
 
@@ -781,8 +791,8 @@ static int64_t s64iadd(int64_t a, int64_t b) {
      * subtraction, the C99 standard guarantees that the expression evaluates *
      * to zero (see Sec. 6.5.5 in Ref. [11]).                                 */
 
-    if (a >= 0 && b <= INT64_MAX-a) { return a+b; }
-    if (a < 0 && a >= INT64_MIN && b >= INT64_MIN-a) { return a+b; }
+    if (a >= 0 && b <= INT64_MAX - a) { return a + b; }
+    if (a < 0 && a >= INT64_MIN && b >= INT64_MIN - a) { return a + b; }
     ERROR("OVERFLOW IN INTEGER ADDITION");
 }
 
@@ -790,14 +800,14 @@ static int64_t s64iadd(int64_t a, int64_t b) {
 static int64_t fac(int64_t n) {
     if (n < 0) { return 0; }
     int64_t l, m = 1;
-    for (l=0; l<n-1; l++) m = s64imul(m, n-l);
+    for (l = 0; l < n-1; l++) { m = s64imul(m, n - l); }
     return m;
 }
 
 /* Euclidean algorithm                                                        */
 static int64_t euclid(int64_t a, int64_t b) {
     int64_t c;
-    while (b != 0) { c = a%b; a = b; b = c; }
+    while (b != 0) { c = a % b; a = b; b = c; }
     return a;
 }
 
@@ -810,14 +820,14 @@ static double complex Ylml(int32_t l, int32_t ml, double theta, double phi) {
     double complex ac, y;
 
     /* Azimuthal contribution (here we still need the sign of ml) */
-    ac = COMPLEX(cos(ml*phi), sin(ml*phi));
+    ac = COMPLEX(cos(ml * phi), sin(ml * phi));
 
     /* Check input regime and react accordingly */
     sml = (ml < 0) ? -1: 1; ml *= sml;
     if (l < ml) { return COMPLEX(0., 0.); }
 
     /* Prefactor (the Condon-Shortley phase is in Legendre polynomials) */
-    pf = sqrt((2*l+1)*fac(l-ml)/(4.*PI*fac(l+ml)));
+    pf = sqrt((2 * l + 1) * fac(l - ml) / (4. * PI * fac(l + ml)));
 
     /* Polar contribution                                                     *
      *                                                                        *
@@ -830,18 +840,18 @@ static double complex Ylml(int32_t l, int32_t ml, double theta, double phi) {
      * rendered non-negative. This means automatically everything (up to a    *
      * phase included later) is correct. It is probably vital to view         *
      * 'theory.d/theory.pdf' to understand this part.                         */
-    phase = (ml%2) ? -1: 1; x = cos(theta);
+    phase = (ml % 2) ? -1: 1; x = cos(theta);
     if (l == ml) {
-        Pk = phase*fac(2*ml)/fac(ml)*pow(.25*(1.-x*x), .5*ml);
+        Pk = phase * fac(2 * ml) / fac(ml) * pow(.25 * (1. - x * x), .5 * ml);
     } else
-    if (l == ml+1) {
-        Pkm1 = phase*fac(2*ml)/fac(ml)*pow(.25*(1.-x*x), .5*ml);
-        Pk = (2*(ml+1)-1)*x*Pkm1;
+    if (l == ml + 1) {
+        Pkm1 = phase * fac(2 * ml) / fac(ml) * pow(.25 * (1. - x * x), .5 * ml);
+        Pk = (2 * (ml + 1) - 1) * x * Pkm1;
     } else {
-        Pkm2 = phase*fac(2*ml)/fac(ml)*pow(.25*(1.-x*x), .5*ml);
-        Pkm1 = (2*ml+1)*x*Pkm2; k = ml+2;
+        Pkm2 = phase * fac(2 * ml) / fac(ml) * pow(.25 * (1. - x * x), .5 * ml);
+        Pkm1 = (2 * ml + 1) * x * Pkm2; k = ml + 2;
         do {
-            Pk = ((2*k-1)*x*Pkm1-(k+ml-1)*Pkm2)/(k-ml);
+            Pk = ((2 * k - 1) * x * Pkm1 - (k + ml - 1) * Pkm2) / (k - ml);
             Pkm2 = Pkm1; Pkm1 = Pk;
         } while (k++ < l);
     }
@@ -855,7 +865,7 @@ static double complex Ylml(int32_t l, int32_t ml, double theta, double phi) {
 
 /* Convert symbolic Clebsch-Gordan coefficient into a floating-point number */
 static double cgtofloat(alkcalc_cg c) {
-    return c.sign*sqrt(c.numerator/(double)c.denominator);
+    return c.sign * sqrt(c.numerator / (double)c.denominator);
 }
 
 /* Thermal photon-occupation number at energy hnu and temperature T */
@@ -867,20 +877,24 @@ static double thermal_photon_occupation(double hnu, double T) {
      *                                                                        *
      * - Photon energy h x nu (hnu) in units of Hartree (EH)                  *
      * - Temperature T in units of Kelvin (K)                                 */
-    r = hnu/(3.166811e-6*T); /* For Boltzmann's constant see Ref. [5] */
+    r = hnu / (3.166811e-6 * T); /* For Boltzmann's constant see Ref. [5] */
 
     /* Compute photon occupation number according to Planck's law */
     if (T <= 0.) { return 0.; } /* Zero T case */
-    if (r < cbrt(720.*DBL_EPSILON)) { return 1./r-.5+1./12.*r; } /* High T */
-    if (r > -1./3.*log(DBL_EPSILON)) { x = exp(-r); return x+x*x; } /* Low T */
-    return 1./expm1(r); /* Intermediate regime */
+    if (r < cbrt(720. * DBL_EPSILON)) { /* High T */
+        return 1. / r - .5 + 1. / 12. * r;
+    }
+    if (r > -1. / 3. * log(DBL_EPSILON)) { /* Low T */
+        x = exp(-r); return x + x * x;
+    }
+    return 1. / expm1(r); /* Intermediate regime */
 }
 
 /* Fetch extremal principle quantum numbers */
 static void nextrm(char *species, int32_t *nmin, int32_t *nmax, int32_t l,
                    double j) {
 
-    char file[LEN_PATH_TO_ALKCALC+101], filename[101];
+    char file[LEN_PATH_TO_ALKCALC + 101], filename[101];
     int32_t J;
     FILE *fd;
 

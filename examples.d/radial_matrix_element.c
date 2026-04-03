@@ -21,7 +21,7 @@ int main(int argc, char **argv)
     nb = 3; lb = 0; jb = .5;
     nk = nb; lk = lb; jk = .5;
     p = 1.;
-    printf("Should be: %1.8lf\n", 1.5*nb*nk);
+    printf("Should be: %1.8lf\n", 1.5 * nb * nk);
     printf("Is: %1.8lf\n\n", alkcalc_rp("1H", nb, lb, jb, p, nk, lk, jk));
 
     printf("%s\n", "--- End");
