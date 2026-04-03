@@ -41,23 +41,17 @@ double alkcalc_Enlsj(char *species, int32_t n, int32_t l, double j) {
     (void)sprintf(filename, "data.d/energies-%s-%02d-%02d.dat", species, l, J);
     (void)strcpy(file, PATH_TO_ALKCALC);
     (void)strcat(file, filename);
-    if (!(fd = fopen(file, "r"))) {
-        printf("%s\n", "ERROR: REQUESTED EIGENENERGY NOT AVAILABLE");
-        exit(1);
-    }
+    if (!(fd = fopen(file, "r")))
+        ERROR("REQUESTED EIGENENERGY NOT AVAILABLE");
 
     /* Extract energy */
     move(fd, 9);
     (void)fscanf(fd, "MINIMAL PRINCIPAL QUANTUM NUMBER: %d\n", &nl);
-    if (n < nl) {
-        printf("%s\n", "ERROR: REQUESTED EIGENENERGY DOES NOT EXIST");
-        exit(1);
-    }
+    if (n < nl)
+        ERROR("REQUESTED EIGENENERGY DOES NOT EXIST");
     (void)fscanf(fd, "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %d\n", &nmax);
-    if (nmax < n) {
-        printf("%s\n", "ERROR: REQUESTED EIGENENERGY NOT AVAILABLE");
-        exit(1);
-    }
+    if (nmax < n)
+        ERROR("REQUESTED EIGENENERGY NOT AVAILABLE");
     move(fd, n+1);
     (void)fscanf(fd, "%d     %lf\n", &dummy, &E);
 
@@ -93,10 +87,8 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
     (void)sprintf(filename, "state-%s-%03d-%02d-%02d.dat", species, n, l, J);
     (void)strcpy(file, PATH_TO_STATES);
     (void)strcat(file, filename);
-    if (!(fd = fopen(file, "r"))) {
-        printf("%s\n", "ERROR: REQUESTED RADIAL EIGENSTATE NOT FOUND");
-        exit(1);
-    }
+    if (!(fd = fopen(file, "r")))
+        ERROR("REQUESTED RADIAL EIGENSTATE NOT FOUND");
 
     /* Read in metadata and move file pointer to data */
     move(fd, 7);
@@ -116,8 +108,7 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
             state->h = h = NULL;
             break;
         default:
-            printf("%s\n", "ERROR: INVALID ARGUMENT FOR 'RESULT'");
-            exit(1);
+            ERROR("INVALID ARGUMENT FOR 'RESULT'");
             break;
     }
     state->fnlsj = fnlsj = (double *)malloc(dim*sizeof(double));
@@ -150,10 +141,8 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
     (void)sprintf(filename, "data.d/discretisation-%s.dat", species);
     (void)strcpy(file, PATH_TO_ALKCALC);
     (void)strcat(file, filename);
-    if (!(fd = fopen(file, "r"))) {
-        printf("%s\n", "ERROR: REQUESTED DISCRETISATION DATA DOES NOT EXIST");
-        exit(1);
-    }
+    if (!(fd = fopen(file, "r")))
+        ERROR("REQUESTED DISCRETISATION DATA DOES NOT EXIST");
     move(fd, 8);
     (void)fscanf(fd, "%d %lf\n", &dummy, t);
     (void)fread(bfr = buffer = (char *)malloc(d), 1, d, fd);
@@ -318,18 +307,12 @@ alkcalc_spinor alkcalc_YlmlXsms(int32_t l, int32_t ml, double ms, double theta,
     alkcalc_spinor spinor;
 
     /* Check input validity */
-    if (l < 0 || INTEGER_ABS(ml) > l) {
-        printf("%s\n", "ERROR: INVALID ORBITAL ANGULAR MOMENTUM\n");
-        exit(1);
-    }
-    if (theta < 0 || PI < theta) {
-        printf("%s\n", "ERROR: INVALID POLAR ANGLE\n");
-        exit(1);
-    }
-    if (phi < 0 || 2.*PI < phi) {
-        printf("%s\n", "ERROR: INVALID AZIMUTHAL ANGLE\n");
-        exit(1);
-    }
+    if (l < 0 || INTEGER_ABS(ml) > l)
+        ERROR("INVALID ORBITAL ANGULAR MOMENTUM");
+    if (theta < 0 || PI < theta)
+        ERROR("INVALID POLAR ANGLE");
+    if (phi < 0 || 2.*PI < phi)
+        ERROR("INVALID AZIMUTHAL ANGLE");
 
     /* Compute value of spherical harmonic */
     y = Ylml(l, ml, theta, phi);
@@ -365,26 +348,16 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
 
     /* Check input validity */
     ll = 2*l; J = CONVERT(j); MJ = CONVERT(mj);
-    if (J < INTEGER_ABS(MJ)) { /* Ensure mj <= j */
-        printf("%s\n", "ERROR: J MUST BE LARGER EQUAL ABSOLUTE VALUE OF MJ\n");
-        exit(1);
-    }
-    if (J%2 != MJ%2) { /* Ensure (half-)int. */
-        printf("%s\n", "ERROR: HALF-INTEGER J(MJ) BUT INTEGER MJ(J)\n");
-        exit(1);
-    }
-    if (J != ll-1 && J != ll+1) { /* Ensure |l-1/2| <= j <= l+1/2 */
-        printf("%s\n", "ERROR: J MUST BE |L-1/2| OR L+1/2\n");
-        exit(1);
-    }
-    if (theta < 0 || PI < theta) {
-        printf("%s\n", "ERROR: INVALID POLAR ANGLE\n");
-        exit(1);
-    }
-    if (phi < 0 || 2.*PI < phi) {
-        printf("%s\n", "ERROR: INVALID AZIMUTHAL ANGLE\n");
-        exit(1);
-    }
+    if (J < INTEGER_ABS(MJ)) /* Ensure mj <= j */
+        ERROR("J MUST BE LARGER EQUAL ABSOLUTE VALUE OF MJ");
+    if (J%2 != MJ%2) /* Ensure (half-)int. */
+        ERROR("HALF-INTEGER J(MJ) BUT INTEGER MJ(J)");
+    if (J != ll-1 && J != ll+1) /* Ensure |l-1/2| <= j <= l+1/2 */
+        ERROR("J MUST BE |L-1/2| OR L+1/2");
+    if (theta < 0 || PI < theta)
+        ERROR("INVALID POLAR ANGLE");
+    if (phi < 0 || 2.*PI < phi)
+        ERROR("INVALID AZIMUTHAL ANGLE");
 
     /* Compute Clebsch-Gordan coefficients (spin up [u] and down [d]) */
     cgu = cgtofloat(alkcalc_cj1m1j2m2jmj(l, mj-.5, .5, .5, j, mj));
@@ -775,8 +748,7 @@ static int64_t s64imul(int64_t a, int64_t b) {
         || (a < 0 && b > 0 && -b >= INT64_MIN/(-a)))
         return a*b;
 s64imulOverflow:
-    printf("%s\n", "ERROR: OVERFLOW IN INTEGER MULTIPLICATION");
-    exit(1);
+    ERROR("OVERFLOW IN INTEGER MULTIPLICATION");
 }
 
 /* Secure 64-bit integer multiplication (n times)                             */
@@ -796,8 +768,7 @@ static int64_t s64iadd(int64_t a, int64_t b) {
 
     if (a >= 0 && b <= INT64_MAX-a) return a+b;
     if (a < 0 && a >= INT64_MIN && b >= INT64_MIN-a) return a+b;
-    printf("%s\n", "ERROR: OVERFLOW IN INTEGER ADDITION");
-    exit(1);
+    ERROR("OVERFLOW IN INTEGER ADDITION");
 }
 
 /* Integer factorial                                                          */
@@ -903,10 +874,8 @@ static void nextrm(char *species, int32_t *nmin, int32_t *nmax, int32_t l,
     (void)sprintf(filename, "data.d/energies-%s-%02d-%02d.dat", species, l, J);
     (void)strcpy(file, PATH_TO_ALKCALC);
     (void)strcat(file, filename);
-    if (!(fd = fopen(file, "r"))) {
-        printf("%s\n", "ERROR: REQUESTED ENERGY SERIES IS NOT AVAILABLE");
-        exit(1);
-    }
+    if (!(fd = fopen(file, "r")))
+        ERROR("REQUESTED ENERGY SERIES IS NOT AVAILABLE");
 
     /* Extract information */
     move(fd, 9);

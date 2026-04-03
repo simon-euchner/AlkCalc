@@ -38,6 +38,12 @@
 #define MAX(X, Y) ((X) > (Y)) ? (X): (Y)
 #define MIN(X, Y) ((X) > (Y)) ? (Y): (X)
 #define COMPLEX(X, Y) ((X)+(Y)*I)
+#define ERROR(...) do { \
+    fprintf(stderr, "ERROR (%s:%d): ", __FILE__, __LINE__); \
+    fprintf(stderr, __VA_ARGS__); \
+    fprintf(stderr, "\n"); \
+    exit(EXIT_FAILURE); \
+} while (0)
 
 /* -------------------------------------------------------------------------- *
  * Data type for radial eigenstates                                           *
