@@ -38,7 +38,9 @@ double alkcalc_Enlsj(char *species, int32_t n, int32_t l, double j) {
 
     /* Open file for reading */
     J = CONVERT(j);
-    (void)sprintf(filename, "data.d/energies-%s-%02d-%02d.dat", species, l, J);
+    (void)sprintf(filename,
+                  "data.d/energies-%s-%02" PRId32 "-%02" PRId32 ".dat", species,
+                  l, J);
     (void)strcpy(file, PATH_TO_ALKCALC);
     (void)strcat(file, filename);
     if (!(fd = fopen(file, "r"))) {
@@ -47,16 +49,17 @@ double alkcalc_Enlsj(char *species, int32_t n, int32_t l, double j) {
 
     /* Extract energy */
     move(fd, 9);
-    (void)fscanf(fd, "MINIMAL PRINCIPAL QUANTUM NUMBER: %d\n", &nl);
+    (void)fscanf(fd, "MINIMAL PRINCIPAL QUANTUM NUMBER: %" SCNd32 "\n", &nl);
     if (n < nl) {
         ERROR("REQUESTED EIGENENERGY DOES NOT EXIST");
     }
-    (void)fscanf(fd, "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %d\n", &nmax);
+    (void)fscanf(fd, "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" SCNd32 "\n",
+                 &nmax);
     if (nmax < n) {
         ERROR("REQUESTED EIGENENERGY NOT AVAILABLE");
     }
     move(fd, n + 1);
-    (void)fscanf(fd, "%d     %lf\n", &dummy, &E);
+    (void)fscanf(fd, "%" SCNd32 "     %lf\n", &dummy, &E);
 
     /* Clean up */
     fclose(fd); fd = NULL;
@@ -87,7 +90,9 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
 
     /* Open file with requested state */
     J = CONVERT(j);
-    (void)sprintf(filename, "state-%s-%03d-%02d-%02d.dat", species, n, l, J);
+    (void)sprintf(filename,
+                  "state-%s-%03" PRId32 "-%02" PRId32 "-%02" PRId32 ".dat",
+                  species, n, l, J);
     (void)strcpy(file, PATH_TO_STATES);
     (void)strcat(file, filename);
     if (!(fd = fopen(file, "r"))) {
@@ -96,7 +101,7 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
 
     /* Read in metadata and move file pointer to data */
     move(fd, 7);
-    (void)fscanf(fd, "NUMBER OF DISCRETISATION POINTS: %d\n", &N);
+    (void)fscanf(fd, "NUMBER OF DISCRETISATION POINTS: %" SCNd32 "\n", &N);
     move(fd, 2);
 
     /* Allocate memory for result */
@@ -149,7 +154,7 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
         ERROR("REQUESTED DISCRETISATION DATA DOES NOT EXIST");
     }
     move(fd, 8);
-    (void)fscanf(fd, "%d %lf\n", &dummy, t);
+    (void)fscanf(fd, "%" SCNd32 " %lf\n", &dummy, t);
     (void)fread(bfr = buffer = (char *)malloc(d), 1, d, fd);
     for (k = 0; k < N - 2; k++) {
         state->t[k + 1] = parse(bfr += c, ndf);
@@ -900,7 +905,9 @@ static void nextrm(char *species, int32_t *nmin, int32_t *nmax, int32_t l,
 
     /* Open file for reading */
     J = CONVERT(j);
-    (void)sprintf(filename, "data.d/energies-%s-%02d-%02d.dat", species, l, J);
+    (void)sprintf(filename,
+                  "data.d/energies-%s-%02" PRId32 "-%02" PRId32 ".dat", species,
+                  l, J);
     (void)strcpy(file, PATH_TO_ALKCALC);
     (void)strcat(file, filename);
     if (!(fd = fopen(file, "r"))) {
@@ -909,8 +916,9 @@ static void nextrm(char *species, int32_t *nmin, int32_t *nmax, int32_t l,
 
     /* Extract information */
     move(fd, 9);
-    (void)fscanf(fd, "MINIMAL PRINCIPAL QUANTUM NUMBER: %d\n", nmin);
-    (void)fscanf(fd, "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %d\n", nmax);
+    (void)fscanf(fd, "MINIMAL PRINCIPAL QUANTUM NUMBER: %" SCNd32 "\n", nmin);
+    (void)fscanf(fd, "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" SCNd32 "\n",
+                 nmax);
 
     /* Clean up */
     fclose(fd); fd = NULL;

@@ -96,15 +96,15 @@ void vint_initpar(double *rpar, int32_t *ipar) {
     while (l != (c = fgetc(fd)) && c != 'Z')
         while ((c = fgetc(fd)) != '\n');
     if (c == 'Z') {
-        ERROR("REQUESTED QUANTUM NUMBER 'L=%c' IS NOT KNOWN", l);
+        ERROR("REQUESTED QUANTUM NUMBER 'L = %c' IS NOT KNOWN", l);
     } else {
         (void)fgetc(fd);
-        (void)fscanf(fd, "%lf %lf %lf %lf %lf %d\n",
+        (void)fscanf(fd, "%lf %lf %lf %lf %lf %" SCNd32 "\n",
                      rpar, rpar + 1, rpar + 2, rpar + 3, rpar + 4, ipar + 3);
     }
     while ((c = fgetc(fd)) != 'Z');
-    (void)fscanf(fd, "%d\n", ipar);
-    (void)fscanf(fd, "ZC %d\n", ipar + 1);
+    (void)fscanf(fd, "%" SCNd32 "\n", ipar);
+    (void)fscanf(fd, "ZC %" SCNd32 "\n", ipar + 1);
     (void)fscanf(fd, "ALPHAD %lf\n", rpar + 5);
     (void)fscanf(fd, "M %lf(%lf)\n", rpar + 6, &dummy);
     /* IMPORTANT: Here is the position in the code where the mass correction, *

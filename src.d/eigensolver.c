@@ -35,7 +35,8 @@ int main(int argc, char **argv)
 /* Initialise eigenproblem (result owned by caller)                           */
 eigensolver_data *eigensolver_data_init() {
 
-    int32_t dim, *Hrs, *Hcs, *perm_r, *perm_c, *ipar, lo, k, k0, *info;
+    int *info;
+    int32_t dim, *Hrs, *Hcs, *perm_r, *perm_c, *ipar, lo, k, k0;
     double *vs, *hs, *Mdata, *Hdata, *b, *rpar, C, tk, runtime;
     clock_t tstart, tend;
     SuperMatrix H, *B;
@@ -131,7 +132,7 @@ eigensolver_data *eigensolver_data_init() {
     dgssv(&options, &H, perm_c, perm_r, &data->L, &data->U, B, stat, info);
     tend = clock(); runtime = (tend-tstart)/(double)CLOCKS_PER_SEC;
     if (*info) {
-        ERROR("LU-DECOMPOSITION FAILED WITH 'INFO = %d'", *info);
+        ERROR(("LU-DECOMPOSITION FAILED WITH 'INFO = %d'"), *info);
     } else {
         printf("LU-DECOMPOSITION SUCCESSFUL (RUNTIME: %1.3f S)\n\n", runtime);
     }
@@ -180,8 +181,8 @@ double step(int32_t k) {
 /* Solve eigenproblem                                                         */
 void solve(eigensolver_data *data) {
 
-    int32_t dim, ido, n, nl, nev, ncv, ldv, ldz, lworkl, *iparam, *ipntr, nerr,
-            info, k;
+    int ido, nerr, info;
+    int32_t dim, n, nl, nev, ncv, ldv, ldz, lworkl, *iparam, *ipntr, k;
     double tol, *resid, *v, *workd, *workl, *select, *d, *z, sigma, runtime,
            *dummy, iC;
     clock_t tstart, tend;
@@ -318,33 +319,35 @@ void save_energies(eigensolver_data *data, double *energies) {
     nl = (ipar = data->ipar)[3]; lo = ipar[2]; jj = 2 * (int32_t)j + 1;
     EGS = data->rpar[9]; runtime = (int32_t)data->runtime;
     dti = step(1); dtf = step(N - 1);
-    (void)sprintf(filename, "energies-%s-%02d-%02d.dat", species, lo, jj);
+    (void)sprintf(filename, "energies-%s-%02" PRId32 "-%02" PRId32 ".dat",
+                  species, lo, jj);
     (void)strcpy(file, "./data.d/");
     (void)strcat(file, filename);
     if (!(fd = fopen(file, "w"))) {
         ERROR("COULD NOT OPEN FILE '%s' FOR WRITING", filename);
     }
 
-    /* Read in metadata */
+    /* Save metadata */
     (void)fprintf(fd,
                   "EIGENENERGIES FOR '%s' [HARTREE]\n\n"
-                  "CPU TIME TO GENERATE DATA SET [S]: %d\n"
+                  "CPU TIME TO GENERATE DATA SET [S]: %" PRId32 "\n"
                   "GROUND STATE ENERGY [HARTREE]: %1.8lf\n"
                   "ORBITAL ANGULAR MOMENTUM [HBAR]: %c\n"
-                  "TOTAL ANGULAR MOMENTUM [HBAR]: %d/2\n"
+                  "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "/2\n"
                   "RMAX [BOHR'S RADIUS]: %1.3E\n"
-                  "NUMBER OF DISCRETISATION POINTS: %d\n"
+                  "NUMBER OF DISCRETISATION POINTS: %" PRId32 "\n"
                   "FIRST, FINAL STEPSIZE: %1.3E, %1.3E\n"
-                  "MINIMAL PRINCIPAL QUANTUM NUMBER: %d\n"
-                  "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %d\n\n\n\n"
+                  "MINIMAL PRINCIPAL QUANTUM NUMBER: %" PRId32 "\n"
+                  "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" PRId32 "\n\n\n\n"
                   "N   ENERGY\n\n",
                   species, runtime, EGS, l, jj, rmax, N, dti, dtf, nl, nmax);
 
-    /* Read in eigenenergies */
+    /* Save eigenenergies */
     n = 0;
-    while (++n < nl) { (void)fprintf(fd, "%03d\n", n); }
+    while (++n < nl) { (void)fprintf(fd, "%03" PRId32 "\n", n); }
     while (n++ < nmax + 1) {
-        (void)fprintf(fd, "%03d %+1.8E\n", n - 1, energies[n - (nl - 1) - 2]);
+        (void)fprintf(fd, "%03" PRId32 " %+1.8E\n", n - 1,
+                      energies[n - (nl - 1) - 2]);
     }
 
     /* Close file */
@@ -354,7 +357,7 @@ void save_energies(eigensolver_data *data, double *energies) {
 /* Save computed radial eigenstates to file                                   */
 void save_states(eigensolver_data *data, double *z) {
 
-    char file[LEN_PATH_TO_STATES+101], filename[101];
+    char file[LEN_PATH_TO_STATES + 101], filename[101];
     int32_t *ipar, nl, lo, jj, dim, n, k;
     FILE *fd;
 
@@ -365,27 +368,28 @@ void save_states(eigensolver_data *data, double *z) {
 
         /* Open file for writing */
         file[0] = filename[0] = '\0';
-        (void)sprintf(filename, "state-%s-%03d-%02d-%02d.dat", species, n, lo,
-                      jj);
+        (void)sprintf(filename,
+                      "state-%s-%03" PRId32 "-%02" PRId32 "-%02" PRId32 ".dat",
+                      species, n, lo, jj);
         (void)strcpy(file, PATH_TO_STATES);
         (void)strcat(file, filename);
 
-        /* Write metadata to file */
+        /* Save metadata */
         if (!(fd = fopen(file, "w"))) {
             ERROR("COULD NOT OPEN FILE '%s' FOR WRITING", filename);
         }
         (void)fprintf(fd,
                       "RADIAL EIGENSTATE FOR '%s' [DIMENSIONLESS]\n\n"
                       "COEFFICIENTS 'FK' (K = 1, ..., N-2)\n"
-                      "PRINCIPAL QUANTUM NUMBER (N): %d\n"
+                      "PRINCIPAL QUANTUM NUMBER (N): %" PRId32 "\n"
                       "ORBITAL ANGULAR MOMENTUM [HBAR]: %c\n"
-                      "TOTAL ANGULAR MOMENTUM [HBAR]: %d/2\n"
+                      "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "/2\n"
                       "RMAX [BOHR'S RADIUS]: %1.3E\n"
-                      "NUMBER OF DISCRETISATION POINTS: %d\n\n\n\n"
+                      "NUMBER OF DISCRETISATION POINTS: %" PRId32 "\n\n\n\n"
                       "FK\n\n",
                       species, n, l, jj, rmax, N);
 
-        /* Write state to file */
+        /* Save state */
         for (k = 0; k < dim; k++) {
             (void)fprintf(fd, "%+1.14E\n", z[dim * (n - nl) + k]);
         }
@@ -409,18 +413,18 @@ void save_discretisation() {
     (void)strcat(file, filename);
     if ((fd = fopen(file, "r"))) { return; }
 
-    /* Write metadata to file */
+    /* Save metadata */
     (void)fprintf(fd = fopen(file, "w"),
                   "DISCRETISATION DATA FOR SPECIES '%s'\n\n"
-                  "NUMBER OF DISCRETISATION POINTS: %d\n\n\n\n"
+                  "NUMBER OF DISCRETISATION POINTS: %" PRId32 "\n\n\n\n"
                   "K        T                     H\n\n",
                   species, N);
 
-    /* Write discretisation data to file */
-    fprintf(fd, "%08d %+1.14E\n", 0, 0.); tk = 0.;
+    /* Save discretisation data */
+    fprintf(fd, "%08" PRId32 " %+1.14E\n", 0, 0.); tk = 0.;
     for (k = 1; k < N; k++) {
         tk += (hk = step(k));
-        fprintf(fd, "%08d %+1.14E %+1.14E\n", k, tk, hk);
+        fprintf(fd, "%08" PRId32 " %+1.14E %+1.14E\n", k, tk, hk);
     }
 
     /* Close file */
