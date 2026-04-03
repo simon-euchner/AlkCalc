@@ -6,12 +6,6 @@
 
 #include "../interface.d/alkcalc.h"
 
-#define CONVERT(X) (int32_t)floor(2.*(X)+.5)
-#define INTEGER_ABS(X) (((X) > 0) ? (X): -1*(X))
-#define MAX(X, Y) ((X) > (Y)) ? (X): (Y)
-#define MIN(X, Y) ((X) > (Y)) ? (Y): (X)
-#define COMPLEX(X, Y) ((X)+(Y)*I)
-
 static void move(FILE *, int32_t);
 static inline double parse(const char *, int32_t);
 static alkcalc_cg w3jm(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);

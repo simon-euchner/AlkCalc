@@ -31,6 +31,15 @@
 #define LEN_PATH_TO_STATES 40
 
 /* -------------------------------------------------------------------------- *
+ * Macros for numerical applications and error handling                       *
+ * -------------------------------------------------------------------------- */
+#define CONVERT(X) (int32_t)floor(2.*(X)+.5)
+#define INTEGER_ABS(X) (((X) > 0) ? (X): -1*(X))
+#define MAX(X, Y) ((X) > (Y)) ? (X): (Y)
+#define MIN(X, Y) ((X) > (Y)) ? (Y): (X)
+#define COMPLEX(X, Y) ((X)+(Y)*I)
+
+/* -------------------------------------------------------------------------- *
  * Data type for radial eigenstates                                           *
  * -------------------------------------------------------------------------- */
 typedef struct _AlkcalcState {
