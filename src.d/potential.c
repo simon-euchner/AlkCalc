@@ -100,8 +100,9 @@ void vint_initpar(double *rpar, int32_t *ipar) {
     if (c == 'Z') {
         printf("ERROR: REQUESTED QUANTUM NUMBER 'L=%c' IS NOT KNOWN\n", l);
     } else {
-        (void)fscanf(fd, "%d %lf %lf %lf %lf %lf %d\n",
-                     &c, rpar, rpar+1, rpar+2, rpar+3, rpar+4, ipar+3);
+        (void)fgetc(fd);
+        (void)fscanf(fd, "%lf %lf %lf %lf %lf %d\n",
+                     rpar, rpar+1, rpar+2, rpar+3, rpar+4, ipar+3);
     }
     while ((c = fgetc(fd)) != 'Z');
     (void)fscanf(fd, "%d\n", ipar);
