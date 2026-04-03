@@ -26,6 +26,14 @@
 
 #define SPECIES_DATA "./interface.d/species.dat"
 
+/* Macro for error handling */
+#define ERROR(...) do { \
+    fprintf(stderr, "ERROR (%s:%d): ", __FILE__, __LINE__); \
+    fprintf(stderr, __VA_ARGS__); \
+    fprintf(stderr, "\n"); \
+    exit(EXIT_FAILURE); \
+} while (0)
+
 /* Data type to store data for eigensolver */
 typedef struct _EigensolverData {
     int32_t dim, *perm_r, *perm_c, ipar[4], info;

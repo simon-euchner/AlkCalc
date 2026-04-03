@@ -80,8 +80,7 @@ void vint_initpar(double *rpar, int32_t *ipar) {
 
     /* Open data file */
     if (!(fd = fopen(SPECIES_DATA, "r"))) {
-        printf("%s\n", "ERROR: COULD NOT OPEN 'SPECIES.DAT' FOR READING");
-        exit(1);
+        ERROR("COULD NOT OPEN 'SPECIES.DAT' FOR READING");
     }
 
     /* Search for identifier corresponding to 'species' */
@@ -89,8 +88,7 @@ void vint_initpar(double *rpar, int32_t *ipar) {
     while (strcmp(species, id)) {
         move(fd, id);
         if (!id[0]) {
-            printf("ERROR: REQUESTED SPECIES '%s' IS NOT KNOWN\n", species);
-            exit(1);
+            ERROR("REQUESTED SPECIES '%s' IS NOT KNOWN", species);
         }
     }
 
@@ -98,8 +96,7 @@ void vint_initpar(double *rpar, int32_t *ipar) {
     while (l != (c = fgetc(fd)) && c != 'Z')
         while ((c = fgetc(fd)) != '\n');
     if (c == 'Z') {
-        printf("ERROR: REQUESTED QUANTUM NUMBER 'L=%c' IS NOT KNOWN\n", l);
-        exit(1);
+        ERROR("REQUESTED QUANTUM NUMBER 'L=%c' IS NOT KNOWN", l);
     } else {
         (void)fgetc(fd);
         (void)fscanf(fd, "%lf %lf %lf %lf %lf %d\n",

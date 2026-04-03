@@ -41,17 +41,20 @@ double alkcalc_Enlsj(char *species, int32_t n, int32_t l, double j) {
     (void)sprintf(filename, "data.d/energies-%s-%02d-%02d.dat", species, l, J);
     (void)strcpy(file, PATH_TO_ALKCALC);
     (void)strcat(file, filename);
-    if (!(fd = fopen(file, "r")))
+    if (!(fd = fopen(file, "r"))) {
         ERROR("REQUESTED EIGENENERGY NOT AVAILABLE");
+    }
 
     /* Extract energy */
     move(fd, 9);
     (void)fscanf(fd, "MINIMAL PRINCIPAL QUANTUM NUMBER: %d\n", &nl);
-    if (n < nl)
+    if (n < nl) {
         ERROR("REQUESTED EIGENENERGY DOES NOT EXIST");
+    }
     (void)fscanf(fd, "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %d\n", &nmax);
-    if (nmax < n)
+    if (nmax < n) {
         ERROR("REQUESTED EIGENENERGY NOT AVAILABLE");
+    }
     move(fd, n+1);
     (void)fscanf(fd, "%d     %lf\n", &dummy, &E);
 
@@ -87,8 +90,9 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
     (void)sprintf(filename, "state-%s-%03d-%02d-%02d.dat", species, n, l, J);
     (void)strcpy(file, PATH_TO_STATES);
     (void)strcat(file, filename);
-    if (!(fd = fopen(file, "r")))
+    if (!(fd = fopen(file, "r"))) {
         ERROR("REQUESTED RADIAL EIGENSTATE NOT FOUND");
+    }
 
     /* Read in metadata and move file pointer to data */
     move(fd, 7);
@@ -136,13 +140,14 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
     state->n = n; state->l = l; state->j = J/2.;
 
     /* Read in discretisation data (if requested, i.e., if result = 'f') */
-    if (result == 'p') return state;
+    if (result == 'p') { return state; }
     file[0] = filename[0] = '\0';
     (void)sprintf(filename, "data.d/discretisation-%s.dat", species);
     (void)strcpy(file, PATH_TO_ALKCALC);
     (void)strcat(file, filename);
-    if (!(fd = fopen(file, "r")))
+    if (!(fd = fopen(file, "r"))) {
         ERROR("REQUESTED DISCRETISATION DATA DOES NOT EXIST");
+    }
     move(fd, 8);
     (void)fscanf(fd, "%d %lf\n", &dummy, t);
     (void)fread(bfr = buffer = (char *)malloc(d), 1, d, fd);
@@ -307,12 +312,15 @@ alkcalc_spinor alkcalc_YlmlXsms(int32_t l, int32_t ml, double ms, double theta,
     alkcalc_spinor spinor;
 
     /* Check input validity */
-    if (l < 0 || INTEGER_ABS(ml) > l)
+    if (l < 0 || INTEGER_ABS(ml) > l) {
         ERROR("INVALID ORBITAL ANGULAR MOMENTUM");
-    if (theta < 0 || PI < theta)
+    }
+    if (theta < 0 || PI < theta) {
         ERROR("INVALID POLAR ANGLE");
-    if (phi < 0 || 2.*PI < phi)
+    }
+    if (phi < 0 || 2.*PI < phi) {
         ERROR("INVALID AZIMUTHAL ANGLE");
+    }
 
     /* Compute value of spherical harmonic */
     y = Ylml(l, ml, theta, phi);
@@ -348,16 +356,21 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
 
     /* Check input validity */
     ll = 2*l; J = CONVERT(j); MJ = CONVERT(mj);
-    if (J < INTEGER_ABS(MJ)) /* Ensure mj <= j */
+    if (J < INTEGER_ABS(MJ)) { /* Ensure mj <= j */
         ERROR("J MUST BE LARGER EQUAL ABSOLUTE VALUE OF MJ");
-    if (J%2 != MJ%2) /* Ensure (half-)int. */
+    }
+    if (J%2 != MJ%2) { /* Ensure (half-)int. */
         ERROR("HALF-INTEGER J(MJ) BUT INTEGER MJ(J)");
-    if (J != ll-1 && J != ll+1) /* Ensure |l-1/2| <= j <= l+1/2 */
+    }
+    if (J != ll-1 && J != ll+1) { /* Ensure |l-1/2| <= j <= l+1/2 */
         ERROR("J MUST BE |L-1/2| OR L+1/2");
-    if (theta < 0 || PI < theta)
+    }
+    if (theta < 0 || PI < theta) {
         ERROR("INVALID POLAR ANGLE");
-    if (phi < 0 || 2.*PI < phi)
+    }
+    if (phi < 0 || 2.*PI < phi) {
         ERROR("INVALID AZIMUTHAL ANGLE");
+    }
 
     /* Compute Clebsch-Gordan coefficients (spin up [u] and down [d]) */
     cgu = cgtofloat(alkcalc_cj1m1j2m2jmj(l, mj-.5, .5, .5, j, mj));
@@ -395,8 +408,8 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
 
     /* Apply selection rules */
     JI = CONVERT(ji); JF = CONVERT(jf);
-    if (JI < 0 || JF < 0 || li < 0 || lf < 0) return 0;
-    if (INTEGER_ABS(JF-JI) > 2 || INTEGER_ABS(lf-li) != 1) return 0.;
+    if (JI < 0 || JF < 0 || li < 0 || lf < 0) { return 0; }
+    if (INTEGER_ABS(JF-JI) > 2 || INTEGER_ABS(lf-li) != 1) { return 0.; }
 
     /* Energy difference between initial (i) and final (f) state in Hartree */
     Efi = alkcalc_Enlsj(species, nf, lf, jf)-alkcalc_Enlsj(species, ni, li, ji);
@@ -613,10 +626,11 @@ SkipedSState:
 
 /* Move file descriptor down by 'nlines' lines                                */
 static void move(FILE *fd, int32_t nlines) {
-    int32_t k, c;
+    int c;
+    int32_t k;
     for (k=0; k<nlines; k++) {
         while ((c = fgetc(fd)) != '\n' && c != EOF);
-        if (c == EOF) break;
+        if (c == EOF) { break; };
     }
 }
 
@@ -676,10 +690,10 @@ static alkcalc_cg w3jm(int32_t j1, int32_t m1, int32_t j2, int32_t m2,
     /* Check if ji and mi (i=1,2,3) are compatible */
     if (   (j1%2 && !(m1%2)) || (m1%2 && !(j1%2))
         || (j2%2 && !(m2%2)) || (m2%2 && !(j2%2))
-        || (j3%2 && !(m3%2)) || (m3%2 && !(j3%2))) return result;
+        || (j3%2 && !(m3%2)) || (m3%2 && !(j3%2))) { return result; }
 
     /* Kronecker delta */
-    if (m1+m2+m3) return result;
+    if (m1+m2+m3) { return result; }
 
     /* Phase */
     phase = (((j1-j2-m3)/2)%2) ? -1: 1;
@@ -692,14 +706,14 @@ static alkcalc_cg w3jm(int32_t j1, int32_t m1, int32_t j2, int32_t m2,
     f[4] = s64imul(fac((j2-m2)/2), fac((j2+m2)/2));
     f[5] = s64imul(fac((j3-m3)/2), fac((j3+m3)/2));
     f[6] = fac((j1+j2+j3)/2+1); /* Used later */
-    if (!(fs = ns64imul(6, f))) return result;
+    if (!(fs = ns64imul(6, f))) { return result; }
 
     /* Bounds for summation */
     K = MAX(0, MAX((j2-j3-m1)/2, (j1-j3+m2)/2));
     N = MIN((j1+j2-j3)/2, MIN((j1-m1)/2, (j2+m2)/2));
 
     /* Summation */
-    if (N < K) return result;
+    if (N < K) { return result; }
     A = (int64_t *)malloc((N-K+1)*sizeof(int64_t));
     for (k=K; k<N+1; k++) {
         s = (k%2) ? -1: 1;
@@ -715,7 +729,7 @@ static alkcalc_cg w3jm(int32_t j1, int32_t m1, int32_t j2, int32_t m2,
     for (k=0; k<N-K+1; k++) {
         m = 1;
         for (l=0; l<N-K+1; l++) {
-            if (l == k) continue;
+            if (l == k) { continue; }
             m = s64imul(m, A[l]);
         }
         SN = s64iadd(SN, m);
@@ -735,7 +749,7 @@ static alkcalc_cg w3jm(int32_t j1, int32_t m1, int32_t j2, int32_t m2,
 
 /* Secure 64-bit integer multiplication                                       */
 static int64_t s64imul(int64_t a, int64_t b) {
-    if (!a || !b) return 0;
+    if (!a || !b) { return 0; }
     if (a == INT64_MIN) {
         if (b == 1) { return a; } else { goto s64imulOverflow; }
     }
@@ -745,8 +759,9 @@ static int64_t s64imul(int64_t a, int64_t b) {
     if (   (a > 0 && b > 0 && a <= INT64_MAX/b)
         || (a < 0 && b < 0 && -a <= INT64_MAX/(-b))
         || (a > 0 && b < 0 && -a >= INT64_MIN/(-b))
-        || (a < 0 && b > 0 && -b >= INT64_MIN/(-a)))
+        || (a < 0 && b > 0 && -b >= INT64_MIN/(-a))) {
         return a*b;
+    }
 s64imulOverflow:
     ERROR("OVERFLOW IN INTEGER MULTIPLICATION");
 }
@@ -766,14 +781,14 @@ static int64_t s64iadd(int64_t a, int64_t b) {
      * subtraction, the C99 standard guarantees that the expression evaluates *
      * to zero (see Sec. 6.5.5 in Ref. [11]).                                 */
 
-    if (a >= 0 && b <= INT64_MAX-a) return a+b;
-    if (a < 0 && a >= INT64_MIN && b >= INT64_MIN-a) return a+b;
+    if (a >= 0 && b <= INT64_MAX-a) { return a+b; }
+    if (a < 0 && a >= INT64_MIN && b >= INT64_MIN-a) { return a+b; }
     ERROR("OVERFLOW IN INTEGER ADDITION");
 }
 
 /* Integer factorial                                                          */
 static int64_t fac(int64_t n) {
-    if (n < 0) return 0;
+    if (n < 0) { return 0; }
     int64_t l, m = 1;
     for (l=0; l<n-1; l++) m = s64imul(m, n-l);
     return m;
@@ -799,7 +814,7 @@ static double complex Ylml(int32_t l, int32_t ml, double theta, double phi) {
 
     /* Check input regime and react accordingly */
     sml = (ml < 0) ? -1: 1; ml *= sml;
-    if (l < ml) return COMPLEX(0., 0.);
+    if (l < ml) { return COMPLEX(0., 0.); }
 
     /* Prefactor (the Condon-Shortley phase is in Legendre polynomials) */
     pf = sqrt((2*l+1)*fac(l-ml)/(4.*PI*fac(l+ml)));
@@ -855,8 +870,8 @@ static double thermal_photon_occupation(double hnu, double T) {
     r = hnu/(3.166811e-6*T); /* For Boltzmann's constant see Ref. [5] */
 
     /* Compute photon occupation number according to Planck's law */
-    if (T <= 0.) return 0.; /* Zero T case */
-    if (r < cbrt(720.*DBL_EPSILON)) return 1./r-.5+1./12.*r; /* High T */
+    if (T <= 0.) { return 0.; } /* Zero T case */
+    if (r < cbrt(720.*DBL_EPSILON)) { return 1./r-.5+1./12.*r; } /* High T */
     if (r > -1./3.*log(DBL_EPSILON)) { x = exp(-r); return x+x*x; } /* Low T */
     return 1./expm1(r); /* Intermediate regime */
 }
@@ -874,8 +889,9 @@ static void nextrm(char *species, int32_t *nmin, int32_t *nmax, int32_t l,
     (void)sprintf(filename, "data.d/energies-%s-%02d-%02d.dat", species, l, J);
     (void)strcpy(file, PATH_TO_ALKCALC);
     (void)strcat(file, filename);
-    if (!(fd = fopen(file, "r")))
+    if (!(fd = fopen(file, "r"))) {
         ERROR("REQUESTED ENERGY SERIES IS NOT AVAILABLE");
+    }
 
     /* Extract information */
     move(fd, 9);

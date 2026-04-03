@@ -32,9 +32,9 @@
  * -------------------------------------------------------------------------- */
 const char      *species     =         "1H"                                    ;
 const int32_t    N           =       100000                                    ;
-const int32_t    nmax        =           70                                    ;
-const char       l           =          'S'                                    ;
+const int32_t    nmax        =            6                                    ;
+const char       l           =          'P'                                    ;
 const double     j           =             .5                                  ;
 const double     rmax        =        10000.                                   ;
-const double     offset      =            1.6                                  ;
+const double     offset      =            1.2                                  ;
 const double     shift       =            1.                                   ;

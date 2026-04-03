@@ -62,14 +62,12 @@ eigensolver_data *eigensolver_data_init() {
 
     /* Sanity check for specified maximal principal quantum number */
     if (nmax < ipar[3]) {
-        printf("%s\n", "ERROR: TOO SMALL MAXIMAL PRINCIPAL QUANTUM NUMBER");
-        exit(1);
+        ERROR("TOO SMALL MAXIMAL PRINCIPAL QUANTUM NUMBER");
     }
 
     /* Sanity check for number of discretisation points */
     if (N < 3) {
-        printf("%s\n", "ERROR: TOO FEW DISCRETISATION POINTS");
-        exit(1);
+        ERROR("TOO FEW DISCRETISATION POINTS");
     }
 
     /* Compute potential vector and step sizes */
@@ -131,8 +129,7 @@ eigensolver_data *eigensolver_data_init() {
     dgssv(&options, &H, perm_c, perm_r, &data->L, &data->U, B, stat, info);
     tend = clock(); runtime = (tend-tstart)/(double)CLOCKS_PER_SEC;
     if (*info) {
-        printf("ERROR: LU-DECOMPOSITION FAILED WITH 'INFO = %d'\n", *info);
-        exit(1);
+        ERROR("LU-DECOMPOSITION FAILED WITH 'INFO = %d'", *info);
     } else {
         printf("LU-DECOMPOSITION SUCCESSFUL (RUNTIME: %1.3f S)\n\n", runtime);
     }
@@ -190,8 +187,8 @@ void solve(eigensolver_data *data) {
     /* Initialise variables for Lanczos algorithm */
     dim = data->dim;
     ido = 0; n = dim; nl = data->ipar[3]; nev = nmax-nl+1;
-    if ((ncv = 2*nev+1) < 20) ncv = 20;
-    if (ncv > dim) ncv = dim;
+    if ((ncv = 2*nev+1) < 20) { ncv = 20; }
+    if (ncv > dim) { ncv = dim; }
     ldv = dim; ldz = dim; lworkl = ncv*(8+ncv); info = 0; tol = 1e-12;
     iparam = (int32_t *)calloc(11, sizeof(int32_t));
     ipntr = (int32_t *)calloc(11, sizeof(int32_t));
@@ -218,18 +215,18 @@ void solve(eigensolver_data *data) {
 
         /* Check if call was successful */
         if (ido != 1 && ido != -1 && ido != 2 && ido != 99) {
-            printf("ERROR: ERROR DURING ITERATION: IDO = %d\n", ido);
+            ERROR("ERROR DURING ITERATION: IDO = %d", ido);
             nerr++;
         }
         if (info != 0 && info != 1) {
-            printf("ERROR: ERROR DURING ITERATION: INFO = %d\n", info);
+            ERROR("ERROR DURING ITERATION: INFO = %d", info);
             nerr++;
         }
         if (info == 1) {
-            printf("%s\n", "ERROR: REACHED MAXIMAL NUMBER OF ITERATIONS");
+            ERROR("REACHED MAXIMAL NUMBER OF ITERATIONS");
             nerr++;
         }
-        if (nerr) exit(1);
+        if (nerr) { exit(1); }
 
         /* React to instructions from 'DSAUPD' */
         if (ido == 1) { /* Compute action of shift-inverted Hamiltonian */
@@ -316,10 +313,8 @@ void save_energies(eigensolver_data *data, double *energies) {
     (void)sprintf(filename, "energies-%s-%02d-%02d.dat", species, lo, jj);
     (void)strcpy(file, "./data.d/");
     (void)strcat(file, filename);
-    if (!(fd = fopen(file, "w"))) {
-        printf("ERROR: COULD NOT OPEN FILE '%s' FOR WRITING\n", filename);
-        exit(1);
-    }
+    if (!(fd = fopen(file, "w")))
+        ERROR("COULD NOT OPEN FILE '%s' FOR WRITING", filename);
 
     /* Read in metadata */
     (void)fprintf(fd,
@@ -367,8 +362,7 @@ void save_states(eigensolver_data *data, double *z) {
 
         /* Write metadata to file */
         if (!(fd = fopen(file, "w"))) {
-            printf("ERROR: COULD NOT OPEN FILE '%s' FOR WRITING\n", filename);
-            exit(1);
+            ERROR("COULD NOT OPEN FILE '%s' FOR WRITING", filename);
         }
         (void)fprintf(fd,
                       "RADIAL EIGENSTATE FOR '%s' [DIMENSIONLESS]\n\n"
@@ -401,7 +395,7 @@ void save_discretisation() {
     (void)sprintf(filename, "discretisation-%s.dat", species);
     (void)strcpy(file, "./data.d/");
     (void)strcat(file, filename);
-    if ((fd = fopen(file, "r"))) return;
+    if ((fd = fopen(file, "r"))) { return; }
 
     /* Write metadata to file */
     (void)fprintf(fd = fopen(file, "w"),
