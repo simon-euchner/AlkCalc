@@ -67,7 +67,7 @@ eigensolver_data *eigensolver_data_init() {
     }
 
     /* Sanity check for number of discretisation points */
-    if (N < 3) {
+    if (N < 4) {
         ERROR("TOO FEW DISCRETISATION POINTS");
     }
 
@@ -78,7 +78,7 @@ eigensolver_data *eigensolver_data_init() {
     for (k = 1; k < N - 1; k++) {
         tk += (hs[k - 1] = step(k));
         vs[k - 1] = lo * (lo + 1.) / (2. * tk * tk)
-                  + C * vint(tk, rpar, ipar) + offset-shift;
+                  + C * vint(tk, rpar, ipar) + offset - shift;
     }
     hs[N - 2] = step(N - 1);
 
@@ -106,15 +106,15 @@ eigensolver_data *eigensolver_data_init() {
         Hdata[k0] = -.5 / hs[k] + .5 * (vs[k - 1] + vs[k]) * Mdata[k0];
         Hdata[k0 + 1] = .5 / hs[k] + .5 / hs[k + 1] + vs[k] * Mdata[k0 + 1];
         Hdata[k0 + 2] = -.5 / hs[k + 1]
-                      + .5* (vs[k] + vs[k + 1]) * Mdata[k0 + 2];
+                      + .5 * (vs[k] + vs[k + 1]) * Mdata[k0 + 2];
         Hrs[k0] = k - 1; Hrs[k0 + 1] = k; Hrs[k0 + 2] = k + 1;
         Hcs[k + 1] = Hcs[k] + 3;
     }
     k0 = 2 + 3 * (dim - 2);
-    Hdata[k0] = -.5 / hs[N - 3] + .5* (vs[N - 4] + vs[N - 3]) * Mdata[k0];
+    Hdata[k0] = -.5 / hs[N - 3] + .5 * (vs[N - 4] + vs[N - 3]) * Mdata[k0];
     Hdata[k0 + 1] = .5 / hs[N - 3] + .5 / hs[N - 2] + vs[N - 3] * Mdata[k0 + 1];
     Hrs[k0] = dim - 2; Hrs[k0 + 1] = dim - 1;
-    Hcs[dim] += Hcs[dim - 1] + 2;
+    Hcs[dim] = Hcs[dim - 1] + 2;
     dCreate_CompCol_Matrix(&H, dim, dim, 3 * dim - 2, Hdata, Hrs, Hcs, SLU_NC,
                            SLU_D, SLU_GE);
 
@@ -127,10 +127,10 @@ eigensolver_data *eigensolver_data_init() {
 
     /* Perform LU decomposition */
     tend = clock();
-    runtime = (tend-tstart)/(double)CLOCKS_PER_SEC; data->runtime = runtime;
+    runtime = (tend - tstart)/(double)CLOCKS_PER_SEC; data->runtime = runtime;
     tstart = clock(); info = &data->info;
     dgssv(&options, &H, perm_c, perm_r, &data->L, &data->U, B, stat, info);
-    tend = clock(); runtime = (tend-tstart)/(double)CLOCKS_PER_SEC;
+    tend = clock(); runtime = (tend - tstart)/(double)CLOCKS_PER_SEC;
     if (*info) {
         ERROR(("LU-DECOMPOSITION FAILED WITH 'INFO = %d'"), *info);
     } else {
@@ -174,7 +174,7 @@ double step(int32_t k) {
 
     double hk;
 
-    hk = rmax*(2 * k - 1)/((double)(N - 1) * (N - 1));
+    hk = rmax * (2 * k - 1)/((double)(N - 1) * (N - 1));
 
     return hk;
 }
@@ -412,10 +412,13 @@ void save_discretisation() {
     (void)sprintf(filename, "discretisation-%s.dat", species);
     (void)strcpy(file, "./data.d/");
     (void)strcat(file, filename);
-    if ((fd = fopen(file, "r"))) { return; }
+    if ((fd = fopen(file, "r"))) { fclose(fd); fd = NULL; return; }
 
     /* Save metadata */
-    (void)fprintf(fd = fopen(file, "w"),
+    if (!(fd = fopen(file, "w"))) {
+        ERROR("COULD NOT WRITE DICRETISATION DATA");
+    }
+    (void)fprintf(fd,
                   "DISCRETISATION DATA FOR SPECIES '%s'\n\n"
                   "NUMBER OF DISCRETISATION POINTS: %" PRId32 "\n\n\n\n"
                   "K        T                     H\n\n",

@@ -22,7 +22,7 @@
  * Settings                                                                   *
  *                                                                            *
  * species   : Atom or ion species                                            *
- * N         : Number of discretisation points (N > 2)                        *
+ * N         : Number of discretisation points (N > 3)                        *
  * nmax      : Maximal principle quantum number                               *
  * l         : Orbital angular momentum quantum number                        *
  * j         : Total angular momentum quantum number                          *
@@ -31,10 +31,10 @@
  * shift     : Shift for shift-invert mode Ref. [3]                           *
  * -------------------------------------------------------------------------- */
 const char      *species     =         "1H"                                    ;
-const int32_t    N           =       100000                                    ;
+const int32_t    N           =      1000000                                    ;
 const int32_t    nmax        =            6                                    ;
-const char       l           =          'P'                                    ;
+const char       l           =          'S'                                    ;
 const double     j           =             .5                                  ;
 const double     rmax        =        10000.                                   ;
-const double     offset      =            1.2                                  ;
+const double     offset      =            1.3                                  ;
 const double     shift       =            1.                                   ;
