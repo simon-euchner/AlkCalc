@@ -190,7 +190,7 @@ void solve(eigensolver_data *data) {
 
     /* Initialise variables for Lanczos algorithm */
     dim = data->dim;
-    ido = 0; n = dim; nl = data->ipar[3]; nev = nmax-nl+1;
+    ido = 0; n = dim; nl = data->ipar[3]; nev = nmax - nl + 1;
     if ((ncv = 2 * nev + 1) < 20) { ncv = 20; }
     if (ncv > dim) { ncv = dim; }
     ldv = dim; ldz = dim; lworkl = ncv * (8 + ncv); info = 0; tol = 1e-12;
