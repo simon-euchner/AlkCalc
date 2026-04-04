@@ -36,7 +36,7 @@
  * -------------------------------------------------------------------------- */
 #define CONVERT(X) (int32_t)floor(2. * (X) + .5)
 #define INTEGER_ABS(X) (((X) > 0) ? (X): -(X))
-#define MAX(X, Y) (((X) > (Y)) ? (X): (Y))
+#define MAX(X, Y) (((X) > (Y)) ? (X): (Y)) /* Careful with X++ and alike! */
 #define MIN(X, Y) (((X) > (Y)) ? (Y): (X))
 #define COMPLEX(X, Y) ((X) + (Y) * I)
 #define ERROR(...) do { \
