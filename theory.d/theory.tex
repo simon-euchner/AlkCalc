@@ -199,7 +199,7 @@
     This document's purpose is to define the Hamiltonian which \alkcalc is
     designed to diagonalise. Moreover, it formally defines the numerically
     computed quantities and hence serves as a reference for the user. In
-    particular, the final section is a reference manual or the library
+    particular, the final section is a reference manual for the library
     functions.
 
     %%% SECTION
@@ -280,7 +280,7 @@
     \end{equation}
     which accounts for the polarisation of the screened nucleus due to the
     presence of the valence electron. Here, $r_\mathrm{c}$ is the effective
-    nucleus' size and $\alpha_\mathrm{d}$ its polariseability. Finally,
+    nucleus' size and $\alpha_\mathrm{d}$ its polarisability. Finally,
     \begin{equation}\label{eq:vrIons}
         V_\mathrm{R}(r;\bm{L}^2,\bm{S}^2,\bm{J}^2)
         =
@@ -393,7 +393,7 @@
         (-1)^{m_l}\frac{(2m_l)!}{2^{m_l}m_l!} (1-x^2)^{m_l\slash{2}}
     \,,
     \end{equation}
-    in combination with $P^{m_l}_l(x)=0$ for $l<m_j$. Negative values of $m_l$
+    in combination with $P^{m_l}_l(x)=0$ for $l<m_l$. Negative values of $m_l$
     are treated with the relation
     \begin{equation}
         P^{-m_l}_l = (-1)^{m_l} \frac{(l-m_l)!}{(l+m_l)!}P^{m_l}_l
@@ -427,9 +427,9 @@
     $\norm*{\bm{\alpha}}\in[0,2\pii)$. Moreover, the angular momentum
     Hamiltonian is invariant under the action of $\rho$, such that it is
     automatically block diagonal. The irreducible representations of
-    $\mathrm{SU}(2)$ are $j(j+1)$-dimensional, with
+    $\mathrm{SU}(2)$ are $(2j+1)$-dimensional, with
     $j=0,1\slash{2},1,3\slash{2},2,\dots$, such that the blocks have dimensions
-    $\mu_j{j}(j+1)$, where $\mu_j$ is the multiplicity of the irreducible
+    $\mu_j(2j+1)$, where $\mu_j$ is the multiplicity of the irreducible
     representation $j$ in the direct sum decomposition of $\rho$. The
     eigenvalues associated to the blocks are operators on the radial Hilbert
     space. The multiplicities are $\mu_{j}=2$ and $\mu_0=0$, because for each
@@ -586,7 +586,7 @@
     \,.
     \end{equation}
     for $k=1,\dots,N-2$, and for $k=0$ and $k=N-1$ the Dirichlet boundary
-    conditions $f_{n,l,s,j}(0)=f_{n,l,s,j}(t_\mathrm{max})$ lead to the
+    conditions $f_{n,l,s,j}(0)=f_{n,l,s,j}(t_\mathrm{max})=0$ lead to the
     canonical choice $\phi_0=\phi_{N-1}\equiv0$. To obtain a matrix problem
     which approximates Eq.~\eqref{eq:eigenproblem} we compute projections of it
     onto the elements with the real scalar product (`dummy' functions
@@ -623,7 +623,7 @@
     This expansion automatically fulfils the Dirichlet boundary conditions
     $f(0)=f(t_\mathrm{max})=0$. Projection, i.e., applying the map
     $B(\phi_k,\cdot)$ for all $k=1,\dots,N-2$, yields a matrix eigenproblem
-    who's solutions converge to solutions of Eq.~\eqref{eq:eigenproblem} as $N$
+    whose solutions converge to solutions of Eq.~\eqref{eq:eigenproblem} as $N$
     tends to infinity:
     \begin{equation}\label{eq:matrixEigenproblem}
         (K+V) \bm{f} = \lambda M \bm{f}
@@ -801,7 +801,7 @@
     \end{equation}
     with the energy difference
     $\EH\bar{E}_\mathrm{f,i}=E_\mathrm{f}-E_\mathrm{i}$. Note that we sum over
-    the all final $m'_j$, because we are interested in transitions between the
+    all final $m'_j$, because we are interested in transitions between the
     fine-structure states without resolving the Zeeman sub-levels. The oscillator
     strength is a measure for how strongly the induced Hertzian (electric)
     dipole oscillates: the radiation power is large for spatially large dipoles
@@ -883,7 +883,7 @@
 
     To compute the lifetime of a fine-structure state, we need to calculate the
     so-called `Einstein-A' coefficient \cite{einstein1917,friedrich2017}. It is
-    a rate, that describes the number of spontaneous emissions per unit time at
+    a rate that describes the number of spontaneous emissions per unit time at
     zero temperature. The total decay rate, at zero temperature, is given by the
     sum over all Einstein-A coefficients. In the dipole approximation this sum
     is given by the expression \cite{friedrich2017}:
@@ -915,7 +915,7 @@
     rate only for zero temperature case. At finite temperature, spontaneous
     transitions increasing the energy may be driven as well, if thermal
     fluctuations are sufficiently strong. The background spectral density is
-    given by Plank's law, which yields for the average photon number at
+    given by Planck's law, which yields for the average photon number at
     frequency $\omega$ and temperature $T$:
     \begin{equation}
         n(\omega,T)
@@ -965,7 +965,7 @@
     use $q=0$, for $q\in[0.25,0.75)$ we use $q=1\slash{2}$, and so on, in both
     the negative and positive direction. In the following manual, this
     convention is applied to all quantum numbers that can take half-integer
-    values, unless states otherwise.
+    values, unless stated otherwise.
 
     \sffamily%
     \pagestyle{plain}%
