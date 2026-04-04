@@ -129,7 +129,7 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
      * instance, if the floating-point values are of the form '+1.23E+45',    *
      * ndf = 3. If the integers, numbering the discretisation points, are of  *
      * the form '0123', ndi = 4. The integers a, b, c, and d repeatedly       *
-     * appear in the code. They only dependent on ndi and ndf.                */
+     * appear in the code. They dependent only on ndi and ndf.                */
     ndi = 8; ndf = 15;
     a = ndf + 7;
     b = dim * a - 1;
@@ -274,7 +274,7 @@ double alkcalc_rp(char *species, int32_t nb, int32_t lb, double jb, double p,
         rp += f[k] * (   Rpo[k - 1] * g[k - 1]
                        + Rpd[k] * g[k] + Rpo[k] * g[k + 1] );
     }
-    rp += f[dim-1] * (Rpo[dim - 2] * g[dim - 2] + Rpd[dim - 1] * g[dim - 1]);
+    rp += f[dim - 1] * (Rpo[dim - 2] * g[dim - 2] + Rpd[dim - 1] * g[dim - 1]);
 
     /* Clean up */
     alkcalc_state_free(bra); bra = NULL;
@@ -299,7 +299,7 @@ alkcalc_cg alkcalc_cj1m1j2m2jmj(double j1, double m1, double j2, double m2,
     J2 = CONVERT(j2); M2 = CONVERT(m2);
     J = CONVERT(j); MJ = CONVERT(mj);
 
-    /* Wigner's 3jm symbol (no '/ 2' necessary, see source for 'w3jm' */
+    /* Wigner's 3jm symbol (no '/ 2' necessary, see source for 'w3jm') */
     result = w3jm(J1, M1, J2, M2, J, -MJ);
 
     /* Add phase and scaling factor */
@@ -433,7 +433,8 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
     if (INTEGER_ABS(JF-JI) > 2 || INTEGER_ABS(lf-li) != 1) { return 0.; }
 
     /* Energy difference between initial (i) and final (f) state in Hartree */
-    Efi = alkcalc_Enlsj(species, nf, lf, jf)-alkcalc_Enlsj(species, ni, li, ji);
+    Efi = alkcalc_Enlsj(species, nf, lf, jf)
+        - alkcalc_Enlsj(species, ni, li, ji);
 
     /* Radial dipole-transition matrix element between (i) and (f) */
     r = alkcalc_rp(species, ni, li, ji, 1., nf, lf, jf);
@@ -539,7 +540,7 @@ SkipedSState:
         for (k = nlm1 - 1; k >= nmnlm1; k--) {
 
             /* j'=l-s */
-            hnu = En-alkcalc_Enlsj(species, k, lm, jm);
+            hnu = En - alkcalc_Enlsj(species, k, lm, jm);
             fftoi = -alkcalc_fitof(species, n, l, j, k, lm, jm);
             nocc = thermal_photon_occupation(hnu, T);
             Gamma += hnu * hnu * fftoi * (1. + nocc);
@@ -578,7 +579,7 @@ SkipedSState:
         for (k = nlp1 - 1; k >= nmnlp1; k--) {
 
             /* j'=l+s */
-            hnu = En-alkcalc_Enlsj(species, k, lp, jp);
+            hnu = En - alkcalc_Enlsj(species, k, lp, jp);
             fftoi = -alkcalc_fitof(species, n, l, j, k, lp, jp);
             nocc = thermal_photon_occupation(hnu, T);
             Gamma += hnu * hnu * fftoi * (1. + nocc);
