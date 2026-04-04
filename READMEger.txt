@@ -9,7 +9,7 @@
 
 Kontakt.
 
-    Bei etwaigen Zweifeln, Fragen und/order Anregungen zögern Sie bitte nicht
+    Bei etwaigen Zweifeln, Fragen und/order Anregungen zögern Sie bitte nicht,
     den Autor zu kontaktieren.
 
         Simon Euchner
@@ -19,9 +19,9 @@ Kontakt.
 Einführung.
 
         Physik mit gefangenen Atomen und Ionen ist von großem Interesse in allen
-    möglichen Naturwissenschaften. Insbesondere Quanten Computer und Quanten
-    Simulatoren, basierend auf ultra kalten Atomen und Ionen, gewannen große
-    Beliebtheit über die letzten Jahrzehnte, da heutzutage die notwendige
+    möglichen Naturwissenschaften. Insbesondere Quantensomputer und
+    Quantensimulatoren, basierend auf ultra kalten Atomen und Ionen, gewannen
+    große Beliebtheit über die letzten Jahrzehnte, da heutzutage die notwendige
     Kontrolle über diese komplexen Quantensysteme Wirklichkeit ist.
 
         Jedoch ist es für das Konstruieren solcher Systeme Zugang zu
@@ -43,18 +43,18 @@ Einführung.
     Programmiersprache selbst zu verwenden.
 
         Zur Lösung der oben genannten Probleme präsentieren wie die Bibliothek
-    AlkCalc (Alkali-Metall-Atom and Erdalkali-Metall-Ionen Rechner), welche mit
+    AlkCalc (Alkali-Metall-Atom und Erdalkali-Metall-Ionen Rechner), welche mit
     einer anderen Philosophie entwickelt wurde: Wir wollen ein einfaches
-    Computer Program zur Verfügung stellen, welches alle Bedürfnisse deckt und
+    Computerprogram zur Verfügung stellen, welches alle Bedürfnisse deckt und
     gleichzeitig so schlank wie möglich gehalten ist. AlkCalc ist in nativem C
     und FORTRAN programmiert und besteht aus zwei Teilen: Den
     Bibliotheksfunktionen, welche das Arbeiten mit Eigenenergien,
     Eigenfunktionen, Clebsch-Gordan Koeffizienten und (nahezu) beliebigen
-    Radialmatrixelementen erlauben, und einem Teil der es dazu dient die
+    Radialmatrixelementen erlauben, und einem Teil der dazu dient, die
     gewünschten Eigenenergien und radialen Eigenzustände numerisch zu berechnen.
-    Die dabei generierten Daten werden dann von den Bibliotheksfunktionen
+    Die dabei erzeugten Daten werden dann von den Bibliotheksfunktionen
     benutzt um eine einfache Schnittstelle für den Benutzer zu kreieren.
-        AlkCalc is ein Programm zum "Anfassen", in dem Sinne, dass es einfach
+        AlkCalc ist ein Programm zum "Anfassen", in dem Sinne, dass es einfach
     genug ist um direkt mit dem Quellkode interagieren zu können. Weil AlkCalc
     in einer hardwarenahen Sprache geschrieben ist, normgerecht bzgl. des C99
     Standards, ist es praktisch plattformunabhängig. Wichtig zu beachten ist,
@@ -73,20 +73,20 @@ Einführung.
     bedienen.
         Abschließend sei angemerkt, dass die Parameter für das Modellpotential
     in einer einzigen Textdatei enthalten sind, d. h. es ist leicht auf diese
-    zuzugreifen und neue hinzuzufügen. Im Zusammenhand damit sei erwähnt, dass
-    alle Daten in form von Text gespeichert sind, sodass keine weiteren
+    zuzugreifen und neue hinzuzufügen. Im Zusammenhang damit sei erwähnt, dass
+    alle Daten in Form von Text gespeichert sind, sodass keine weiteren
     Programme notwendig sind um binäre oder ähnliche Datenformate
     aufzuschlüsseln.
 
         Insgesamt ist AlkCalc eine Software für all die Wissenschaftler die
-    durchsichtige Computer Programme sowie volle Kontrolle über diese, und damit
-    die Methoden die dazu dienen Daten für Ihre Forschung zu erzeugen, schätzen.
-    Es ist alles völlig offen gelegt, keine Details versteckt, keine unnötig
-    komplizierten Datenformate verwendet und die gesamte Bibliothek schlank
-    gehalten und dennoch vollständig; wenn die Eigenenergien und Eigenzustände
-    bekannt sind, ist das gesamte Problem gelöst! Alle Bestandteile sind
-    vollständig Quelloffen und der Benutzer ist dazu angehalten den Quellkode zu
-    lesen und mit diesem auch zu interagieren.
+    durchsichtige Computerprogramme sowie volle Kontrolle über diese und damit
+    die Methoden, die dazu dienen Daten für Ihre Forschung zu erzeugen,
+    schätzen. Es ist alles völlig offen gelegt, keine Details versteckt, keine
+    unnötig komplizierten Datenformate verwendet und die gesamte Bibliothek
+    schlank gehalten und dennoch vollständig; wenn die Eigenenergien und
+    Eigenzustände bekannt sind, ist das gesamte Problem gelöst! Alle
+    Bestandteile sind vollständig Quelloffen und der Benutzer ist dazu
+    angehalten den Quellkode zu lesen und mit diesem auch zu interagieren.
 
 
 Struktur dieser README Datei.
@@ -94,9 +94,9 @@ Struktur dieser README Datei.
         Diese README Datei ist auf die folgende Weise Strukturiert: Im Abschnitt
     "Software Voraussetzungen" ist aufgelistet welche (wenigen) Programme
     dritter auf der Maschine vorhanden sein müssen. Das Meiste an Software
-    dritter is schon in Form von deren Quellkode (natürlich nur der tatsächlich
-    benutze) zur Verfügung gestellt. Im Abschnitt "Installation" beschreiben wir
-    den Installationsprozess von AlkCalc. Im Abschnitt "Datenerzeugung"
+    dritter ist schon in Form von deren Quellkode (natürlich nur der tatsächlich
+    benutzte) zur Verfügung gestellt. Im Abschnitt "Installation" beschreiben
+    wir den Installationsprozess von AlkCalc. Im Abschnitt "Datenerzeugung"
     beschreiben wir wie die Eigenenergien und radialen Eigenzustände mit Hilfe
     von AlkCalc numerisch berechnet werden können. Abschließend sind im
     Abschnitt "Wichtige zusätzliche Informationen" (technische) Aspekte
@@ -104,7 +104,7 @@ Struktur dieser README Datei.
         Zusätzlich zu dieser README Datei ist in "theory.d/theory.pdf" eine
     Einführung zu den Hamilton Operatoren die AlkCalc programmiert ist zu
     diagonalisieren dargelegt. Des Weiteren ist die Methode der Finiten
-    Elemente, welche dazu dient das Eigenproblem in ein Matrixproblem zu
+    Elemente, welche dazu dient, das Eigenproblem in ein Matrixproblem zu
     transformieren, beschrieben. Abschließend enthält "theory.d/theory.pdf" die
     volle Dokumentation der Bibliotheksfunktionen und alle Informationen die ein
     Benutzer bedarf.
@@ -124,16 +124,16 @@ Software Voraussetzungen.
 
     FORTRAN Compiler     gcc-fortran-15.2.1+r22+gc4e96a094636-1 [12]
 
-    C Bibliothek         glibc-2.42+r17+gd7274d718e6f-1 [13]
+    C-Bibliothek         glibc-2.42+r17+gd7274d718e6f-1 [13]
     ----------------------------------------------------------------
 
     - AlkCalc folgt dem C99 standard, Ref. [11], mit der zusätzlichen Annahme,
       dass die Ganzzahltypen,  int8_t, int32_t und int64_t vorhanden sind. Der
       C99 Standard definiert diese Typen als optional (siehe Absch. 7.18.1.1 in
-      Ref. [11]). Die meisten modernen C Bibliotheken (z. B. GNUs)
+      Ref. [11]). Die meisten modernen C-Bibliotheken (z. B. die von GNU)
       implementieren diese Typen. Diese haben den Vorteil, dass der C99 Standard
-      sicher stellt, dass falls diese Typen definiert sind, diese mit dem
-      Zweierkomplementsystem arbeiten und keine zusätzlichen bits am end der
+      sicherstellt, dass falls diese Typen definiert sind, diese mit dem
+      Zweierkomplementsystem arbeiten und keine zusätzlichen bits am Ende der
       Zahlen existieren (siehe Absch. 7.18.1.1 in Ref. [11]). Wir benutzen diese
       Eigenschaften um das Detektieren von arithmetischem Überlauf zu
       erleichtern und grundsätzlich fest definierte Zahlenbereiche zu erhalten.
@@ -151,7 +151,7 @@ Installation.
 
     2. Navigieren Sie in den Ordner LANCZOS.D und führen Sie die Makefile mit
        dem Befehl "make" aus. Das baut den relevanten Anteil von ARPACK (siehe
-       Ref. [3]). Die Makefile ist für GNUs make geschrieben. Gegebenenfalls
+       Ref. [3]). Die Makefile ist für GNU make geschrieben. Gegebenenfalls
        müssen Sie diese Datei also für Ihr Makesystem anpassen, oder die Befehle
        manuell ausführen.
 
@@ -182,7 +182,7 @@ Installation.
 
     7. Um die Bibliotheksfunktionen benutzen zu können müssen die entsprechenden
        Daten, d. h. die Eigenenergien und die radialen Eigenzustände, zunächst
-       generiert werden. Diesen Prozess beschreiben wir im nächsten Abschnitt.
+       erzeugt werden. Diesen Prozess beschreiben wir im nächsten Abschnitt.
 
 (*) An dieser Stelle ist der Installationsprozess soweit fortgeschritten, dass
     die Eigenenergien und die radialen Eigenzustände numerisch berechnet werden
@@ -197,7 +197,7 @@ Datenerzeugung.
     um (zumindest teilweise) den vollen Einelektronenhamiltonoperator, definiert
     in "theory.d/theory.pdf", zu diagonalisieren. Dieser Teil ist unverzichtbar
     um die für die Bibliotheksfunktionen benötigten Daten (Eigenenergien und
-    radiale Eigenzustände) zu generieren. Im Folgenden ist das Vorgehen in vier
+    radiale Eigenzustände) zu erzeugt. Im Folgenden ist das Vorgehen in vier
     Schritten anhand des Atoms oder Ions X erklärt.
 
     1. Navigieren Sie in den Ordner interface.d und öffnen Sie die Datei
@@ -213,7 +213,7 @@ Datenerzeugung.
        den Wert 1.0 lokalisiert ist, d. h. in unserem Beispiel dass "offset"
        etwa den Wert 1.3 haben sollte. Nun kann "shift" auf 1.0 gesetzt werden,
        was bedeutet dass der Algorithmus Eigenwerte um 1.0 ausgibt. Am
-       sichersten is es mit "offset" alle Eigenenergien größer als "shift" zu
+       sichersten ist es mit "offset" alle Eigenenergien größer als "shift" zu
        machen. In unserem Beispiel könnte das mit dem Wert 1.6 für "offset"
        erreicht werden. Bitte beachten Sie, dass die numerisch berechneten
        Eigenenergien automatisch für die Werte von "offset" und "shift"
@@ -226,23 +226,23 @@ Datenerzeugung.
        Wahlen.
 
     3. Führen Sie die Makefile im Hauptordner AlkCalc mit dem Argument "solve"
-       aus. Das generiert die Eigenenergien und radialen Eigenzustände. Die
+       aus. Das erzeugt die Eigenenergien und radialen Eigenzustände. Die
        radialen Eigenzustände werden am Benutzerdefinierten (siehe
        Absch. Installation) Ort abgespeichert, und die Eigenenergien in data.d.
        Überprüfen Sie ob die Grundzustandsenergie richtig berechnet wurde und
        verändern Sie ggf. die Parameter "offset" und "shift".
 
        WICHTIG: Abhängig davon wie hoch die maximale Hauptquantenzahl sein soll,
-                muss der maximale radius "rmax" groß genug gewählt werden. Dabei
+                muss der maximale Radius "rmax" groß genug gewählt werden. Dabei
                 ist zu beachten, dass für große Kernladungen der Träger der
                 radialen Eigenzustände bei kleinen Radien liegt, d. h.,
-                typischerweise, muss "rmax" für Atome größer gewählt werden als
+                typischerweise muss "rmax" für Atome größer gewählt werden als
                 für Ionen.
 
-    4. Von hieran lässt man die PARAMETER species, N, nmax, rmax, in
+    4. Von hier an lässt man die PARAMETER species, N, nmax, rmax, in
        "interface.d/settings.c" UNVERÄNDERT und verändert nur noch die
        Bahndrehimpulsquantenzahl (l) und die Gesamtdrehimpulsquantenzahl (j).
-       Für jede Wahl (l, j) generiert man nun die Eigenenergien und radialen
+       Für jede Wahl (l, j) erzeugt man nun die Eigenenergien und radialen
        Eigenzustände durch das Ausführen der Makefile mit dem Argument "solve".
        Wichtig ist zu beachten, dass es nötig sein kann die Parameter "offset"
        und "shift" zu verändern, während die Daten für die verschiedenen Paare
@@ -257,8 +257,8 @@ Datenerzeugung.
                 EINMAL abgespeichert. Daher muss nach dem Testen von Parametern
                 die zugehörige Datei mit den Daten für die Diskretisierung
                 manuell gelöscht werden. Diese wird dann für die finalen
-                Parameter EINMAL generiert. Das mag sich etwas verwirrend
-                anhören aber kann wie folgt zusammengefasst werden:
+                Parameter EINMAL erzeugt. Das mag sich etwas verwirrend anhören
+                aber kann wie folgt zusammengefasst werden:
 
                 - Überprüfen Sie durch das Testen von verschiedenen Parametern
                   ob die Eigenenergien effizient berechnet werden, wie
@@ -266,18 +266,18 @@ Datenerzeugung.
 
                 - Sobald die Wahl für die Parameter getroffen ist, hält man alle
                   Parameter fest, bis auf (l, j). Bevor die ersten Daten
-                  generiert werden, löscht man die Datei mit den Daten für die
+                  erzeugt werden, löscht man die Datei mit den Daten für die
                   Diskretisierung im Ordner "data.d". Sobald der Algorithmus zur
-                  Datengeneration ein weiteres Mal ausgeführt wird, für das
+                  Datenerzeugung ein weiteres Mal ausgeführt wird, für das
                   nächste Paar (l, j), wird die Datei mit den Daten für die
-                  Diskretisierung nicht noch einmal generiert --- die Datei wird
-                  nur generiert falls diese nicht gefunden werden konnte, d. h.
+                  Diskretisierung nicht noch einmal erzeigt --- die Datei wird
+                  nur erzeugt, falls diese nicht gefunden werden konnte, d. h.
                   gelöscht wurde.
 
 
 Wichtige zusätzliche Informationen.
 
-    - Per Standarteinstellung ist der Faktor C für die Massenkorrektur,
+    - Per Standardeinstellung ist der Faktor C für die Massenkorrektur,
       definiert in "theory.d/theory.pdf", im Quellkode in "src.d/eigensolver.c"
       auf eins gesetzt. Das ist der Tatsache geschuldet, dass die
       Modellparameter (siehe Refn. [6,8]) die wir standardmäßig für das
@@ -295,8 +295,8 @@ Wichtige zusätzliche Informationen.
     - AlkCalc enthält den Atomtyp Wasserstoff (1H) und den Ionentyp Helium
       (4He+). Beide sind inklusive Russell-Saunders (LS) Kopplung beschrieben,
       sowie, per Standardeinstellung, OHNE Massenkorrektur, d. h. wir nehmen an,
-      dass die reduzierte Masse der Elektronenmasse enstpricht. Wir stellen
-      diese Typen bereit um Daten generieren zu können die auch durch
+      dass die reduzierte Masse der Elektronenmasse entspricht. Wir stellen
+      diese Typen bereit um Daten erzeugt zu können die auch durch
       analytische Methoden zugänglich sind; LS Kopplung ist schwach
       (insbesondere für kleine Bahndrehimpulsquantenzahlen l und große
       Hauptquantenzahlen n). Mit den bekannten Formeln kann somit bestimmt
@@ -305,7 +305,7 @@ Wichtige zusätzliche Informationen.
 
     - Für die Diskretisierung des Intervalls [0, rmax] benutzt AlkCalc linear
       größer werdende Schrittweiten. Das kann jedoch leicht verändert werden
-      indem man die Funktion "step" in "srd.d/eigensolver.d" umdefiniert.
+      indem man die Funktion "step" in "src.d/eigensolver.d" umdefiniert.
       Weitere Informationen dazu sind direkt dem zugehörigen Quellkode zu
       entnehmen.
 
@@ -329,11 +329,11 @@ Referenzen.
     [6] M. Aymar, C. H. Greene, E. Luc-Koenig, Rev. Mod. Phys. 68, 1015 (1996)
     [7] "SuperLU 7.0.1",
         URL: https://portal.nersc.gov/project/sparse/superlu/ug.pdf
-    [8] M. Marinescu, H. R. Sadeghpour, and A. Dalgarno, Phys. Rev. A 49, 982
+    [8] M. Marinescu, H. R. Sadeghpour, und A. Dalgarno, Phys. Rev. A 49, 982
         (1994)
     [9] "Comission on isotopic abundances and atomic weights (CIAAW)",
         URL: https://www.ciaaw.org/lithium.htm
-   [10] N. Šibalić, J. D. Pritchard, C. S. Adams, and K. J. Weatherill, Comput.
+   [10] N. Šibalić, J. D. Pritchard, C. S. Adams, und K. J. Weatherill, Comput.
         Phys. Commun. 220, 319–331 (2017)
    [11] INTERNATIONAL STANDARD ISO/IEC 9899:1999(E) (American National Standard
         Institute, New York, 1999) 2nd ed.
