@@ -129,7 +129,7 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
      * instance, if the floating-point values are of the form '+1.23E+45',    *
      * ndf = 3. If the integers, numbering the discretisation points, are of  *
      * the form '0123', ndi = 4. The integers a, b, c, and d repeatedly       *
-     * appear in the code. They dependent only on ndi and ndf.                */
+     * appear in the code. They depend only on ndi and ndf.                   */
     ndi = 8; ndf = 15;
     a = ndf + 7;
     b = dim * a - 1;
@@ -259,17 +259,14 @@ double alkcalc_rp(char *species, int32_t nb, int32_t lb, double jb, double p,
     /* Avoid warning by compiler because Rpo[0] is not initialised if dim is  *
      * less than 2, i.e., if N < 4. Practically, this of course not a         *
      * problem, because N must be large, e.g. 100000, to yield sensible       *
-     * results. This code just defines the behaviour for dim = 1              *
-     * unambiguously. The case dim < 1 is excluded by the condition N > 3,    *
-     * which is presented to the user in 'interface.d/settings.c'.            */
-    f = bra->fnlsj; g = ket->fnlsj;
-    if (dim < 2) {
-        Rpo[0] = 0.; rp = f[0] * Rpd[0] * g[0];
-    } else {
-        rp = f[0] * (Rpd[0] * g[0] + Rpo[0] * g[1]);
-    }
+     * results. The assertion just tells the compiler there is nothing to     *
+     * worry about. Further, the condition N > 3, is presented to the user in *
+     * 'interface.d/settings.c'.                                              */
+    assert(dim >= 2);
 
     /* Compute matrix element */
+    f = bra->fnlsj; g = ket->fnlsj;
+    rp = f[0] * (Rpd[0] * g[0] + Rpo[0] * g[1]);
     for (k = 1; k < dim - 1; k++) {
         rp += f[k] * (   Rpo[k - 1] * g[k - 1]
                        + Rpd[k] * g[k] + Rpo[k] * g[k + 1] );
@@ -303,7 +300,7 @@ alkcalc_cg alkcalc_cj1m1j2m2jmj(double j1, double m1, double j2, double m2,
     result = w3jm(J1, M1, J2, M2, J, -MJ);
 
     /* Add phase and scaling factor */
-    result.sign *= (((-J1 + J2 - MJ) / 2) % 2) ? -1 : 1;
+    result.sign *= (((-J1 + J2 - MJ) / 2) & 1) ? -1 : 1;
     result.numerator = s64imul(result.numerator, J + 1);
 
     /* Clean up result */
@@ -378,11 +375,11 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
     if (J < INTEGER_ABS(MJ)) { /* Ensure mj <= j */
         ERROR("J MUST BE LARGER EQUAL ABSOLUTE VALUE OF MJ");
     }
-    if (J % 2 != MJ % 2) { /* Ensure (half-)int. */
-        ERROR("HALF-INTEGER J(MJ) BUT INTEGER MJ(J)");
+    if ((J & 1) != (MJ & 1)) { /* Check J, MJ both (half-) integer */
+        ERROR("HALF-INTEGER J/MJ BUT INTEGER MJ/J");
     }
     if (J != ll - 1 && J != ll + 1) { /* Check |l - 1 / 2| <= j <= l + 1 / 2 */
-        ERROR("J MUST BE |L-1/2| OR L+1/2");
+        ERROR("J MUST BE |L - 1 / 2| OR L + 1 / 2");
     }
     if (theta < 0 || PI < theta) {
         ERROR("INVALID POLAR ANGLE");
@@ -604,7 +601,7 @@ SkipedSState:
         }
 
         /* Absorption: l' = l + 1 */
-        for (k = nlp1; k < nmnlp1 + dn; k++) {
+        for (k = nlp1; k < nlp1 + dn; k++) {
 
             /* j'=l+s */
             hnu = alkcalc_Enlsj(species, k, lp, jp) - En;
@@ -615,7 +612,7 @@ SkipedSState:
 
         /* Absorption: l = l - 1 */
         if (l) {
-            for (k = nlm1; k < nmnlm1 + dn; k++) {
+            for (k = nlm1; k < nlm1 + dn; k++) {
 
                 /* j' = l - s */
                 hnu = alkcalc_Enlsj(species, k, lm, jm) - En;
@@ -712,15 +709,15 @@ static alkcalc_cg w3jm(int32_t j1, int32_t m1, int32_t j2, int32_t m2,
     result.sign = 1; result.numerator = 0; result.denominator = 1;
 
     /* Check if ji and mi (i = 1, 2, 3) are compatible */
-    if (    (j1 % 2 && !(m1 % 2)) || (m1 % 2 && !(j1 % 2))
-         || (j2 % 2 && !(m2 % 2)) || (m2 % 2 && !(j2 % 2))
-         || (j3 % 2 && !(m3 % 2)) || (m3 % 2 && !(j3 % 2)) ) { return result; }
+    if (    (j1 & 1 && !(m1 & 1)) || (m1 & 1 && !(j1 & 1))
+         || (j2 & 1 && !(m2 & 1)) || (m2 & 1 && !(j2 & 1))
+         || (j3 & 1 && !(m3 & 1)) || (m3 & 1 && !(j3 & 1)) ) { return result; }
 
     /* Kronecker delta */
     if (m1 + m2 + m3) { return result; }
 
     /* Phase */
-    phase = (((j1 - j2 - m3) / 2) % 2) ? -1 : 1;
+    phase = (((j1 - j2 - m3) / 2) & 1) ? -1 : 1;
 
     /* Compute factorials in prefactors of sum */
     f[0] = fac((j1 + j2 - j3) / 2);
@@ -740,7 +737,7 @@ static alkcalc_cg w3jm(int32_t j1, int32_t m1, int32_t j2, int32_t m2,
     if (N < K) { return result; }
     A = (int64_t *)malloc((N - K + 1) * sizeof(int64_t));
     for (k = K; k < N + 1; k++) {
-        s = (k % 2) ? -1 : 1;
+        s = (k & 1) ? -1 : 1;
         g[0] = fac(k);
         g[1] = fac((j1 + j2 - j3) / 2 - k);
         g[2] = fac((j1 - m1) / 2 - k);
@@ -780,10 +777,10 @@ static int64_t s64imul(int64_t a, int64_t b) {
     if (b == INT64_MIN) {
         if (a == 1) { return b; } else { goto s64imulOverflow; }
     }
-    if (   (a > 0 && b > 0 && a <= INT64_MAX / b)
-        || (a < 0 && b < 0 && -a <= INT64_MAX/ (-b))
-        || (a > 0 && b < 0 && -a >= INT64_MIN/ (-b))
-        || (a < 0 && b > 0 && -b >= INT64_MIN/ (-a))) {
+    if (    (a > 0 && b > 0 && a <= INT64_MAX / b)
+         || (a < 0 && b < 0 && -a <= INT64_MAX/ (-b))
+         || (a > 0 && b < 0 && -a >= INT64_MIN/ (-b))
+         || (a < 0 && b > 0 && -b >= INT64_MIN/ (-a)) ) {
         return a*b;
     }
 s64imulOverflow:
@@ -854,7 +851,7 @@ static double complex Ylml(int32_t l, int32_t ml, double theta, double phi) {
      * rendered non-negative. This means automatically everything (up to a    *
      * phase included later) is correct. It is probably vital to view         *
      * 'theory.d/theory.pdf' to understand this part.                         */
-    phase = (ml % 2) ? -1 : 1; x = cos(theta);
+    phase = (ml & 1) ? -1 : 1; x = cos(theta);
     if (l == ml) {
         Pk = phase * fac(2 * ml) / fac(ml) * pow(.25 * (1. - x * x), .5 * ml);
     } else
@@ -887,6 +884,9 @@ static double thermal_photon_occupation(double hnu, double T) {
 
     double r, x;
 
+    /* Zero T case */
+    if (T <= 0.) { return 0.; }
+
     /* Ratio of photon and thermal energy                                     *
      *                                                                        *
      * - Photon energy h x nu (hnu) in units of Hartree (EH)                  *
@@ -894,7 +894,6 @@ static double thermal_photon_occupation(double hnu, double T) {
     r = hnu / (3.166811e-6 * T); /* For Boltzmann's constant see Ref. [5] */
 
     /* Compute photon occupation number according to Planck's law */
-    if (T <= 0.) { return 0.; } /* Zero T case */
     if (r < cbrt(720. * DBL_EPSILON)) { /* High T */
         return 1. / r - .5 + 1. / 12. * r;
     }
