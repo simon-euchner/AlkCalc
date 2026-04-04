@@ -18,8 +18,8 @@
  *                                                                            *
  *     Charge : e > 0 (elementary charge)                                     *
  *     Mass   : me (electron's mass)                                          *
- *     Length : aB = hbar/(m*c*alpha) (Bohr's radius)                         *
- *     Energy : e^2/(4pi*aB*varepsilon_0) = 2 Ry = 27.211386245988(53) eV     *
+ *     Length : aB = hbar / (m * c * alpha) (Bohr's radius)                   *
+ *     Energy : e**2 / (4pi * aB * varepsilon_0) = 27.211386245988(53) eV     *
  *              (Hartree), see Ref. [5].                                      *
  *                                                                            *
  * Each atom/ion species comes with a set of parameters. In 'rpar' the double *
@@ -41,13 +41,13 @@
  *                                                                            *
  * Information on parameters                                                  *
  *                                                                            *
- *     rpar[0], k1     : Fitting parameter, see Ref. [1], units of 1/aB       *
- *     rpar[1], k2     : Fitting parameter, see Ref. [1], units of 1/aB       *
- *     rpar[2], k3     : Fitting parameter, see Ref. [1], units of 1/aB       *
- *     rpar[3], k4     : Fitting parameter, see Ref. [1], units of 1/aB^2     *
+ *     rpar[0], k1     : Fitting parameter, see Ref. [1], units of 1 / aB     *
+ *     rpar[1], k2     : Fitting parameter, see Ref. [1], units of 1 / aB     *
+ *     rpar[2], k3     : Fitting parameter, see Ref. [1], units of 1 / aB     *
+ *     rpar[3], k4     : Fitting parameter, see Ref. [1], units of 1 / aB**2  *
  *     rpar[4], rc     : Cut-off radius, see Ref. [1], units of aB            *
  *     rpar[5], alphaD : Polarisability, see Ref. [1], units of               *
- *                       me*e^2*aB^4/hbar^2                                   *
+ *                       me * e**2 * aB**4 / hbar**2                          *
  *     rpar[6], M      : Total mass of atom/ion, units of me                  *
  *     rpar[7], C      : Mass correction, see 'theory.d/theory.pdf'           *
  *     rpar[8], j      : Total angular momentum quantum number (version of    *
@@ -55,8 +55,8 @@
  *                       but corrected to be exactly half integer).           *
  *     rpar[9], EGS    : Ground state energy, see Ref. [5], units of Hartree  *
  *                                                                            *
- *     ipar[0], Z      : Nuclear charge, units of e>0                         *
- *     ipar[1], Zc     : Charge of screened core, units of e>0                *
+ *     ipar[0], Z      : Nuclear charge, units of e > 0                       *
+ *     ipar[1], Zc     : Charge of screened core, units of e > 0              *
  *     ipar[2], l      : Orbital angular momentum quantum number              *
  *     ipar[3], nl     : Minimal principal quantum number for series 'l'      *
  * -------------------------------------------------------------------------- */
@@ -99,14 +99,14 @@ void vint_initpar(double *rpar, int32_t *ipar) {
         ERROR("REQUESTED QUANTUM NUMBER 'L = %c' IS NOT KNOWN", l);
     } else {
         (void)fgetc(fd);
-        (void)fscanf(fd, "%lf %lf %lf %lf %lf %" SCNd32, rpar, rpar + 1,
+        (void)fscanf(fd, "%lf %lf %lf %lf %lf %" SCNd32 " ", rpar, rpar + 1,
                      rpar + 2, rpar + 3, rpar + 4, ipar + 3);
     }
     while ((c = fgetc(fd)) != 'Z');
-    (void)fscanf(fd, "%" SCNd32, ipar);
-    (void)fscanf(fd, "ZC %" SCNd32, ipar + 1);
-    (void)fscanf(fd, "ALPHAD %lf", rpar + 5);
-    (void)fscanf(fd, "M %lf(%lf)", rpar + 6, &dummy);
+    (void)fscanf(fd, "%" SCNd32 " ", ipar);
+    (void)fscanf(fd, "ZC %" SCNd32 " ", ipar + 1);
+    (void)fscanf(fd, "ALPHAD %lf" " ", rpar + 5);
+    (void)fscanf(fd, "M %lf(%lf) ", rpar + 6, &dummy);
     /* IMPORTANT: Here is the position in the code where the mass correction, *
      * i.e., the fact that the reduced mass is NOT the electron's mass, can   *
      * be accounted for. However, we do not actually include the mass         *
@@ -130,7 +130,7 @@ void vint_initpar(double *rpar, int32_t *ipar) {
         default: break;
     }
     rpar[8] = .5 * (2 * (int32_t)j + 1);
-    (void)fscanf(fd, "EGS %lf", rpar + 9);
+    (void)fscanf(fd, "EGS %lf ", rpar + 9);
 
     /* Close file */
     fclose(fd); fd = NULL;
@@ -144,7 +144,7 @@ static void move(FILE *fd, char *id) {
     while ((c = fgetc(fd)) != EOF && c != '$');
     if (c != EOF) {
         (void)fgetc(fd);
-        (void)fscanf(fd, "ID %s", id);
+        (void)fscanf(fd, "ID %s ", id);
         while ((c = fgetc(fd)) != '\n');
         while ((c = fgetc(fd)) != '\n');
     } else {

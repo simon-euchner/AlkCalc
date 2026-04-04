@@ -25,9 +25,9 @@ static void nextrm(char *, int32_t *, int32_t *, int32_t, double);
  *                                                                            *
  * species : String specifying atom/ion species                               *
  * n       : Principal quantum number n = 1, 2, 3, ...                        *
- * l       : Orbital angular momentum l = 0, 1, ..., n-1                      *
- * s       : Spin (Not an argument, since we always have s = 1/2!)            *
- * j       : Total angular momentum quantum number j = |l-1/2|, l+1/2         *
+ * l       : Orbital angular momentum l = 0, 1, ..., n - 1                    *
+ * s       : Spin (Not an argument, since we always have s = 1 / 2!)          *
+ * j       : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  * -------------------------------------------------------------------------- */
 double alkcalc_Enlsj(char *species, int32_t n, int32_t l, double j) {
 
@@ -49,16 +49,17 @@ double alkcalc_Enlsj(char *species, int32_t n, int32_t l, double j) {
 
     /* Extract energy */
     move(fd, 9);
-    (void)fscanf(fd, "MINIMAL PRINCIPAL QUANTUM NUMBER: %" SCNd32, &nl);
+    (void)fscanf(fd, "MINIMAL PRINCIPAL QUANTUM NUMBER: %" SCNd32 " ", &nl);
     if (n < nl) {
         ERROR("REQUESTED EIGENENERGY DOES NOT EXIST");
     }
-    (void)fscanf(fd, "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" SCNd32, &nmax);
+    (void)fscanf(fd, "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" SCNd32 " ",
+                 &nmax);
     if (nmax < n) {
         ERROR("REQUESTED EIGENENERGY NOT AVAILABLE");
     }
     move(fd, n + 1);
-    (void)fscanf(fd, "%" SCNd32 "     %lf", &dummy, &E);
+    (void)fscanf(fd, "%" SCNd32 "     %lf ", &dummy, &E);
 
     /* Clean up */
     fclose(fd); fd = NULL;
@@ -67,16 +68,16 @@ double alkcalc_Enlsj(char *species, int32_t n, int32_t l, double j) {
 }
 
 /* -------------------------------------------------------------------------- *
- * Radial eigenstate times radius: Rnlsj(r) = fnlsj(r/aB) / (aB^(1/3) r/aB)   *
+ * Radial eigenstate times radius                                             *
  * Result owned by caller, destroy with 'alkcalc_state_free' after usage      *
  * (see 'theory.d/theory.pdf', section 'Manual')                              *
  *                                                                            *
  * result  : 'f': full result; 'p': partial result (only 'fnlsj' not NULL)    *
  * species : String specifying atom/ion species                               *
  * n       : Principal quantum number n = 1, 2, 3, ...                        *
- * l       : Orbital angular momentum l = 0, 1, ..., n-1                      *
- * s       : Spin (Not an argument, since we always have s = 1/2!)            *
- * j       : Total angular momentum quantum number j = |l-1/2|, l+1/2         *
+ * l       : Orbital angular momentum l = 0, 1, ..., n - 1                    *
+ * s       : Spin (Not an argument, since we always have s = 1 / 2!)          *
+ * j       : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  * -------------------------------------------------------------------------- */
 alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
                              double j) {
@@ -100,7 +101,7 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
 
     /* Read in metadata and move file pointer to data */
     move(fd, 7);
-    (void)fscanf(fd, "NUMBER OF DISCRETISATION POINTS: %" SCNd32, &N);
+    (void)fscanf(fd, "NUMBER OF DISCRETISATION POINTS: %" SCNd32 " ", &N);
     move(fd, 2);
 
     /* Allocate memory for result */
@@ -126,9 +127,9 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
      * The number of digits used per integer (ndi) and floating-point value   *
      * (ndf) in the data files 'states-...' and 'discretisation-...'. For     *
      * instance, if the floating-point values are of the form '+1.23E+45',    *
-     * ndf=3. If the integers, numbering the discretisation points, are of    *
-     * the form '0123', ndi=4. The integers a, b, c, and d repeatedly appear  *
-     * in the code. They only dependent on ndi and ndf.                       */
+     * ndf = 3. If the integers, numbering the discretisation points, are of  *
+     * the form '0123', ndi = 4. The integers a, b, c, and d repeatedly       *
+     * appear in the code. They only dependent on ndi and ndf.                */
     ndi = 8; ndf = 15;
     a = ndf+7; b = dim*a-1; c = ndi+1; d = (N-1)*(ndi+1+2*a)-1;
 
@@ -153,7 +154,7 @@ alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
         ERROR("REQUESTED DISCRETISATION DATA DOES NOT EXIST");
     }
     move(fd, 8);
-    (void)fscanf(fd, "%" SCNd32 " %lf", &dummy, t);
+    (void)fscanf(fd, "%" SCNd32 " %lf ", &dummy, t);
     (void)fread(bfr = buffer = (char *)malloc(d), 1, d, fd);
     for (k = 0; k < N - 2; k++) {
         state->t[k + 1] = parse(bfr += c, ndf);
@@ -181,19 +182,21 @@ void alkcalc_state_free(alkcalc_state *state) {
 }
 
 /* -------------------------------------------------------------------------- *
- * Radial matrix element <n,l,s,j|r^p|n',l',s',j'> (s=s'=1/2)                 *
+ * Radial matrix element <n,l,s,j|r^p|n',l',s',j'> (s = s' = 1 / 2)           *
  * (see 'theory.d/theory.pdf', section 'Manual')                              *
  *                                                                            *
  * species : String specifying atom/ion species                               *
  * nb      : Principal quantum number of bra                                  *
- * lb      : Orbital angular momentum l = 0, 1, ..., n-1 of bra               *
- * sb      : Spin of bra (Not an argument, since we always have s = 1/2!)     *
- * jb      : Total angular momentum quantum number j = |l-1/2|, l+1/2, of bra *
+ * lb      : Orbital angular momentum l = 0, 1, ..., n - 1 of bra             *
+ * sb      : Spin of bra (Not an argument, since we always have s = 1 / 2!)   *
+ * jb      : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
+ *           of bra                                                           *
  * p       : Power of radius operator in matrix element                       *
  * nk      : Principal quantum number of ket                                  *
- * lk      : Orbital angular momentum l = 0, 1, ..., n-1 of ket               *
- * sk      : Spin of ket (Not an argument, since we always have s = 1/2!)     *
- * jk      : Total angular momentum quantum number j = |l-1/2|, l+1/2, of ket *
+ * lk      : Orbital angular momentum l = 0, 1, ..., n - 1 of ket             *
+ * sk      : Spin of ket (Not an argument, since we always have s = 1 / 2!)   *
+ * jk      : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
+ *           of ket                                                           *
  * -------------------------------------------------------------------------- */
 double alkcalc_rp(char *species, int32_t nb, int32_t lb, double jb, double p,
                   int32_t nk, int32_t lk, double jk) {
@@ -292,7 +295,7 @@ alkcalc_cg alkcalc_cj1m1j2m2jmj(double j1, double m1, double j2, double m2,
     J2 = CONVERT(j2); M2 = CONVERT(m2);
     J = CONVERT(j); MJ = CONVERT(mj);
 
-    /* Wigner's 3jm symbol (no '/2' necessary, see source for 'w3jm' */
+    /* Wigner's 3jm symbol (no '/ 2' necessary, see source for 'w3jm' */
     result = w3jm(J1, M1, J2, M2, J, -MJ);
 
     /* Add phase and scaling factor */
@@ -310,10 +313,10 @@ alkcalc_cg alkcalc_cj1m1j2m2jmj(double j1, double m1, double j2, double m2,
  * Angular eigenstate in uncoupled basis (dimensionless)                      *
  * (see 'theory.d/theory.pdf', section 'Manual')                              *
  *                                                                            *
- * l       : Orbital angular momentum l = 0, 1, ..., n-1                      *
+ * l       : Orbital angular momentum l = 0, 1, ..., n - 1                    *
  * ml      : Magnetic quantum number, ml = -l, ..., l                         *
- * s       : Spin (Not an argument, since we always have s = 1/2!)            *
- * ms      : Spin-projection quantum number ms = -1/2, 1/2                    *
+ * s       : Spin (Not an argument, since we always have s = 1 / 2!)          *
+ * ms      : Spin-projection quantum number ms = -1 / 2, 1 / 2                *
  * theta   : Polar angle (Zenitwinkel), theta in [0, pi]                      *
  * phi     : Azimuthal angle (Azimut), phi in [0, 2pi]                        *
  * -------------------------------------------------------------------------- */
@@ -351,9 +354,9 @@ alkcalc_spinor alkcalc_YlmlXsms(int32_t l, int32_t ml, double ms, double theta,
  * Angular eigenstate in coupled basis (dimensionless)                        *
  * (see 'theory.d/theory.pdf', section 'Manual')                              *
  *                                                                            *
- * l       : Orbital angular momentum l = 0, 1, ..., n-1                      *
- * s       : Spin (Not an argument, since we always have s = 1/2!)            *
- * j       : Total angular momentum quantum number j = |l-1/2|, l+1/2         *
+ * l       : Orbital angular momentum l = 0, 1, ..., n - 1                    *
+ * s       : Spin (Not an argument, since we always have s = 1 / 2!)          *
+ * j       : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  * mj      : Total magnetic quantum number, mj = -j, ..., j                   *
  * theta   : Polar angle (Zenitwinkel), theta in [0, pi]                      *
  * phi     : Azimuthal angle (Azimut), phi in [0, 2pi]                        *
@@ -374,7 +377,7 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
     if (J % 2 != MJ % 2) { /* Ensure (half-)int. */
         ERROR("HALF-INTEGER J(MJ) BUT INTEGER MJ(J)");
     }
-    if (J != ll - 1 && J != ll + 1) { /* Ensure |l-1/2| <= j <= l+1/2 */
+    if (J != ll - 1 && J != ll + 1) { /* Check |l - 1 / 2| <= j <= l + 1 / 2 */
         ERROR("J MUST BE |L-1/2| OR L+1/2");
     }
     if (theta < 0 || PI < theta) {
@@ -404,13 +407,15 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
  *                                                                            *
  * species : String specifying atom/ion species                               *
  * ni      : Principal quantum number of initial state (i)                    *
- * li      : Orbital angular momentum l = 0, 1, ..., n-1, of (i)              *
- * si      : Spin of (i) (Not an argument, since we always have s = 1/2!)     *
- * ji      : Total angular momentum quantum number j = |l-1/2|, l+1/2 of (i)  *
+ * li      : Orbital angular momentum l = 0, 1, ..., n - 1, of (i)            *
+ * si      : Spin of (i) (Not an argument, since we always have s = 1 / 2!)   *
+ * ji      : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
+ *           of (i)                                                           *
  * nf      : Principal quantum number of final state (f)                      *
- * lf      : Orbital angular momentum l = 0, 1, ..., n-1 of (f)               *
- * sf      : Spin of (f) (Not an argument, since we always have s = 1/2!)     *
- * jf      : Total angular momentum quantum number j = |l-1/2|, l+1/2, of (f) *
+ * lf      : Orbital angular momentum l = 0, 1, ..., n - 1 of (f)             *
+ * sf      : Spin of (f) (Not an argument, since we always have s = 1 / 2!)   *
+ * jf      : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
+ *           of (f)                                                           *
  * -------------------------------------------------------------------------- */
 double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
                      int32_t nf, int32_t lf, double jf) {
@@ -471,9 +476,9 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
  * species : String specifying atom/ion species                               *
  * n       : Principal quantum number n = 1, 2, 3, ...                        *
  * dn      : Consider up to (including) n+dn for absorption                   *
- * l       : Orbital angular momentum l = 0, 1, ..., n-1                      *
- * s       : Spin (Not an argument, since we always have s = 1/2!)            *
- * j       : Total angular momentum quantum number j = |l-1/2|, l+1/2         *
+ * l       : Orbital angular momentum l = 0, 1, ..., n - 1                    *
+ * s       : Spin (Not an argument, since we always have s = 1 / 2!)          *
+ * j       : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  * -------------------------------------------------------------------------- */
 double alkcalc_tau(double T, char *species, int32_t n, int32_t dn, int32_t l,
                    double j) {
@@ -614,7 +619,7 @@ SkipedSState:
                 Gamma += hnu * hnu * fftoi * nocc;
 
                 /* j'=l-3s */
-                if (l > 1) { /* P(j=1/2) -> S(j'=-1/2) is not possible */
+                if (l > 1) { /* P(j = 1 / 2) -> S(j' = -1 / 2) not possible */
                     hnu = alkcalc_Enlsj(species, k, lm, jm - 1.) - En;
                     fftoi = alkcalc_fitof(species, n, l, j, k, lm, jm - 1.);
                     nocc = thermal_photon_occupation(hnu, T);
@@ -626,7 +631,7 @@ SkipedSState:
 
     /* Compute lifetime in units of nanoseconds                               *
      *                                                                        *
-     * The conversion factor used below is 2 * alpha**3 x EH / hbar, where    *
+     * The conversion factor used below is 2 * alpha**3 * EH / hbar, where    *
      * alpha is the fine-structure constant, EH is the Hartree, and hbar is   *
      * is the reduced Planck constant; for their values, see Ref. [5].        */
     tau = 1. / (32.1300103 * Gamma);
@@ -701,7 +706,7 @@ static alkcalc_cg w3jm(int32_t j1, int32_t m1, int32_t j2, int32_t m2,
     alkcalc_cg result;
     result.sign = 1; result.numerator = 0; result.denominator = 1;
 
-    /* Check if ji and mi (i=1,2,3) are compatible */
+    /* Check if ji and mi (i = 1, 2, 3) are compatible */
     if (    (j1 % 2 && !(m1 % 2)) || (m1 % 2 && !(j1 % 2))
          || (j2 % 2 && !(m2 % 2)) || (m2 % 2 && !(j2 % 2))
          || (j3 % 2 && !(m3 % 2)) || (m3 % 2 && !(j3 % 2)) ) { return result; }
@@ -915,8 +920,9 @@ static void nextrm(char *species, int32_t *nmin, int32_t *nmax, int32_t l,
 
     /* Extract information */
     move(fd, 9);
-    (void)fscanf(fd, "MINIMAL PRINCIPAL QUANTUM NUMBER: %" SCNd32, nmin);
-    (void)fscanf(fd, "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" SCNd32, nmax);
+    (void)fscanf(fd, "MINIMAL PRINCIPAL QUANTUM NUMBER: %" SCNd32 " ", nmin);
+    (void)fscanf(fd, "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" SCNd32 " ",
+                 nmax);
 
     /* Clean up */
     fclose(fd); fd = NULL;

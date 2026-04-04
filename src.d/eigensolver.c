@@ -22,7 +22,7 @@ int main(int argc, char **argv)
     /* Compute eigenenergies */
     solve(data);
 
-    /* Save discretisation points and stepsizes to file */
+    /* Save discretisation points and step sizes to file */
     save_discretisation();
 
     /* Clean up */
@@ -122,10 +122,10 @@ eigensolver_data *eigensolver_data_init() {
     set_default_options(&options); options.ColPerm = NATURAL;
     StatInit(stat=&data->stat);
 
-    /* Dummy right-hand side (b is already initialized to hold zeros) */
+    /* Dummy right-hand side (b is already initialised to hold zeros) */
     dCreate_Dense_Matrix(B=&data->B, dim, 1, b, dim, SLU_DN, SLU_D, SLU_GE);
 
-    /* Preform LU decomposition */
+    /* Perform LU decomposition */
     tend = clock();
     runtime = (tend-tstart)/(double)CLOCKS_PER_SEC; data->runtime = runtime;
     tstart = clock(); info = &data->info;
@@ -159,17 +159,18 @@ void eigensolver_data_free(eigensolver_data *data) {
     free(data); data = NULL;
 }
 
-/* Function returning the k-th (k = 1, ..., N-1) step size                    */
+/* Function returning the k-th (k = 1, ..., N - 1) step size                  */
 double step(int32_t k) {
 
-    /* Here the step sizes, hk = tk - tkm1 (km1 means 'k-1'), are defined.    *
-     * The step sizes must be such, that the sum over all of them is rmax     *
-     * (see 'interface.d/settings.c'). Note that the step sizes are set       *
-     * rather than the (more canonically) discretisation mesh itself. This is *
-     * to avoid so-called 'catastrophic cancellation' when computing the step *
-     * sizes, i.e., ensures numerical stability.                              *
+    /* Here the step sizes hk = tk - tkm1 (km1 means 'k - 1') are defined.    *
+     * The step sizes must be such that their sum is rmax (see                *
+     * 'interface.d/settings.c'). Note here the step sizes are set rather     *
+     * than the discretisation mesh itself. This is to avoid so-called        *
+     * 'catastrophic cancellation' when computing the step sizes, which       *
+     * ensures numerical stability.                                           *
      *                                                                        *
-     * Note: Careful with overflow in integer multiplication and addition.    */
+     * Note: One must be careful with overflow in integer multiplication and  *
+     * addition here, if N is very large.                                     */
 
     double hk;
 
@@ -204,7 +205,7 @@ void solve(eigensolver_data *data) {
     z = (double *)malloc(nev * dim * sizeof(double));
     sigma = shift;
     iparam[0] = 1;
-    iparam[2] = 1000000000; /* Large enough to not become a problem */
+    iparam[2] = 1000000000; /* Large enough to avoid becoming a problem */
     iparam[3] = 1;
     iparam[6] = 3; /* Shift-invert mode */
 
@@ -238,11 +239,11 @@ void solve(eigensolver_data *data) {
             }
             shift_invert_f(data, &workd[ipntr[1] - 1]); /* Result in argument */
         } else
-        if (ido == 2) { /* Compute action of mass marix */
+        if (ido == 2) { /* Compute action of mass matrix */
             mass_matrix_f(data, &workd[ipntr[0] - 1], &workd[ipntr[1] - 1]);
         } else { /* Initialisation step */
             mass_matrix_f(data, &workd[ipntr[0] - 1], &workd[ipntr[1] - 1]);
-            shift_invert_f(data, &workd[ipntr[1] - 1]); /* Result in agument */
+            shift_invert_f(data, &workd[ipntr[1] - 1]); /* Result in argument */
         }
 
     } while (ido == 1 || ido == 2 || ido == -1);
@@ -255,7 +256,7 @@ void solve(eigensolver_data *data) {
     data->runtime += runtime;
     printf("ALGORITHM FINISHED SUCCESSFULLY (RUNTIME: %.3f S)\n\n", runtime);
 
-    /* Dummy data to hand 'Destroy_Dense_Matrix' something to free */
+    /* Dummy data to give 'Destroy_Dense_Matrix' something to free */
     dummy = (double *)calloc(1, sizeof(double));
     ((DNformat *)(data->B.Store))->nzval = dummy;
 
@@ -336,7 +337,7 @@ void save_energies(eigensolver_data *data, double *energies) {
                   "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "/2\n"
                   "RMAX [BOHR'S RADIUS]: %1.3E\n"
                   "NUMBER OF DISCRETISATION POINTS: %" PRId32 "\n"
-                  "FIRST, FINAL STEPSIZE: %1.3E, %1.3E\n"
+                  "FIRST, FINAL STEP SIZE: %1.3E, %1.3E\n"
                   "MINIMAL PRINCIPAL QUANTUM NUMBER: %" PRId32 "\n"
                   "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" PRId32 "\n\n\n\n"
                   "N   ENERGY\n\n",
@@ -389,7 +390,7 @@ void save_states(eigensolver_data *data, double *z) {
                       "FK\n\n",
                       species, n, l, jj, rmax, N);
 
-        /* Save state */
+        /* Save radial eigenstates */
         for (k = 0; k < dim; k++) {
             (void)fprintf(fd, "%+1.14E\n", z[dim * (n - nl) + k]);
         }
