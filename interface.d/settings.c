@@ -23,7 +23,7 @@
  *                                                                            *
  * species   : Atom or ion species                                            *
  * N         : Number of discretisation points (N > 3)                        *
- * nmax      : Maximal principle quantum number                               *
+ * nmax      : Maximal principal quantum number                               *
  * l         : Orbital angular momentum quantum number                        *
  * j         : Total angular momentum quantum number                          *
  * rmax      : Maximal radius in units of Bohr's radius, aB                   *

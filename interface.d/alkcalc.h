@@ -4,8 +4,8 @@
  * Author of this file: Simon Euchner                                         *
  * -------------------------------------------------------------------------- */
 
-#ifndef ALCKALC_H
-#define ALCKALC_H
+#ifndef ALKCALC_H
+#define ALKCALC_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,9 +35,9 @@
  * Macros for numerical applications and error handling                       *
  * -------------------------------------------------------------------------- */
 #define CONVERT(X) (int32_t)floor(2. * (X) + .5)
-#define INTEGER_ABS(X) (((X) > 0) ? (X): -1 * (X))
-#define MAX(X, Y) ((X) > (Y)) ? (X): (Y)
-#define MIN(X, Y) ((X) > (Y)) ? (Y): (X)
+#define INTEGER_ABS(X) (((X) > 0) ? (X): -(X))
+#define MAX(X, Y) (((X) > (Y)) ? (X): (Y))
+#define MIN(X, Y) (((X) > (Y)) ? (Y): (X))
 #define COMPLEX(X, Y) ((X) + (Y) * I)
 #define ERROR(...) do { \
     fprintf(stderr, "ERROR (%s:%d): ", __FILE__, __LINE__); \
@@ -76,7 +76,7 @@ typedef struct alkcalc_cg_s {
  * -------------------------------------------------------------------------- */
 typedef struct alkcalc_spinor_s {
     double complex u; /* First (spin-up) spinor component */
-    double complex d; /* Second (spin-down= spinor component */
+    double complex d; /* Second (spin-down) spinor component */
 } alkcalc_spinor;
 
 /* -------------------------------------------------------------------------- *
