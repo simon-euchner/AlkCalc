@@ -40,7 +40,15 @@ Einführung.
     sind solche Bibliotheken oftmals für eine bestimmte, stark von der Hardware
     abstrahierte, Programmiersprache entwickelt, wie z. B. Python, was
     Wissenschaftler, zumindest Projektbezogen, dazu zwingt diese
-    Programmiersprache selbst zu verwenden.
+    Programmiersprache selbst zu verwenden. Man beachte, dass das natürlich
+    genau die Art Software ist, die den meisten Nutzer möchten. Jedoch, um
+    Systeme zu beschreiben für die es nicht genügt eine bestimmte Kenngröße zu
+    berechnen, wie z. B. einen C6 Dispersionskoeffizienten, müssen die vollen
+    Eigenzustände bekannt sein. Wenn die Berechnung der Eigenzustände auf
+    Quantendefekten basiert, schränkt das die Breite der möglichen Systeme ein,
+    da natürlich die Quantendefekte bekannt sein müssen --- ein in sich
+    geschlossener Ansatzt ist, auch die Eigenenergien aus dem Modellpotential zu
+    bestimmen, sodass keine Quantendefekte nötig sind.
 
         Zur Lösung der oben genannten Probleme präsentieren wie die Bibliothek
     AlkCalc (Alkali-Metall-Atom und Erdalkali-Metall-Ionen Rechner), welche mit
