@@ -109,11 +109,11 @@ Struktur dieser README Datei.
     von AlkCalc numerisch berechnet werden können. Abschließend sind im
     Abschnitt "Wichtige zusätzliche Informationen" (technische) Aspekte
     diskutiert, welche unbedingt vor der Benutzung von AlkCalc zu beachten sind.
-        Zusätzlich zu dieser README Datei ist in "theory.d/theory.pdf" eine
+        Zusätzlich zu dieser README Datei ist in "theory/theory.pdf" eine
     Einführung zu den Hamilton Operatoren die AlkCalc programmiert ist zu
     diagonalisieren dargelegt. Des Weiteren ist die Methode der Finiten
     Elemente, welche dazu dient, das Eigenproblem in ein Matrixproblem zu
-    transformieren, beschrieben. Abschließend enthält "theory.d/theory.pdf" die
+    transformieren, beschrieben. Abschließend enthält "theory/theory.pdf" die
     volle Dokumentation der Bibliotheksfunktionen und alle Informationen die ein
     Benutzer bedarf.
 
@@ -157,23 +157,22 @@ Installation.
     1. Stellen Sie sicher, dass auf der Maschine eine BLAS (z. B. Ref. [1]) und
        eine LAPACK (z. B. Ref. [2]) Installation vorhanden ist.
 
-    2. Navigieren Sie in den Ordner LANCZOS.D und führen Sie die Makefile mit
-       dem Befehl "make" aus. Das baut den relevanten Anteil von ARPACK (siehe
+    2. Navigieren Sie in den Ordner LANCZOS und führen Sie die Makefile mit dem
+       Befehl "make" aus. Das baut den relevanten Anteil von ARPACK (siehe
        Ref. [3]). Die Makefile ist für GNU make geschrieben. Gegebenenfalls
        müssen Sie diese Datei also für Ihr Makesystem anpassen, oder die Befehle
        manuell ausführen.
 
-    3. Navigieren Sie in den Ordner LUFac.d und führen Sie auch hier die
-       Makefile aus. Das baut den relevanten Anteil von SuperLU (siehe
-       Ref. [7]).
+    3. Navigieren Sie in den Ordner LUFac und führen Sie auch hier die Makefile
+       aus. Das baut den relevanten Anteil von SuperLU (siehe Ref. [7]).
 
-    4. Navigieren Sie in den Ordner interface.d und setzen Sie die Variable
+    4. Navigieren Sie in den Ordner interface und setzen Sie die Variable
        PATH_TO_STATES, welche den Ort definiert, an dem die Daten für die
        radialen Eigenzustände später abgelegt werden.
 
 --- Notiz (*)
 
-    5. Im Ordner interface.d, setzen Sie die relevanten Dateipfade in der Datei
+    5. Im Ordner interface, setzen Sie die relevanten Dateipfade in der Datei
        alkcalc.h. Dabei muss PATH_TO_ALKCALC der absolute Dateipfad sein, der
        zum Ordner führt in dem AlkCalc abgelegt ist. Mit der Variable
        PATH_TO_STATES wird AlkCalc der Ort mitgeteilt, an dem die radialen
@@ -186,7 +185,7 @@ Installation.
     6. Führen Sie die Makefile im Hauptordner AlkCalc mit dem Befehl "lib" aus.
        Das baut die Bibliotheksfunktionen, welche zur Endnutzerinteraktion
        bestimmt sind. Für eine ausführliche Dokumentation dieser, konsultieren
-       Sie bitte "theory.d/theory.pdf".
+       Sie bitte "theory/theory.pdf".
 
     7. Um die Bibliotheksfunktionen benutzen zu können müssen die entsprechenden
        Daten, d. h. die Eigenenergien und die radialen Eigenzustände, zunächst
@@ -195,7 +194,7 @@ Installation.
 (*) An dieser Stelle ist der Installationsprozess soweit fortgeschritten, dass
     die Eigenenergien und die radialen Eigenzustände numerisch berechnet werden
     können. Die folgenden Schritte werden nur benötigt, falls die
-    Bibliotheksfunktionen (siehe "theory.d/theory.pdf" für eine vollständige
+    Bibliotheksfunktionen (siehe "theory/theory.pdf" für eine vollständige
     Dokumentation) gewünscht sind.
 
 
@@ -203,12 +202,12 @@ Datenerzeugung.
 
         In diesem Abschnitt beschreiben wir wie AlkCalc dazu benutzt werden kann
     um (zumindest teilweise) den vollen Einelektronenhamiltonoperator, definiert
-    in "theory.d/theory.pdf", zu diagonalisieren. Dieser Teil ist unverzichtbar
-    um die für die Bibliotheksfunktionen benötigten Daten (Eigenenergien und
+    in "theory/theory.pdf", zu diagonalisieren. Dieser Teil ist unverzichtbar um
+    die für die Bibliotheksfunktionen benötigten Daten (Eigenenergien und
     radiale Eigenzustände) zu erzeugt. Im Folgenden ist das Vorgehen in vier
     Schritten anhand des Atoms oder Ions X erklärt.
 
-    1. Navigieren Sie in den Ordner interface.d und öffnen Sie die Datei
+    1. Navigieren Sie in den Ordner interface und öffnen Sie die Datei
        species.dat. Stellen Sie sicher, dass in dieser Datei die notwendigen
        Einträge für X vorhanden sind. Falls X neu hinzugefügt werden muss,
        folgen Sie der Formatierung der bestehenden Einträge.
@@ -236,7 +235,7 @@ Datenerzeugung.
     3. Führen Sie die Makefile im Hauptordner AlkCalc mit dem Argument "solve"
        aus. Das erzeugt die Eigenenergien und radialen Eigenzustände. Die
        radialen Eigenzustände werden am Benutzerdefinierten (siehe
-       Absch. Installation) Ort abgespeichert, und die Eigenenergien in data.d.
+       Absch. Installation) Ort abgespeichert, und die Eigenenergien in data.
        Überprüfen Sie ob die Grundzustandsenergie richtig berechnet wurde und
        verändern Sie ggf. die Parameter "offset" und "shift".
 
@@ -248,7 +247,7 @@ Datenerzeugung.
                 für Ionen.
 
     4. Von hier an lässt man die PARAMETER species, N, nmax, rmax, in
-       "interface.d/settings.c" UNVERÄNDERT und verändert nur noch die
+       "interface/settings.c" UNVERÄNDERT und verändert nur noch die
        Bahndrehimpulsquantenzahl (l) und die Gesamtdrehimpulsquantenzahl (j).
        Für jede Wahl (l, j) erzeugt man nun die Eigenenergien und radialen
        Eigenzustände durch das Ausführen der Makefile mit dem Argument "solve".
@@ -261,7 +260,7 @@ Datenerzeugung.
        Grundzustandsenergie) Energien.
 
        WICHTIG: Die Daten für die Diskretisierung (Orte und Schrittweiten),
-                befindlich in data.d für jede Art von Atom und Ion, werden genau
+                befindlich in data für jede Art von Atom und Ion, werden genau
                 EINMAL abgespeichert. Daher muss nach dem Testen von Parametern
                 die zugehörige Datei mit den Daten für die Diskretisierung
                 manuell gelöscht werden. Diese wird dann für die finalen
@@ -275,7 +274,7 @@ Datenerzeugung.
                 - Sobald die Wahl für die Parameter getroffen ist, hält man alle
                   Parameter fest, bis auf (l, j). Bevor die ersten Daten
                   erzeugt werden, löscht man die Datei mit den Daten für die
-                  Diskretisierung im Ordner "data.d". Sobald der Algorithmus zur
+                  Diskretisierung im Ordner "data". Sobald der Algorithmus zur
                   Datenerzeugung ein weiteres Mal ausgeführt wird, für das
                   nächste Paar (l, j), wird die Datei mit den Daten für die
                   Diskretisierung nicht noch einmal erzeigt --- die Datei wird
@@ -286,19 +285,18 @@ Datenerzeugung.
 Wichtige zusätzliche Informationen.
 
     - Per Standardeinstellung ist der Faktor C für die Massenkorrektur,
-      definiert in "theory.d/theory.pdf", im Quellkode in "src.d/eigensolver.c"
-      auf eins gesetzt. Das ist der Tatsache geschuldet, dass die
-      Modellparameter (siehe Refn. [6,8]) die wir standardmäßig für das
-      Modellpotential verwenden ohne die Massenkorrektur ermittelt wurden. Das
-      schließen wir aus der Tatsache, dass die Grundzustandsenergien besser mit
-      den wahren Ionisationsenergien übereinstimmen wenn wir die Massenkorrektur
-      im Quellkode ignorieren. Natürlich, wenn Modellparameter verwendet werden
-      die UNTER dem Einfluss der Massenkorrektur ermittelt wurden, muss diese
-      auch im Quellkode berücksichtigt werden. Um die Massenkorrektur im
-      Quellkode einzubinden, genügt es eine einzelne Zeile in
-      "src.d/potential.c" einzukommentieren (und dafür eine andere
-      auszukommentieren). Bitte beachten Sie dazu auch die Informationen in
-      "src.d/potential.c".
+      definiert in "theory/theory.pdf", im Quellkode in "src/eigensolver.c" auf
+      eins gesetzt. Das ist der Tatsache geschuldet, dass die Modellparameter
+      (siehe Refn. [6,8]) die wir standardmäßig für das Modellpotential
+      verwenden ohne die Massenkorrektur ermittelt wurden. Das schließen wir aus
+      der Tatsache, dass die Grundzustandsenergien besser mit den wahren
+      Ionisationsenergien übereinstimmen wenn wir die Massenkorrektur im
+      Quellkode ignorieren. Natürlich, wenn Modellparameter verwendet werden die
+      UNTER dem Einfluss der Massenkorrektur ermittelt wurden, muss diese auch
+      im Quellkode berücksichtigt werden. Um die Massenkorrektur im Quellkode
+      einzubinden, genügt es eine einzelne Zeile in "src/potential.c"
+      einzukommentieren (und dafür eine andere auszukommentieren). Bitte
+      beachten Sie dazu auch die Informationen in "src/potential.c".
 
     - AlkCalc enthält den Atomtyp Wasserstoff (1H) und den Ionentyp Helium
       (4He+). Beide sind inklusive Russell-Saunders (LS) Kopplung beschrieben,
@@ -308,17 +306,15 @@ Wichtige zusätzliche Informationen.
       analytische Methoden zugänglich sind; LS Kopplung ist schwach
       (insbesondere für kleine Bahndrehimpulsquantenzahlen l und große
       Hauptquantenzahlen n). Mit den bekannten Formeln kann somit bestimmt
-      werden ob die in "interface.d/settings.c" gesetzten Parameter sinnvoll
-      sind.
+      werden ob die in "interface/settings.c" gesetzten Parameter sinnvoll sind.
 
     - Für die Diskretisierung des Intervalls [0, rmax] benutzt AlkCalc linear
       größer werdende Schrittweiten. Das kann jedoch leicht verändert werden
-      indem man die Funktion "step" in "src.d/eigensolver.d" umdefiniert.
-      Weitere Informationen dazu sind direkt dem zugehörigen Quellkode zu
-      entnehmen.
+      indem man die Funktion "step" in "src/eigensolver.c" umdefiniert. Weitere
+      Informationen dazu sind direkt dem zugehörigen Quellkode zu entnehmen.
 
-    - Alle Ionenmassen in der Datei "interface.d/species.dat" sind die Massen
-      des vollständigen Atoms MINUS der Masse des Elektrons.
+    - Alle Ionenmassen in der Datei "interface/species.dat" sind die Massen des
+      vollständigen Atoms MINUS der Masse des Elektrons.
 
 
 Referenzen.

@@ -24,10 +24,10 @@
 **.bcf-SAVE-ERROR
 
 # Data
-/data.d/discretisation-*
-/data.d/energies-*
-/data.d/state-*
+/data/discretisation-*
+/data/energies-*
+/data/state-*
 
 # Binaries
 /a.out
-/tmp.d/e*
+/tmp/e*

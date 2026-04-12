@@ -16,13 +16,13 @@ LD = gcc
 FLAGS = -Wall -pedantic -Wextra -Ofast -std=c99
 
 # Paths
-SRC = ./src.d
-OBJ = ./obj.d
-LIB = ./lib.d
-INF = ./interface.d
-TMP = ./tmp.d
-LUF = ./LUFac.d/lib.d
-LCZ = ./LANCZOS.D/lib.d
+SRC = ./src
+OBJ = ./obj
+LIB = ./lib
+INF = ./interface
+TMP = ./tmp
+LUF = ./LUFac/lib
+LCZ = ./LANCZOS/lib
 
 # File names
 F0 = potential
@@ -78,6 +78,6 @@ ${OBJ}/${F3}.o: ${SRC}/${F3}.c
 clean:
 	- rm -f ${OBJ}/*.o
 	- rm -f ${LIB}/*.so
-	- rm -f ./tmp.d/solve*
+	- rm -f ./tmp/solve*
 
 .PHONY: clean

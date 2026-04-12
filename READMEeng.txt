@@ -101,11 +101,11 @@ Structure of this README.
     eigenenergies and radial eigenstates can be computed and stored. Finally, in
     the section 'Important additional information' we discuss (technical)
     aspects which should be considered before employing AlkCalc.
-        In addition to this README, we provide the file 'theory.d/theory.pdf',
+        In addition to this README, we provide the file 'theory/theory.pdf',
     which contains an introduction to the physics of the single-atom and
     single-ion Hamiltonian which AlkCalc is designed to diagonalise, as well as
     a full description of the finite-element method we employ to reduce the
-    problem to a matrix eigenproblem. Finally, 'theory.d/theory.pdf' includes an
+    problem to a matrix eigenproblem. Finally, 'theory/theory.pdf' includes an
     exhaustive reference manual for the library functions of AlkCalc, including
     all the information the user may need.
 
@@ -147,22 +147,22 @@ Installation.
     1. Make sure that on the system a BLAS (e.g. Ref. [1]) implementation and a
        version of LAPACK (see Ref. [2]) is installed.
 
-    2. Navigate to the directory LANCZOS.D and run the Makefile. This builds the
+    2. Navigate to the directory LANCZOS and run the Makefile. This builds the
        relevant part of ARPACK (see Ref. [3]). The Makefile is written for GNU
        make. If GNU make is not available, just adjust the Makefile accordingly,
        or manually execute the steps defined in the Makefile.
 
-    3. Navigate to the directory LUFac.d and run the Makefile (regarding the
+    3. Navigate to the directory LUFac and run the Makefile (regarding the
        Makefile, the same conditions apply as in step 2). This builds the
        relevant part of the LU-factorisation software SuperLU (see Ref. [7]).
 
-    4. Navigate to the directory interface.d and set the variable
-       PATH_TO_STATES, which defines the location to which the data for the
-       radial eigenstates will be written.
+    4. Navigate to the directory interface and set the variable PATH_TO_STATES,
+       which defines the location to which the data for the radial eigenstates
+       will be written.
 
 --- Note (*)
 
-    5. Navigate to the directory interface.d and set the relevant paths in the
+    5. Navigate to the directory interface and set the relevant paths in the
        file alkcalk.h. The variable PATH_TO_ALKCALC must be the absolute path to
        the place where the directory AlkCalc is located. The variable
        PATH_TO_STATES defines where the radial eigenstates will be read from.
@@ -173,7 +173,7 @@ Installation.
     6. Run the Makefile in the directory AlkCalc with the argument 'lib'. This
        builds the library functions of AlkCalc, which are the ones meant for
        end-user interaction. For a full manual of the library functions see
-       'theory.d/theory.pdf'.
+       'theory/theory.pdf'.
 
     7. To use the library functions, the associated data, i.e., eigenenergies
        and radial eigenstates, must be computed first. This process is described
@@ -181,7 +181,7 @@ Installation.
 
 (*) This marks the point at which the eigenenergies and radial eigenstates can
     be computed. The following steps are only required if the library functions
-    of AlkCalc (see 'theory.d/theory.pdf' for full documentation of the library
+    of AlkCalc (see 'theory/theory.pdf' for full documentation of the library
     functions) are desired.
 
 
@@ -189,13 +189,13 @@ Data generation.
 
         In this section we describe how AlkCalc can be used to (partially)
     diagonalise the full single-atom or single-ion Hamiltonian presented in the
-    theory part in 'theory.d/theory.pdf'. This part of AlkCalc is crucial for
+    theory part in 'theory/theory.pdf'. This part of AlkCalc is crucial for
     generating the data (eigenenergies and radial eigenstates) which the library
     functions (see Sec. Installation) depend on. In the following we focus on
     the atom or ion species X. The four steps below describe how the data for X
     can be generated.
 
-    1. Navigate to the directory interface.d and open the file species.dat. Make
+    1. Navigate to the directory interface and open the file species.dat. Make
        sure that in this file the necessary data for the species X is located.
        If a new species is added, make sure to keep the formatting correct (cf.
        already available entries).
@@ -219,8 +219,8 @@ Data generation.
     3. Run the Makefile in the top-level directory AlkCalc with the argument
        'solve'. This will generate the eigenenergies and radial eigenstates. The
        radial eigenstates are stored in a user-specified location (see
-       Sec. Installation) and the eigenenergies are stored in data.d. Check if
-       the ground state energy is correctly captured. Otherwise, readjust the
+       Sec. Installation) and the eigenenergies are stored in data. Check if the
+       ground state energy is correctly captured. Otherwise, readjust the
        parameters 'offset' and 'shift'.
 
        IMPORTANT: Depending on the maximum desired principal quantum number,
@@ -230,7 +230,7 @@ Data generation.
                   compared to ions.
 
     4. From now on, KEEP THE PARAMETERS species, N, nmax, rmax in
-       'interface.d/settings.c' FIXED, and only change the orbital (l) and total
+       'interface/settings.c' FIXED, and only change the orbital (l) and total
        angular momentum (j). For each desired pair (l, j) generate the
        eigenenergies and radial eigenstates by running the Makefile with the
        argument 'solve'. Importantly note that it might be necessary to readjust
@@ -242,7 +242,7 @@ Data generation.
        (l, j).
 
        IMPORTANT: The discretisation data (positions and step sizes) is stored
-                  in data.d for each species exactly ONCE. Therefore, after
+                  in data for each species exactly ONCE. Therefore, after
                   testing different settings for the associated parameters,
                   delete this file manually. It will then be regenerated ONCE
                   for the final parameters that the user selected. This might
@@ -254,7 +254,7 @@ Data generation.
                   - Once finished, keep the parameters fixed for all pairs
                     (l, j), and before generating the first set of eigenenergies
                     and radial eigenstates, delete the file containing the
-                    discretisation data in 'data.d'. When the solver is run for
+                    discretisation data in 'data'. When the solver is run for
                     the next pair (l, j), the file containing the discretisation
                     data is NOT overwritten --- it is only regenerated in case
                     the data file could not be located, i.e., was deleted.
@@ -262,8 +262,8 @@ Data generation.
 
 Important additional information.
 
-    - By default, the mass correction factor C from 'theory.d/theory.pdf' is set
-      to unity in the source code in 'src.d/eigensolver.c', that is, we make the
+    - By default, the mass correction factor C from 'theory/theory.pdf' is set
+      to unity in the source code in 'src/eigensolver.c', that is, we make the
       approximation that the reduced mass is equal to the electron's mass. This
       is due to the fact that the model parameters for the model potential we
       use by default (see Refs. [6,8]) have been computed without the mass
@@ -272,7 +272,7 @@ Important additional information.
       the mass correction. If model parameters obtained WITH the mass correction
       are employed, one must include the mass correction in the source code as
       well. This amounts to uncommenting one line (and commenting out another
-      one) in the file 'src.d/potential.c' (please see also the explanation in
+      one) in the file 'src/potential.c' (please see also the explanation in
       this file).
 
     - Alkcalc includes the Hydrogen atom (1H) and the Helium ion (4HE+). Both
@@ -281,16 +281,16 @@ Important additional information.
       We provide these species to benchmark results for both atoms and ions.
       Note that LS-coupling is weak (especially for small orbital angular
       momentum quantum numbers and small n), such that to test if the settings
-      for the eigensolver in 'interface.d/settings.c' are justified, it is
+      for the eigensolver in 'interface/settings.c' are justified, it is
       sufficient to compare the eigenenergies to the analytical result for 1H
       and 4HE+ without LS-coupling.
 
     - By default, AlkCalc uses step sizes that increase linearly over the
       interval [0, rmax]. However, this can be adjusted by altering the function
-      'step' in 'src.d/eigensolver.c'. More information can be found directly in
+      'step' in 'src/eigensolver.c'. More information can be found directly in
       the corresponding source code.
 
-    - All ion masses in the file 'interface.d/species.dat' are the full atom's
+    - All ion masses in the file 'interface/species.dat' are the full atom's
       mass MINUS the electron's mass.
 
 
