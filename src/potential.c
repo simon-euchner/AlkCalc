@@ -60,15 +60,15 @@
  *     ipar[2], l      : Orbital angular momentum quantum number              *
  *     ipar[3], nl     : Minimal principal quantum number for series 'l'      *
  * -------------------------------------------------------------------------- */
-typedef struct _VintData {
+typedef struct vint_data_s {
     double *rpar;
     int32_t *ipar;
 } vint_data;
 
 static void move(FILE *, char *);
-static double VC(double, vint_data *);
-static double VP(double, vint_data *);
-static double VR(double, vint_data *, double, double);
+static double VC(double, const vint_data *);
+static double VP(double, const vint_data *);
+static double VR(double, const vint_data *, double, double);
 
 /* Initialise parameters (rpar, ipar), depending on atom/ion species          */
 void vint_initpar(double *rpar, int32_t *ipar) {
@@ -155,7 +155,7 @@ static void move(FILE *fd, char *id) {
 /* Interaction potential                                                      *
  * To call this function, first select an atom/ion species by initialising    *
  * 'rpar' and 'ipar' with 'vint_initpar'; argument in units of Bohr's radius  */
-double vint(double r, double *rpar, int32_t *ipar) {
+double vint(double r, const double *rpar, const int32_t *ipar) {
 
     double vc, vp, result;
     vint_data data;
@@ -171,7 +171,7 @@ double vint(double r, double *rpar, int32_t *ipar) {
 }
 
 /* Modified Coulomb's potential in units of Hartree                           */
-static double VC(double r, vint_data *data) {
+static double VC(double r, const vint_data *data) {
 
     int32_t *ipar, Z, Zc;
     double *rpar, k1, k2, k3, k4, Zn, result;
@@ -195,7 +195,7 @@ static double VC(double r, vint_data *data) {
 }
 
 /* Polarisation term in units of Hartree                                      */
-static double VP(double r, vint_data *data) {
+static double VP(double r, const vint_data *data) {
 
     double *rpar, rc, alphaD, result;
 
@@ -210,7 +210,7 @@ static double VP(double r, vint_data *data) {
 }
 
 /* Relativistic spin-orbit coupling in units of Hartree                       */
-static double VR(double r, vint_data *data, double vc, double vp) {
+static double VR(double r, const vint_data *data, double vc, double vp) {
 
     /* In 'theory/theory.pdf' the variable K is called N. Here, it is named   *
      * K to avoid clash with the global variables in 'interface/settings.h'.  */
