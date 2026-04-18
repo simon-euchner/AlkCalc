@@ -89,7 +89,7 @@ typedef struct alkcalc_spinor_s {
  * s       : Spin (Not an argument, since we always have s = 1 / 2!)          *
  * j       : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  * -------------------------------------------------------------------------- */
-double alkcalc_Enlsj(char *species, int32_t n, int32_t l, double j);
+double alkcalc_Enlsj(const char *species, int32_t n, int32_t l, double j);
 
 /* -------------------------------------------------------------------------- *
  * Radial eigenstate times radius                                             *
@@ -103,8 +103,8 @@ double alkcalc_Enlsj(char *species, int32_t n, int32_t l, double j);
  * s       : Spin (Not an argument, since we always have s = 1 / 2!)          *
  * j       : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  * -------------------------------------------------------------------------- */
-alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
-                             double j);
+alkcalc_state *alkcalc_fnlsj(char result, const char *species, int32_t n,
+                             int32_t l, double j);
 
 /* -------------------------------------------------------------------------- *
  * Free for data type 'alkcalc_state'                                         *
@@ -128,8 +128,8 @@ void alkcalc_state_free(alkcalc_state *state);
  * jk      : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  *           of ket                                                           *
  * -------------------------------------------------------------------------- */
-double alkcalc_rp(char *species, int32_t nb, int32_t lb, double jb, double p,
-                  int32_t nk, int32_t lk, double jk);
+double alkcalc_rp(const char *species, int32_t nb, int32_t lb, double jb,
+                  double p, int32_t nk, int32_t lk, double jk);
 
 /* -------------------------------------------------------------------------- *
  * Clebsch-Gordan coefficients (see 'theory/theory.pdf', section 'Manual')    *
@@ -181,7 +181,7 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
  * jf      : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  *           of (f)                                                           *
  * -------------------------------------------------------------------------- */
-double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
+double alkcalc_fitof(const char *species, int32_t ni, int32_t li, double ji,
                      int32_t nf, int32_t lf, double jf);
 
 /* -------------------------------------------------------------------------- *
@@ -196,7 +196,7 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
  * s       : Spin (Not an argument, since we always have s = 1 / 2!)          *
  * j       : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  * -------------------------------------------------------------------------- */
-double alkcalc_tau(double T, char *species, int32_t n, int32_t dn, int32_t l,
-                   double j);
+double alkcalc_tau(double T, const char *species, int32_t n, int32_t dn,
+                   int32_t l, double j);
 
 #endif
