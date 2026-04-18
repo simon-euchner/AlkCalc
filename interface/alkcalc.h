@@ -128,7 +128,7 @@ void alkcalc_state_free(alkcalc_state *state);
  * jk      : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  *           of ket                                                           *
  * -------------------------------------------------------------------------- */
-double alkcalc_rp(char *species, int32_t nb, int32_t ln, double jb, double p,
+double alkcalc_rp(char *species, int32_t nb, int32_t lb, double jb, double p,
                   int32_t nk, int32_t lk, double jk);
 
 /* -------------------------------------------------------------------------- *
