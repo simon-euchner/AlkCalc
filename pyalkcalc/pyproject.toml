@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel", "cython"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyalkcalc"
+version = "1.0"
+description = "Python bindings for the AlkCalc C library"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+  {name = "Simon Euchner", email = "euchner.se@gmail.com"}
+]
+maintainers = [
+  {name = "Simon Euchner", email = "euchner.se@gmail.com"}
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

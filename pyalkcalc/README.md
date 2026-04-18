@@ -27,6 +27,9 @@ Software requirements.
 
 Installation.
 
+    !!! Requires: libalkcalc.so installed in system path !!!
+    !!! must be available to the dynamic linker (ld.so) !!!
+
     The installation process is split into ???? steps.
 
     1. Make sure that on the system a BLAS (e.g. Ref. [1]) implementation and a
