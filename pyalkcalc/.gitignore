@@ -10,7 +10,7 @@
 # Build
 build/
 *.egg-info/
-src/PyAlkCalc/_alkcalc.c
+src/PyAlkCalc/_core.c
 
 # Caches
 __pycache__/
