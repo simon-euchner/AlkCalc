@@ -4,4 +4,19 @@
 ### Author of this file: Simon Euchner                                       ###
 ################################################################################
 
+[build-system]
+requires = ["setuptools", "wheel", "Cython"]
+build-backend = "setuptools.build_meta"
 
+[project]
+name = "PyAlkCalc"
+version = "1.0"
+description = "Python interface for AlkCalc"
+authors = [{name = "Simon Euchner"}]
+requires-python = ">=3.8"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

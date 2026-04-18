@@ -4,5 +4,13 @@
 ### Autore of this file: Simon Euchner                                       ###
 ################################################################################
 
+# Libraries
+**.so
+
+# Build
 build/
-**/__pycache__/
+*.egg-info/
+src/PyAlkCalc/_alkcalc.c
+
+# Caches
+__pycache__/
