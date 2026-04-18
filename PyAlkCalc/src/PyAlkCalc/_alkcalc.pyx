@@ -21,22 +21,27 @@ This is a Python interfeace for the precompiled shared library 'libalkcalc.so'.
 # Imports
 # ---------------------------------------------------------------------------- #
 
-cimport alkcalc
+from PyAlkCalc._alkcalc cimport alkcalc_Enlsj
 from libc.stdint cimport int32_t
-import numpy as np
-cimport numpy as cnp
+
+# ------------------------------------------------------------------------------
+# Functions to isolate C calls from Python logic
+# ------------------------------------------------------------------------------
+
+cdef double _Enlsj(const char *species, int32_t n, int32_t l, double j):
+    return alkcalc_Enlsj(species, n, l, j)
 
 # ------------------------------------------------------------------------------
 # Functions
 # ------------------------------------------------------------------------------
 
-cpdef double alkcalc_Enlsj(object species, int32_t n, int32_t l, double j):
+def Enlsj(species: str, n: int, l: int, j: float) -> float:
     """
     Eigenenergies in units of Hartree.
 
     Parameters
     ----------
-    species : str or bytes
+    species : str
         String to specify atom/ion species, e.g., 1H for Hydrogen, or 88SR+ for
         the 88Sr+ ion.
     n : int
@@ -51,29 +56,12 @@ cpdef double alkcalc_Enlsj(object species, int32_t n, int32_t l, double j):
     float
         Eigenenergy corresponding to the quantum numbers n, l, s = 1/2, and j.
     """
-    cdef bytes species_buf
-    return alkcalc.alkcalc_Enlsj(_to_c_string(species, &species_buf), n, l, j)
+
+    ### Convert j to exact half-integer float
+    #j = _convert(j)
+
+    return _Enlsj(species, n, l, j)
 
 # ------------------------------------------------------------------------------
 # Helper functions
 # ------------------------------------------------------------------------------
-
-cdef inline const char * _to_c_string(object s, bytes *buffer) except *:
-    """
-    Convert Python string to charactar pointer.
-
-    Parameters
-    ----------
-    s : str
-        Input Python string.
-    buffer : bytes *
-        Python object holding the UTF-8 encoded string.
-
-    Returns
-    -------
-    const char *
-        Pointer to UTF-8 encoded C string. This pointer is valid as long as
-        the buffer is valid.
-    """
-    buffer[0] = s.encode("utf-8")
-    return buffer[0]

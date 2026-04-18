@@ -8,13 +8,13 @@
 # Imports
 # ------------------------------------------------------------------------------
 
-from libc.stdint cimport int32_t, int8_t
+from libc.stdint cimport int64_t, int32_t, int8_t
 from libc.complex cimport complex
 
 # ------------------------------------------------------------------------------
 # C library objects
 # ------------------------------------------------------------------------------
-cdef extern from "alkcalc.h":
+cdef extern from "../../../interface/alkcalc.h":
 
     # --------------------------------------------------------------------------
     # Types
@@ -44,11 +44,11 @@ cdef extern from "alkcalc.h":
     # --------------------------------------------------------------------------
 
     double alkcalc_Enlsj(
-            char *, int32_t, int32_t, double
+            const char *, int32_t, int32_t, double
             );
 
     alkcalc_state *alkcalc_fnlsj(
-            char, char *, int32_t, int32_t, double
+            char, const char *, int32_t, int32_t, double
             );
 
     void alkcalc_state_free(
@@ -56,7 +56,8 @@ cdef extern from "alkcalc.h":
             );
 
     double alkcalc_rp(
-            char *, int32_t, int32_t, double, double, int32_t, int32_t, double
+            const char *, int32_t, int32_t, double, double, int32_t, int32_t,
+            double
             );
 
     alkcalc_cg alkcalc_cj1m1j2m2jmj(
@@ -72,9 +73,9 @@ cdef extern from "alkcalc.h":
             );
 
     double alkcalc_fitof(
-            char *, int32_t, int32_t, double, int32_t, int32_t, double
+            const char *, int32_t, int32_t, double, int32_t, int32_t, double
             );
 
     double alkcalc_tau(
-            double, char *, int32_t, int32_t, int32_t, double
+            double, const char *, int32_t, int32_t, int32_t, double
             );

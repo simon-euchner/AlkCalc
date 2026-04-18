@@ -8,16 +8,17 @@
 ### Packages
 from setuptools import setup, Extension
 from Cython.Build import cythonize
-import numpy
 # ---------------------------------------------------------------------------- #
 
 extension = Extension(
         name = "PyAlkCalc._alkcalc",
         sources = ["src/PyAlkCalc/_alkcalc.pyx"],
-        include_dirs = [numpy.get_include()],
+        include_dirs = ["/home/simon/Files/GitHub/AlkCalc/interface"],
+        library_dirs = ["/home/simon/Files/GitHub/AlkCalc/lib"],
         libraries = ["alkcalc"],
-        library_dirs = ["/home/simon/Files/GitHub/Alkcalc/lib"],
-
+        extra_link_args=[
+            "-Wl,-rpath,/home/simon/Files/GitHub/AlkCalc/lib"
+        ]
     )
 
 setup(

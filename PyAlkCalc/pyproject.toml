@@ -5,15 +5,15 @@
 ################################################################################
 
 [build-system]
-requires = ["setuptools", "wheel", "Cython"]
+requires = ["setuptools", "wheel", "Cython>=3.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "PyAlkCalc"
 version = "1.0"
+requires-python = ">=3.8"
 description = "Python interface for AlkCalc"
 authors = [{name = "Simon Euchner"}]
-requires-python = ">=3.8"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
