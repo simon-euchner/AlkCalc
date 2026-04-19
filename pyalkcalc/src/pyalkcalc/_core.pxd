@@ -16,7 +16,7 @@ cdef extern from "alkcalc.h":
     # structs
     # --------------------------------------------------------------------------
 
-    cdef struct alkcalc_state:
+    cdef struct alkcalc_state_s:
         int32_t N
         int32_t dim
         int32_t n
@@ -25,15 +25,18 @@ cdef extern from "alkcalc.h":
         double *t
         double *h
         double *fnlsj
+    ctypedef alkcalc_state_s alkcalc_state
 
-    cdef struct alkcalc_cg:
+    cdef struct alkcalc_cg_s:
         int8_t s
         int64_t numerator
         int64_t denominator
+    ctypedef alkcalc_cg_s alkcalc_cg
 
-    cdef struct alkcalc_spinor:
+    cdef struct alkcalc_spinor_s:
         double complex u
         double complex d
+    ctypedef alkcalc_spinor_s alkcalc_spinor
 
 
     # --------------------------------------------------------------------------
