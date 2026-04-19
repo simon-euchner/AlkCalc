@@ -21,6 +21,11 @@ cpdef double _enlsj_core(bytes species, int32_t n, int32_t l, double j):
     cdef const char *species_c = <const char *>species
     return alkcalc_Enlsj(species_c, n, l, j)
 
+cpdef double _tau_core(double T, bytes species, int32_t n, int32_t dn,
+                       int32_t l, double j):
+    cdef const char *species_c = <const char *>species
+    return alkcalc_tau(T, species_c, n, dn, l, j)
+
 
 # ==============================================================================
 # C Library Wrapper (classes)
