@@ -33,9 +33,9 @@ class State:
     n : int
         Principal quantum number.
     l : int
-        Orbital angular momentum quantum number (l = 0, 1, ..., n-1).
+        Orbital angular momentum quantum number l = 0, 1, ..., n-1.
     j : float
-        Total angular momentum quantum number (j = |l - 1/2| or |l + 1/2|).
+        Total angular momentum quantum number j = |l - 1/2| or |l + 1/2|.
 
     Notes
     -----
@@ -68,7 +68,7 @@ def energy(species: str, n: int, l: int, j: float) -> float:
     n : int
         Principal quantum number.
     l : int
-        Orbital angular momentum quantum number l = 0, 1, ..., n-1.
+        Orbital angular momentum quantum number :math:`l = 0, 1, ..., n-1`.
     j : float
         Total angular momentum quantum number j = |l - 1/2|, |l + 1/2|.
 
