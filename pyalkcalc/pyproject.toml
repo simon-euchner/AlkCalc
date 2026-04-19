@@ -4,19 +4,24 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyalkcalc"
-version = "1.0"
-description = "Python bindings for the AlkCalc C library"
 readme = "README.md"
-requires-python = ">=3.9"
+description = "Python bindings for the AlkCalc C library"
+version = "1.0"
 authors = [
   {name = "Simon Euchner", email = "euchner.se@gmail.com"}
 ]
 maintainers = [
   {name = "Simon Euchner", email = "euchner.se@gmail.com"}
 ]
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=2.4.4",
+]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = [
+    "src",
+]

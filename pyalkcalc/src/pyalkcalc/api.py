@@ -6,8 +6,9 @@ Public Python API for AlkCalc.
 # Imports
 # ==============================================================================
 
-from ._core import _enlsj_core, _StateCore, _tau_core, _rp_core
+from ._core import _enlsj_core, _StateCore, _tau_core, _rp_core, _CGCore
 from dataclasses import dataclass
+from numpy import sqrt
 
 
 # ==============================================================================
@@ -51,6 +52,41 @@ class State:
     l: int
     j: float
 
+@dataclass
+class CG:
+    """
+    Container for Clebsch-Gordan coefficient.
+
+    This dataclass represents the metadata associated with a Clebsch-Gordan
+    coefficient. It provides a lightweight, immutable snapshot of the
+    Clebsch-Gordan coefficient returned by the underlying C implementation.
+
+    Attributes
+    ----------
+    sign : int
+        Sign of the Clebsch-Gordan coefficient (see notes below).
+    numerator : int
+        Numerator of the Clebsch-Gordan coefficient (see notes below).
+    denominator : int
+        Denominator of the Clebsch-Gordan coefficient (see notes below).
+
+    Notes
+    -----
+    The Clebsch-Gordan coefficient is returned in three parts: its s, its
+    numerator, and its denominator. This allows to obtain it analytically, not
+    just as a floating-point number. Explicitly, the Clebsch-Gordan coefficient
+    C can be computed in the following way:
+
+        C = s * sqrt(numerator / denominator) .
+
+    The Clebsch-Gordan determines the change of basis between the states
+    |j1,m1>|j2,m2> and |j,mj>. We choose the Condon-Shortley phase convention,
+    that is, we choose the Clebsch-Gordan coefficient with mj = j1 + j2 to be
+    positive.
+    """
+    sign: int
+    numerator: int
+    denominator: int
 
 # ==============================================================================
 # Public Functions
@@ -157,6 +193,51 @@ def radial_matrix_element(species: str, nb: int, lb: int, jb: float, p: float,
     """
     species_ascii = species.encode("ascii")
     return _rp_core(species_ascii, nb, lb, jb, p, nk, lk, jk)
+
+def clebsch_gordan_coefficient(j1: float, m1: float, j2: float, m2: float,
+                               j: float, mj: float,
+                               result: str = "analytic") -> CG:
+    """
+    Clebsch-Gordan coefficient.
+
+    Parameters
+    ----------
+    float : j1
+        Angular momentum quantum number of first factor.
+    float : m1
+        Magnetic quantum number of first factor.
+    float : j2
+        Angular momentum quantum number of second factor.
+    float : m2
+        Magnetic quantum number of second factor.
+    float : j
+        Total angular momentum quantum number.
+    float : mj
+        Total magnetic quantum number.
+    result : str
+        If `result` is `"analytic"`, an instance of the dataclass `CG` is
+        returned and the Clebsch-Gordan coefficient is returned analytically. If
+        `result` is `"numeric"` the Clebsch-Gordan coefficient is returned as
+        a real number.
+
+    Returns
+    -------
+    CG, float
+        Clebsch-Gordan coefficient for coupling j1 and j2 to obtain j.
+    """
+    core = _CGCore(j1, m1, j2, m2, j, mj)
+    cg = CG(
+          sign=core.sign,
+          numerator=core.numerator,
+          denominator=core.denominator,
+          )
+    if result is None or result == "analytic":
+        return cg
+    elif result == "numeric":
+        return cg.sign * sqrt(cg.numerator / cg.denominator)
+    else:
+        raise ValueError("Invalid value for `result`. Expected `\"analytic\"` "
+                         "or `\"numeric\"`.")
 
 def lifetime(T: float, species: str, n: int, dn: int, l: int,
              j: float) -> float:

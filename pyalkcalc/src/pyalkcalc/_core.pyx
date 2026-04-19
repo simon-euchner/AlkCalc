@@ -70,3 +70,22 @@ cdef class _StateCore:
     @property
     def j(self):
         return self.state_ptr.j
+
+cdef class _CGCore:
+    cdef alkcalc_cg cg
+
+    def __cinit__(self, double j1, double m1, double j2, double m2, double j,
+                  double mj):
+        self.cg = alkcalc_cj1m1j2m2jmj(j1, m1, j2, m2, j, mj)
+
+    @property
+    def sign(self):
+        return self.cg.sign
+
+    @property
+    def numerator(self):
+        return self.cg.numerator
+
+    @property
+    def denominator(self):
+        return self.cg.denominator
