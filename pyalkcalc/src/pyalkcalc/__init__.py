@@ -1,11 +1,23 @@
-from .api import energy, State, state, radial_matrix_element, CG, clebsch_gordan_coefficient, lifetime
+from .api import (
+        energy,
+        State,
+        state,
+        radial_matrix_element,
+        CG,
+        clebsch_gordan_coefficient,
+        Spinor,
+        spinor_uncoupled_basis,
+        lifetime,
+)
 
 __all__ = [
         "energy",
         "State",
         "state",
-        "lifetime",
+        "radial_matrix_element",
         "CG",
         "clebsch_gordan_coefficient",
-        "radial_matrix_element",
+        "Spinor",
+        "spinor_uncoupled_basis",
+        "lifetime",
         ]

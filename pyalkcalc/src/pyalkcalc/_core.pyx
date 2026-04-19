@@ -21,13 +21,27 @@ cpdef double _enlsj_core(bytes species, int32_t n, int32_t l, double j):
     cdef const char *species_c = <const char *>species
     return alkcalc_Enlsj(species_c, n, l, j)
 
-cpdef double _tau_core(double T, bytes species, int32_t n, int32_t dn,
-                       int32_t l, double j):
+cpdef double _tau_core(
+        double T,
+        bytes species,
+        int32_t n,
+        int32_t dn,
+        int32_t l,
+        double j
+):
     cdef const char *species_c = <const char *>species
     return alkcalc_tau(T, species_c, n, dn, l, j)
 
-cpdef double _rp_core(bytes species, int32_t nb, int32_t lb, double jb,
-                      double p, int32_t nk, int32_t lk, double jk):
+cpdef double _rp_core(
+        bytes species,
+        int32_t nb,
+        int32_t lb,
+        double jb,
+        double p,
+        int32_t nk,
+        int32_t lk,
+        double jk
+):
     cdef const char *species_c = <const char *>species
     return alkcalc_rp(species, nb, lb, jb, p, nk, lk, jk)
 
@@ -39,8 +53,14 @@ cpdef double _rp_core(bytes species, int32_t nb, int32_t lb, double jb,
 cdef class _StateCore:
     cdef alkcalc_state *state_ptr
 
-    def __cinit__(self, bytes species, int32_t n, int32_t l, double j,
-                  bytes result):
+    def __cinit__(
+            self,
+            bytes species,
+            int32_t n,
+            int32_t l,
+            double j,
+            bytes result
+    ):
         cdef const char *species_c = <const char *>species
         cdef const char *result_c = <const char *>result
         cdef char result_char = result_c[0]
@@ -74,8 +94,15 @@ cdef class _StateCore:
 cdef class _CGCore:
     cdef alkcalc_cg cg
 
-    def __cinit__(self, double j1, double m1, double j2, double m2, double j,
-                  double mj):
+    def __cinit__(
+            self,
+            double j1,
+            double m1,
+            double j2,
+            double m2,
+            double j,
+            double mj
+    ):
         self.cg = alkcalc_cj1m1j2m2jmj(j1, m1, j2, m2, j, mj)
 
     @property
@@ -89,3 +116,24 @@ cdef class _CGCore:
     @property
     def denominator(self):
         return self.cg.denominator
+
+cdef class _SpinorUncoupledBasis:
+    cdef alkcalc_spinor spinor
+
+    def __cinit__(
+            self,
+            int32_t l,
+            int32_t ml,
+            double ms,
+            double theta,
+            double phi
+    ):
+        self.spinor = alkcalc_YlmlXsms(l, ml, ms, theta, phi)
+
+    @property
+    def u(self):
+        return self.spinor.u
+
+    @property
+    def d(self):
+        return self.spinor.d

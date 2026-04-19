@@ -6,7 +6,14 @@ Public Python API for AlkCalc.
 # Imports
 # ==============================================================================
 
-from ._core import _enlsj_core, _StateCore, _tau_core, _rp_core, _CGCore
+from ._core import (
+        _enlsj_core,
+        _StateCore,
+        _tau_core,
+        _rp_core,
+        _CGCore,
+        _SpinorUncoupledBasis,
+)
 from dataclasses import dataclass
 from numpy import sqrt
 
@@ -88,6 +95,25 @@ class CG:
     numerator: int
     denominator: int
 
+@dataclass
+class Spinor:
+    """
+    Container for spinor data.
+
+    The spinor is represented in the basis (|u>, |d>), where |u> and |d> are the
+    spin-1/2 eigenstates with spin +1/2 and -1/2, respectively.
+
+    Attributes
+    ----------
+    u: float
+        Component of spinor associated to +1/2.
+    d: float
+        Component of spinor associated to +1/2.
+    """
+    u: float
+    d: float
+
+
 # ==============================================================================
 # Public Functions
 # ==============================================================================
@@ -158,10 +184,18 @@ def state(species: str, n: int, l: int, j: float, result: str = "f") -> State:
             n=core.n,
             l=core.l,
             j=core.j,
-            )
+    )
 
-def radial_matrix_element(species: str, nb: int, lb: int, jb: float, p: float,
-                          nk: int, lk: int, jk: float) -> float:
+def radial_matrix_element(
+        species: str,
+        nb: int,
+        lb: int,
+        jb: float,
+        p: float,
+        nk: int,
+        lk: int,
+        jk: float
+) -> float:
     """
     Radial matrix element.
 
@@ -194,9 +228,15 @@ def radial_matrix_element(species: str, nb: int, lb: int, jb: float, p: float,
     species_ascii = species.encode("ascii")
     return _rp_core(species_ascii, nb, lb, jb, p, nk, lk, jk)
 
-def clebsch_gordan_coefficient(j1: float, m1: float, j2: float, m2: float,
-                               j: float, mj: float,
-                               result: str = "analytic") -> CG:
+def clebsch_gordan_coefficient(
+        j1: float,
+        m1: float,
+        j2: float,
+        m2: float,
+        j: float,
+        mj: float,
+        result: str = "analytic"
+) -> CG:
     """
     Clebsch-Gordan coefficient.
 
@@ -230,7 +270,7 @@ def clebsch_gordan_coefficient(j1: float, m1: float, j2: float, m2: float,
           sign=core.sign,
           numerator=core.numerator,
           denominator=core.denominator,
-          )
+    )
     if result is None or result == "analytic":
         return cg
     elif result == "numeric":
@@ -239,8 +279,49 @@ def clebsch_gordan_coefficient(j1: float, m1: float, j2: float, m2: float,
         raise ValueError("Invalid value for `result`. Expected `\"analytic\"` "
                          "or `\"numeric\"`.")
 
-def lifetime(T: float, species: str, n: int, dn: int, l: int,
-             j: float) -> float:
+def spinor_uncoupled_basis(
+        l: int,
+        ml: int,
+        ms: float,
+        theta: float,
+        phi: float
+) -> Spinor:
+    """
+    Spinor associated to an uncoupled basis state.
+
+    Parameters
+    ----------
+    l : int
+        Orbital angular momentum quantum number l = 0, 1, ..., n-1.
+    ml : int
+        Magnetic quantum number of obital angular momentum.
+    ms : float
+        Magnetic quantum number of electron spin.
+    theta : float
+        Polar angle (Zenitwinkel) in the range [0, pi].
+    phi : float
+        Azimuthal angle (Azimut) in the range [0, 2pi].
+
+    Returns
+    -------
+    Spinor
+        Spinor associated to an uncoupled basis state. It is computed as
+        follows:
+
+            [ Ylml, 0 ] if `ms` is +1/2 (up) ,
+
+            [ 0, Ylml ] if `ms` is -1/2 (down) .
+
+        Here, Ylml is a spherical harmonic. For these, we assume the
+        Condon-Shortley phase convention.
+    """
+    core = _SpinorUncoupledBasis(l, ml, ms, theta, phi)
+    return Spinor(
+            u=core.u,
+            d=core.d,
+    )
+
+def lifetime(T: float, species: str, n: int, dn: int, l: int,j: float) -> float:
     """
     Lifetime of fine-structure state.
 
