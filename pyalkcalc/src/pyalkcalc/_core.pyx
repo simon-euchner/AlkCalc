@@ -137,3 +137,24 @@ cdef class _SpinorUncoupledBasis:
     @property
     def d(self):
         return self.spinor.d
+
+cdef class _SpinorCoupledBasis:
+    cdef alkcalc_spinor spinor
+
+    def __cinit__(
+            self,
+            int32_t l,
+            double j,
+            double mj,
+            double theta,
+            double phi
+    ):
+        self.spinor = alkcalc_Philsjmj(l, j, mj, theta, phi)
+
+    @property
+    def u(self):
+        return self.spinor.u
+
+    @property
+    def d(self):
+        return self.spinor.d

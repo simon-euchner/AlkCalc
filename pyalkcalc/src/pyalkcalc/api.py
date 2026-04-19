@@ -13,6 +13,7 @@ from ._core import (
         _rp_core,
         _CGCore,
         _SpinorUncoupledBasis,
+        _SpinorCoupledBasis,
 )
 from dataclasses import dataclass
 from numpy import sqrt
@@ -316,6 +317,48 @@ def spinor_uncoupled_basis(
         Condon-Shortley phase convention.
     """
     core = _SpinorUncoupledBasis(l, ml, ms, theta, phi)
+    return Spinor(
+            u=core.u,
+            d=core.d,
+    )
+
+def spinor_coupled_basis(
+        l: int,
+        j: float,
+        mj: float,
+        theta: float,
+        phi: float
+) -> Spinor:
+    """
+    Spinor associated to a coupled basis (fine-structure) state.
+
+    Parameters
+    ----------
+    l : int
+        Orbital angular momentum quantum number l = 0, 1, ..., n-1.
+    j : float
+        Total angular momentum quantum number.
+    mj : float
+        Total magnetic quantum number.
+    theta : float
+        Polar angle (Zenitwinkel) in the range [0, pi].
+    phi : float
+        Azimuthal angle (Azimut) in the range [0, 2pi].
+
+    Returns
+    -------
+    Spinor
+        Spinor associated to a coupled basis (fine-structure) state. It is
+        computed as follows:
+
+            [ C(l,mj-1/2,1/2,+1/2,j,mj) * Ylmj-1/2,
+              C(l,mj+1/2,1/2,-1/2,j,mj) * Ylmj+1/2 ] .
+
+        Here, Ylml is a spherical harmonic and C(j1,m1,j2,m2,j,mj) is the
+        Clebsch-Gordan coefficient which couples j1 and j2 to yield j. For both,
+        we assume the Condon-Shortley phase convention.
+    """
+    core = _SpinorCoupledBasis(l, j, mj, theta, phi)
     return Spinor(
             u=core.u,
             d=core.d,

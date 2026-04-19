@@ -7,6 +7,7 @@ from .api import (
         clebsch_gordan_coefficient,
         Spinor,
         spinor_uncoupled_basis,
+        spinor_coupled_basis,
         lifetime,
 )
 
@@ -19,5 +20,6 @@ __all__ = [
         "clebsch_gordan_coefficient",
         "Spinor",
         "spinor_uncoupled_basis",
+        "spinor_coupled_basis",
         "lifetime",
         ]
