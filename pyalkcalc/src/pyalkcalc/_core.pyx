@@ -26,6 +26,11 @@ cpdef double _tau_core(double T, bytes species, int32_t n, int32_t dn,
     cdef const char *species_c = <const char *>species
     return alkcalc_tau(T, species_c, n, dn, l, j)
 
+cpdef double _rp_core(bytes species, int32_t nb, int32_t lb, double jb,
+                      double p, int32_t nk, int32_t lk, double jk):
+    cdef const char *species_c = <const char *>species
+    return alkcalc_rp(species, nb, lb, jb, p, nk, lk, jk)
+
 
 # ==============================================================================
 # C Library Wrapper (classes)

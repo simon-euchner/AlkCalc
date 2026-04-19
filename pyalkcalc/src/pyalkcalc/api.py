@@ -6,7 +6,7 @@ Public Python API for AlkCalc.
 # Imports
 # ==============================================================================
 
-from ._core import _enlsj_core, _StateCore, _tau_core
+from ._core import _enlsj_core, _StateCore, _tau_core, _rp_core
 from dataclasses import dataclass
 
 
@@ -123,6 +123,40 @@ def state(species: str, n: int, l: int, j: float, result: str = "f") -> State:
             l=core.l,
             j=core.j,
             )
+
+def radial_matrix_element(species: str, nb: int, lb: int, jb: float, p: float,
+                          nk: int, lk: int, jk: float) -> float:
+    """
+    Radial matrix element.
+
+    Parameters
+    ----------
+    nb : int
+        Principal quantum number of bra.
+    lb : int
+        Orbital angular momentum quantum number l = 0, 1, ..., n-1 of bra.
+    jb : float
+        Total angular momentum quantum number j = |l - 1/2|, |l + 1/2| of bra.
+    p : float
+        Power of radius operator. For instance, if `p` is zero, the overlap
+        between the radial eigenstates is calculated, or if `p` is unity, the
+        radial dipole matrix element.
+    nk : int
+        Principal quantum number of ket.
+    lk : int
+        Orbital angular momentum quantum number l = 0, 1, ..., n-1 of ket.
+    jk : float
+        Total angular momentum quantum number j = |l - 1/2|, |l + 1/2| of ket.
+
+    Returns
+    -------
+    float
+        Radial matrix element <R', r**p R> of power `p`. Here, R' and R are the
+        radial eigenstates (bra and ket) with the associated quantum numbers
+        (nb, lb, jb) and (nk, lk, jk).
+    """
+    species_ascii = species.encode("ascii")
+    return _rp_core(species_ascii, nb, lb, jb, p, nk, lk, jk)
 
 def lifetime(T: float, species: str, n: int, dn: int, l: int,
              j: float) -> float:
