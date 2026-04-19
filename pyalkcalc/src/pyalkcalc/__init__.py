@@ -8,6 +8,7 @@ from .api import (
         Spinor,
         spinor_uncoupled_basis,
         spinor_coupled_basis,
+        oscillator_strength,
         lifetime,
 )
 
@@ -21,5 +22,6 @@ __all__ = [
         "Spinor",
         "spinor_uncoupled_basis",
         "spinor_coupled_basis",
+        "oscillator_strength",
         "lifetime",
         ]

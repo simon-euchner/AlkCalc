@@ -9,11 +9,12 @@ Public Python API for AlkCalc.
 from ._core import (
         _enlsj_core,
         _StateCore,
-        _tau_core,
         _rp_core,
         _CGCore,
         _SpinorUncoupledBasis,
         _SpinorCoupledBasis,
+        _tau_core,
+        _fitof_core,
 )
 from dataclasses import dataclass
 from numpy import sqrt
@@ -364,7 +365,60 @@ def spinor_coupled_basis(
             d=core.d,
     )
 
-def lifetime(T: float, species: str, n: int, dn: int, l: int,j: float) -> float:
+def oscillator_strength(
+        species: str,
+        ni: int,
+        li: int,
+        ji: float,
+        nf: int,
+        lf: int,
+        jf: float
+) -> float:
+    """
+    Oscillator strength between fine-structure states.
+
+    Parameters
+    ----------
+    species : str
+        String to specify atom/ion species, e.g., 1H for Hydrogen, or 88SR+ for
+        the 88Sr+ ion.
+    ni : int
+        Principal quantum number of initial state.
+    li : int
+        Orbital angular momentum quantum number l = 0, 1, ..., n-1 of initial
+        state.
+    ji : float
+        Total angular momentum quantum number j = |l - 1/2|, |l + 1/2| of final
+        state.
+    nf : int
+        Principal quantum number of initial state.
+    lf : int
+        Orbital angular momentum quantum number l = 0, 1, ..., n-1 of final
+        state.
+    jf : float
+        Total angular momentum quantum number j = |l - 1/2|, |l + 1/2| of
+        final state.
+
+    Returns
+    -------
+    float
+        Oscillator strength between the fine-structure states associated to the
+        initial and final state with quantum numbers (ni, li, ji) and
+        (nf, lf, jf), respectively. Note that this result is obtained after
+        summation over mjf. Because of this, the oscillator strength is the same
+        for all mji. Therefore, mji is not an argument here.
+    """
+    species_ascii = species.encode("ascii")
+    return _fitof_core(species_ascii, ni, li, ji, nf, lf, jf)
+
+def lifetime(
+    T: float,
+    species: str,
+    n: int,
+    dn: int,
+    l: int,
+    j: float
+) -> float:
     """
     Lifetime of fine-structure state.
 

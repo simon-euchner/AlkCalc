@@ -45,6 +45,18 @@ cpdef double _rp_core(
     cdef const char *species_c = <const char *>species
     return alkcalc_rp(species, nb, lb, jb, p, nk, lk, jk)
 
+cpdef double _fitof_core(
+        bytes species,
+        int32_t ni,
+        int32_t li,
+        double ji,
+        int32_t nf,
+        int32_t lf,
+        double jf,
+):
+    cdef const char *species_c = <const char *>species
+    return alkcalc_fitof(species_c, ni, li, ji, nf, lf, jf)
+
 
 # ==============================================================================
 # C Library Wrapper (classes)
