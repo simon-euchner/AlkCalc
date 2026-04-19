@@ -41,9 +41,9 @@ class State:
     -----
     The total wave-function is defined as the product of the angular spinor and
     the radial eigenstate Rnlsj. This dataclass represents Rnlsj in terms of
-    fnlsj(t) = sqrt(aB) * r * Rnlsj(r) , where t = r / aB with Bohr's radius aB.
+    fnlsj(t) = sqrt(aB) * r * Rnlsj(r), where t = r / aB with Bohr's radius aB.
     Note that fnlsj is dimensionless, because the dimension of Rnlsj is
-    1/aB**(3/2).
+    1 / sqrt(aB)**3.
     """
     N: int
     dim: int
@@ -68,7 +68,7 @@ def energy(species: str, n: int, l: int, j: float) -> float:
     n : int
         Principal quantum number.
     l : int
-        Orbital angular momentum quantum number :math:`l = 0, 1, ..., n-1`.
+        Orbital angular momentum quantum number l = 0, 1, ..., n-1.
     j : float
         Total angular momentum quantum number j = |l - 1/2|, |l + 1/2|.
 
