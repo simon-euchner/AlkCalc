@@ -11,6 +11,11 @@ Python wrapper for the C library AlkCalc
 # distutils: language = c
 
 from libc.stdint cimport int32_t
+from libc.string cimport memcpy
+
+import numpy as np
+cimport numpy as np
+from numpy import empty, float64, ndarray
 
 
 # ==============================================================================
@@ -102,6 +107,31 @@ cdef class _StateCore:
     @property
     def j(self):
         return self.state_ptr.j
+
+    @property
+    def t(self):
+        cdef int32_t ln = self.state_ptr.N
+        if self.state_ptr == NULL:
+            return empty(0, dtype=float64)
+        cdef np.ndarray[double, ndim=1, mode="c"] out = empty(ln, dtype=float64)
+        memcpy(&out[0], self.state_ptr.t, ln * sizeof(double))
+        return out
+
+    @property
+    def h(self):
+        cdef int32_t ln = self.state_ptr.N - 1
+        if self.state_ptr == NULL:
+            return empty(0, dtype=float64)
+        cdef np.ndarray[double, ndim=1, mode="c"] out = empty(ln, dtype=float64)
+        memcpy(&out[0], self.state_ptr.h, ln * sizeof(double))
+        return out
+
+    @property
+    def fnlsj(self):
+        cdef int32_t ln = self.state_ptr.dim
+        cdef np.ndarray[double, ndim=1, mode="c"] out = empty(ln, dtype=float64)
+        memcpy(&out[0], self.state_ptr.fnlsj, ln * sizeof(double))
+        return out
 
 cdef class _CGCore:
     cdef alkcalc_cg cg

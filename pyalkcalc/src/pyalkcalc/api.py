@@ -17,7 +17,8 @@ from ._core import (
         _fitof_core,
 )
 from dataclasses import dataclass
-from numpy import sqrt
+from numpy import sqrt, ndarray, float64
+from numpy.typing import NDArray
 
 
 # ==============================================================================
@@ -46,6 +47,21 @@ class State:
         Orbital angular momentum quantum number l = 0, 1, ..., n-1.
     j : float
         Total angular momentum quantum number j = |l - 1/2| or |l + 1/2|.
+    t : NDArray[float64]
+        Discretisation points. This is a numpy array which contains the
+        the points tk, k = 0, ..., N-1, which discretise the interval [0, tmax].
+        Here, tmax represents the maximally considered radius rmax = tmax * aB
+        and N is the number of discretisation points tk. Note that t0 = 0 and
+        tN-1 = tmax.
+    h : NDAarray[float64]
+        Step sizes. This is a numpy array of length N-1, with entries
+        hk = tk - tk-1, k = 1, ..., N-1. These are the (non-uniform) step sizes
+        of the grid defined by tk.
+    fnlsj : NDArray[float64]
+        Values of the radial eigenstate. This is a numpy array which contains
+        the values fnlsj(tk), k = 1, ..., dim, where dim = N-2. Note that the
+        boundary terms are by construction zero, i.e.,
+        fnlsj(t0) = fnlsj(tN-1) = 0.
 
     Notes
     -----
@@ -60,6 +76,9 @@ class State:
     n: int
     l: int
     j: float
+    t: NDArray[float64]
+    h: NDArray[float64]
+    fnlsj: NDArray[float64]
 
 @dataclass
 class CG:
@@ -180,12 +199,16 @@ def state(species: str, n: int, l: int, j: float, result: str = "f") -> State:
     species_ascii = species.encode("ascii")
     result_ascii = result.encode("ascii")
     core = _StateCore(species_ascii, n, l, j, result_ascii)
+    core.t.flags.writeable = False
     return State(
             N=core.N,
             dim=core.dim,
             n=core.n,
             l=core.l,
             j=core.j,
+            t=core.t,
+            h=core.h,
+            fnlsj=core.fnlsj,
     )
 
 def radial_matrix_element(
