@@ -309,7 +309,7 @@ void shift_invert_f(eigensolver_data *data, double *x) {
 }
 
 /* Save computed eigenenergies to file                                        */
-void save_energies(const eigensolver_data *data, const double *energies) {
+void save_energies(eigensolver_data *data, const double *energies) {
 
     char file[71], filename[51];
     int32_t *ipar, nl, lo, jj, runtime, n;
@@ -356,7 +356,7 @@ void save_energies(const eigensolver_data *data, const double *energies) {
 }
 
 /* Save computed radial eigenstates to file                                   */
-void save_states(const eigensolver_data *data, const double *z) {
+void save_states(eigensolver_data *data, const double *z) {
 
     char file[LEN_PATH_TO_STATES + 101], filename[101];
     int32_t *ipar, nl, lo, jj, dim, n, k;
