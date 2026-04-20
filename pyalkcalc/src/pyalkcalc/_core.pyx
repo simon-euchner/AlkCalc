@@ -43,7 +43,7 @@ cpdef double _rp_core(
         double jk
 ):
     cdef const char *species_c = <const char *>species
-    return alkcalc_rp(species, nb, lb, jb, p, nk, lk, jk)
+    return alkcalc_rp(species_c, nb, lb, jb, p, nk, lk, jk)
 
 cpdef double _fitof_core(
         bytes species,
