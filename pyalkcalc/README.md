@@ -1,9 +1,9 @@
 # pyalkcalc
 
-Python interface to [*AlkCalc*](https://github.com/simon-euchner/AlkCalc) ---
-an alkali-metal atom and alkaline-earth-metal ion calculator written in C.
+Python interface to [*AlkCalc*](https://github.com/simon-euchner/AlkCalc) — an
+alkali-metal atom and alkaline-earth-metal ion calculator written in C.
 
-**Author:** Simon Euchner <euchner.se[at]gmail.com>
+**Author:** Simon Euchner [euchner.se[at]gmail.com]
 
 **License:** GPLv3
 
@@ -20,18 +20,18 @@ directory.
 
 ## Prerequisites
 
-> **The Python package** ***pyalkcalc*** requires ***AlkCalc*** **to be
+> **The Python package** ***pyalkcalc*** **requires** ***AlkCalc*** **to be
 >   installed and set up on your system.**
 > Without it, *pyalkcalc* will not work. In particular:
 >
 > 1. *AlkCalc* must be compiled and the shared library must be available
 >    system-wide (or on your `LD_LIBRARY_PATH`).
 > 2. The eigenenergy and radial eigenstate data for the atom or ion species of
->    interest must have been generated beforehand using AlkCalc's data
->    generation pipeline. See the *AlkCalc* README and `theory/theory.pdf` for
+>    interest must have been generated beforehand using the data generation
+>    pipeline of *AlkCalc*. See the *AlkCalc* README and `theory/theory.pdf` for
 >    instructions.
 
-pyalkcalc itself requires:
+*pyalkcalc* itself requires:
 
 - Python >= 3.10
 - NumPy
@@ -70,4 +70,4 @@ later version. See [LICENSE](LICENSE) for the full license text.
 
 ## Contact
 
-Simon Euchner <euchner.se[at]gmail.com>
+Simon Euchner [euchner.se[at]gmail.com]
