@@ -32,7 +32,7 @@ cpdef double _tau_core(
         int32_t n,
         int32_t dn,
         int32_t l,
-        double j
+        double j,
 ):
     cdef const char *species_c = <const char *>species
     return alkcalc_tau(T, species_c, n, dn, l, j)
@@ -45,7 +45,7 @@ cpdef double _rp_core(
         double p,
         int32_t nk,
         int32_t lk,
-        double jk
+        double jk,
 ):
     cdef const char *species_c = <const char *>species
     return alkcalc_rp(species_c, nb, lb, jb, p, nk, lk, jk)
@@ -76,7 +76,7 @@ cdef class _StateCore:
             int32_t n,
             int32_t l,
             double j,
-            bytes result
+            bytes result,
     ):
         cdef const char *species_c = <const char *>species
         cdef const char *result_c = <const char *>result
@@ -143,7 +143,7 @@ cdef class _CGCore:
             double j2,
             double m2,
             double j,
-            double mj
+            double mj,
     ):
         self.cg = alkcalc_cj1m1j2m2jmj(j1, m1, j2, m2, j, mj)
 
@@ -168,7 +168,7 @@ cdef class _SpinorUncoupledBasis:
             int32_t ml,
             double ms,
             double theta,
-            double phi
+            double phi,
     ):
         self.spinor = alkcalc_YlmlXsms(l, ml, ms, theta, phi)
 
@@ -189,7 +189,7 @@ cdef class _SpinorCoupledBasis:
             double j,
             double mj,
             double theta,
-            double phi
+            double phi,
     ):
         self.spinor = alkcalc_Philsjmj(l, j, mj, theta, phi)
 

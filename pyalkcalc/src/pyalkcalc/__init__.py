@@ -11,6 +11,9 @@ from .api import (
         oscillator_strength,
         lifetime,
 )
+from .tools import (
+        plot_state,
+)
 
 __all__ = [
         "energy",
@@ -24,4 +27,5 @@ __all__ = [
         "spinor_coupled_basis",
         "oscillator_strength",
         "lifetime",
-        ]
+        "plot_state",
+]

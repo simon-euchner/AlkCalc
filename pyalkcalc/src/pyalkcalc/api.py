@@ -185,7 +185,7 @@ def state(species: str, n: int, l: int, j: float, result: str = "f") -> State:
         Orbital angular momentum quantum number l = 0, 1, ..., n-1.
     j : float
         Total angular momentum quantum number j = |l - 1/2|, |l + 1/2|.
-    result : str
+    result : str, optional
         Character for deciding if discretisation data is returned. If it is
         `"f"` (full), the full result is returned. If result is `"p"` (partial),
         the discretisation data is not returned. In the latter case, the arrays
@@ -219,7 +219,7 @@ def radial_matrix_element(
         p: float,
         nk: int,
         lk: int,
-        jk: float
+        jk: float,
 ) -> float:
     """
     Radial matrix element.
@@ -260,7 +260,7 @@ def clebsch_gordan_coefficient(
         m2: float,
         j: float,
         mj: float,
-        result: str = "analytic"
+        result: str = "analytic",
 ) -> CG:
     """
     Clebsch-Gordan coefficient.
@@ -301,15 +301,17 @@ def clebsch_gordan_coefficient(
     elif result == "numeric":
         return cg.sign * sqrt(cg.numerator / cg.denominator)
     else:
-        raise ValueError("Invalid value for `result`. Expected `\"analytic\"` "
-                         "or `\"numeric\"`.")
+        raise ValueError(
+                "Invalid value for `result`. Expected `\"analytic\"` or "
+                "`\"numeric\"`."
+        )
 
 def spinor_uncoupled_basis(
         l: int,
         ml: int,
         ms: float,
         theta: float,
-        phi: float
+        phi: float,
 ) -> Spinor:
     """
     Spinor associated to an uncoupled basis state.
@@ -351,7 +353,7 @@ def spinor_coupled_basis(
         j: float,
         mj: float,
         theta: float,
-        phi: float
+        phi: float,
 ) -> Spinor:
     """
     Spinor associated to a coupled basis (fine-structure) state.
@@ -395,7 +397,7 @@ def oscillator_strength(
         ji: float,
         nf: int,
         lf: int,
-        jf: float
+        jf: float,
 ) -> float:
     """
     Oscillator strength between fine-structure states.
@@ -440,7 +442,7 @@ def lifetime(
     n: int,
     dn: int,
     l: int,
-    j: float
+    j: float,
 ) -> float:
     """
     Lifetime of fine-structure state.

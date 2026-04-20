@@ -63,7 +63,7 @@ cdef extern from "alkcalc.h":
             double,
             int32_t,
             int32_t,
-            double
+            double,
     )
 
     alkcalc_cg alkcalc_cj1m1j2m2jmj(
