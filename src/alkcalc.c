@@ -808,11 +808,34 @@ static int64_t s64iadd(int64_t a, int64_t b) {
 }
 
 /* Integer factorial                                                          */
+static const int64_t fac_table[] = {
+    1LL,
+    1LL,
+    2LL,
+    6LL,
+    24LL,
+    120LL,
+    720LL,
+    5040LL,
+    40320LL,
+    362880LL,
+    3628800LL,
+    39916800LL,
+    479001600LL,
+    6227020800LL,
+    87178291200LL,
+    1307674368000LL,
+    20922789888000LL,
+    355687428096000LL,
+    6402373705728000LL,
+    121645100408832000LL,
+    2432902008176640000LL
+};
+
 static int64_t fac(int64_t n) {
     if (n < 0) { return 0; }
-    int64_t l, m = 1;
-    for (l = 0; l < n-1; l++) { m = s64imul(m, n - l); }
-    return m;
+    if (n > 20) { ERROR("OVERFLOW IN INTEGER MULTIPLICATION"); }
+    return fac_table[n];
 }
 
 /* Euclidean algorithm                                                        */
