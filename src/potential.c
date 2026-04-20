@@ -155,7 +155,7 @@ static void move(FILE *fd, char *id) {
 /* Interaction potential                                                      *
  * To call this function, first select an atom/ion species by initialising    *
  * 'rpar' and 'ipar' with 'vint_initpar'; argument in units of Bohr's radius  */
-double vint(double r, const double *rpar, const int32_t *ipar) {
+double vint(double r, double *rpar, int32_t *ipar) {
 
     double vc, vp, result;
     vint_data data;
