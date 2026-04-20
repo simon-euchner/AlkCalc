@@ -1,69 +1,71 @@
-/* -------------------------------------------------------------------------- *
- * Python interface for AlkCalc                                               *
- *                                                                            *
- * Author of this file: Simon Euchner                                         *
- * -------------------------------------------------------------------------- */
+# pyalkcalc
+
+Python interface to [AlkCalc](https://github.com/simon-euchner/AlkCalc) —-- an
+alkali-metal atom and alkaline-earth-metal ion calculator written in C.
+
+**Author:** Simon Euchner <euchner.se@gmail.com>
+**License:** GPLv3
 
 
-Description.
+## Overview
+
+The Python package *pyalkcalc* exposes the AlkCalc C library as a clean Python
+API. It further provides some additional tools, not offered by the C library.
+
+For the underlying physics, the finite-element method, and a full reference
+manual of all quantities, see `theory/theory.pdf` in the AlkCalc project
+directory.
 
 
-    !!! Python bindings for libX (C library for data generation and analysis) !!!
+## Prerequisites
+
+> **pyalkcalc requires AlkCalc to be installed and set up on your system.**
+> Without it, pyalkcalc will not work. In particular:
+>
+> 1. AlkCalc must be compiled and the shared library must be available
+>    system-wide (or on your `LD_LIBRARY_PATH`).
+> 2. The eigenenergy and radial eigenstate data for the atom or ion species of
+>    interest must have been generated beforehand using AlkCalc's data
+>    generation pipeline. See the AlkCalc README and `theory/theory.pdf` for
+>    instructions.
+
+pyalkcalc itself requires:
+
+- Python >= 3.10
+- NumPy
+- Cython (build only)
 
 
-Structure of this README.
+## Installation
 
-        This file is organised as follows: ...
+```bash
+pip install pyalkcalc
+```
 
+Or from source:
 
-Software requirements.
+```bash
+git clone https://github.com/simon-euchner/AlkCalc
+cd AlkCalc/pyalkcalc
+pip install .
+```
 
-    ----------------------------------------------------------------
-    Software             Example (tested)
-    ----------------------------------------------------------------
-    Python               v???
-    ----------------------------------------------------------------
+Plotting functionality requires matplotlib, which is not installed
+automatically. If you want to use it:
 
-
-Installation.
-
-    !!! Requires: libalkcalc.so installed in system path !!!
-    !!! must be available to the dynamic linker (ld.so) !!!
-
-    The installation process is split into ???? steps.
-
-    1. Make sure that on the system a BLAS (e.g. Ref. [1]) implementation and a
-       version of LAPACK (see Ref. [2]) is installed.
-
-    2. Navigate to the directory LANCZOS and run the Makefile. This builds the
-       relevant part of ARPACK (see Ref. [3]). The Makefile is written for GNU
-    ...
+```bash
+pip install matplotlib
+```
 
 
-Structure of this README.
+## License
 
-        This file is organised as follows: ...
-
-
-Software requirements.
-
-    ----------------------------------------------------------------
-    Software             Example (tested)
-    ----------------------------------------------------------------
-    Python               v???
-    ----------------------------------------------------------------
+The software *pyalkcalc* is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version. See [LICENSE](LICENSE) for the full license text.
 
 
-Installation.
+## Contact
 
-    The installation process is split into ???? steps.
-
-    1. Make sure that on the system a BLAS (e.g. Ref. [1]) implementation and a
-       version of LAPACK (see Ref. [2]) is installed.
-
-    2. Navigate to the directory LANCZOS and run the Makefile. This builds the
-       relevant part of ARPACK (see Ref. [3]). The Makefile is written for GNU
-    ...
-
-    3. Put a symlink to the lib in the directory where python packages are
-       installed
+Simon Euchner <euchner.se@gmail.com>
