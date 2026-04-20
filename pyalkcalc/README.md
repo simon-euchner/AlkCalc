@@ -3,7 +3,7 @@
 Python interface to [*AlkCalc*](https://github.com/simon-euchner/AlkCalc) — an
 alkali-metal atom and alkaline-earth-metal ion calculator written in C.
 
-**Author:** Simon Euchner [euchner.se[at]gmail.com]
+**Author:** Simon Euchner (euchner.se[at]gmail.com)
 
 **License:** GPLv3
 
@@ -65,9 +65,9 @@ pip install matplotlib
 The software *pyalkcalc* is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your option) any
-later version. See [LICENSE](LICENSE) for the full license text.
+later version. See [LICENSE](LICENSE.txt) for the full license text.
 
 
 ## Contact
 
-Simon Euchner [euchner.se[at]gmail.com]
+Simon Euchner (euchner.se[at]gmail.com)
