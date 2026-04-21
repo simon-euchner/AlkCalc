@@ -31,6 +31,6 @@ Radial eigenstate     state-X-n-l-2j.dat       Radial eigenstate with quantum
 Notes.
 
     Depending on the user-defined variable PATH_TO_STATES in
-    'interface.d/settings.h', the radial eigenstates are stored here as well.
+    'interface/settings.h', the radial eigenstates are stored here as well.
 
     All data files are simple text files.
