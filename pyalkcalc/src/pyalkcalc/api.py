@@ -131,8 +131,8 @@ class Spinor:
     d: float
         Component of spinor associated to +1/2.
     """
-    u: float
-    d: float
+    u: complex
+    d: complex
 
 
 # ==============================================================================
