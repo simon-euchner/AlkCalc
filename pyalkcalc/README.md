@@ -60,6 +60,21 @@ pip install matplotlib
 ```
 
 
+## Testing
+
+The test suite uses [pytest](https://docs.pytest.org/). To run the tests, first
+ensure you have `pytest` installed. Then, run the tests from the project root:
+
+```bash
+pytest
+```
+
+Note that some tests require atomic data (by default for `"40CA+"`) to be
+present in your *AlkCalc* installation. If the data is missing, those tests will
+be skipped. You can change the species used for testing by modifying the
+variable `TEST_SPECIES` in `tests/test_api.py`.
+
+
 ## License
 
 The software *pyalkcalc* is free software: you can redistribute it and/or modify
