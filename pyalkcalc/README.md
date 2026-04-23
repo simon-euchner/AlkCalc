@@ -66,7 +66,7 @@ The test suite uses [pytest](https://docs.pytest.org/). To run the tests, first
 ensure you have `pytest` installed. Then, run the tests from the project root:
 
 ```bash
-pytest
+pytest -v
 ```
 
 Note that some tests require atomic data (by default for `"40CA+"`) to be
