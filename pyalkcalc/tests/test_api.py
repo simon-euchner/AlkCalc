@@ -2,6 +2,7 @@
 Tests for the public Python API of pyalkcalc.
 """
 
+
 # ==============================================================================
 # Imports
 # ==============================================================================
@@ -24,33 +25,20 @@ from pyalkcalc import (
 
 
 # ==============================================================================
-# Helpers and Configuration
+# Configuration
 # ==============================================================================
 
-### The following species is used for testing atomic data functions.
-### To test a different species (e.g., "88SR+"), change this value.
+### The following species is used for testing atomic data functions. To test a
+### different species (e.g., "88SR+"), change this value. Note: Data for this
+### species must be present in the AlkCalc installation, otherwise the C library
+### will exit and terminate the test process.
 TEST_SPECIES = "40CA+"
-
-def has_test_data(species: str = TEST_SPECIES):
-    """
-    Check if data for the test species is present.
-    """
-    try:
-        ### Try to get energy for a common state
-        energy(species, 4, 0, .5)
-        return True
-    except (RuntimeError, SystemExit, Exception):
-        ### AlkCalc often exits or errors if data is missing
-        return False
-
-DATA_REASON = f"Data for {TEST_SPECIES} not present in AlkCalc installation"
 
 
 # ==============================================================================
 # Tests: Atomic Data
 # ==============================================================================
 
-@pytest.mark.skipif(not has_test_data(), reason=DATA_REASON)
 def test_energy_data():
     """
     Test the energy function.
@@ -60,7 +48,6 @@ def test_energy_data():
     ### Physical states should have negative energy
     assert en < 0
 
-@pytest.mark.skipif(not has_test_data(), reason=DATA_REASON)
 def test_state_data():
     """
     Test the state function.
@@ -73,7 +60,6 @@ def test_state_data():
     assert s.t.size > 0
     assert s.fnlsj.size > 0
 
-@pytest.mark.skipif(not has_test_data(), reason=DATA_REASON)
 def test_radial_matrix_element_data():
     """
     Test radial matrix element.
@@ -84,7 +70,6 @@ def test_radial_matrix_element_data():
     )
     assert pytest.approx(overlap, abs=1e-2) == 1.
 
-@pytest.mark.skipif(not has_test_data(), reason=DATA_REASON)
 def test_oscillator_strength_data():
     """
     Test oscillator strength (4S -> 4P).
@@ -93,7 +78,6 @@ def test_oscillator_strength_data():
     assert isinstance(f, float)
     assert f > 0
 
-@pytest.mark.skipif(not has_test_data(), reason=DATA_REASON)
 def test_lifetime_data():
     """
     Test lifetime for 4P state.
