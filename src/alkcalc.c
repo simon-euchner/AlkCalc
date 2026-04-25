@@ -10,14 +10,14 @@ static void move(FILE *, int32_t);
 static inline double parse(const char *, int32_t);
 static alkcalc_cg w3jm(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);
 static int64_t s64imul(int64_t, int64_t);
-static int64_t ns64imul(int32_t, int64_t *);
+static int64_t ns64imul(int32_t, const int64_t *);
 static int64_t s64iadd(int64_t, int64_t);
 static int64_t fac(int64_t);
 static int64_t euclid(int64_t, int64_t);
 static double complex Ylml(int32_t, int32_t, double, double);
 static double cgtofloat(alkcalc_cg);
 static double thermal_photon_occupation(double, double);
-static void nextrm(char *, int32_t *, int32_t *, int32_t, double);
+static void nextrm(const char *, int32_t *, int32_t *, int32_t, double);
 
 /* -------------------------------------------------------------------------- *
  * Eigenenergy in units of Hartree (27.211386245981(30) eV Ref. [5])          *
@@ -29,7 +29,7 @@ static void nextrm(char *, int32_t *, int32_t *, int32_t, double);
  * s       : Spin (Not an argument, since we always have s = 1 / 2!)          *
  * j       : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  * -------------------------------------------------------------------------- */
-double alkcalc_Enlsj(char *species, int32_t n, int32_t l, double j) {
+double alkcalc_Enlsj(const char *species, int32_t n, int32_t l, double j) {
 
     char file[LEN_PATH_TO_ALKCALC + 101], filename[101];
     int32_t J, nl, nmax, dummy;
@@ -79,8 +79,8 @@ double alkcalc_Enlsj(char *species, int32_t n, int32_t l, double j) {
  * s       : Spin (Not an argument, since we always have s = 1 / 2!)          *
  * j       : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  * -------------------------------------------------------------------------- */
-alkcalc_state *alkcalc_fnlsj(char result, char *species, int32_t n, int32_t l,
-                             double j) {
+alkcalc_state *alkcalc_fnlsj(char result, const char *species, int32_t n,
+                             int32_t l, double j) {
 
     char file[LEN_PATH_TO_STATES + 101], filename[101], *buffer, *bfr;
     int32_t J, N, dim, dummy, ndi, ndf, a, b, c, d, k;
@@ -201,8 +201,8 @@ void alkcalc_state_free(alkcalc_state *state) {
  * jk      : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  *           of ket                                                           *
  * -------------------------------------------------------------------------- */
-double alkcalc_rp(char *species, int32_t nb, int32_t lb, double jb, double p,
-                  int32_t nk, int32_t lk, double jk) {
+double alkcalc_rp(const char *species, int32_t nb, int32_t lb, double jb,
+                  double p, int32_t nk, int32_t lk, double jk) {
 
     int32_t dim, k;
     double *t, *h, *Rpd, *Rpo, isr3, tkm1, tk, tkp1, hk, hkp1, tm, tp, pm, pp,
@@ -418,7 +418,7 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
  * jf      : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  *           of (f)                                                           *
  * -------------------------------------------------------------------------- */
-double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
+double alkcalc_fitof(const char *species, int32_t ni, int32_t li, double ji,
                      int32_t nf, int32_t lf, double jf) {
 
     int32_t JI, JF, llp1, llm1;
@@ -482,8 +482,8 @@ double alkcalc_fitof(char *species, int32_t ni, int32_t li, double ji,
  * s       : Spin (Not an argument, since we always have s = 1 / 2!)          *
  * j       : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  * -------------------------------------------------------------------------- */
-double alkcalc_tau(double T, char *species, int32_t n, int32_t dn, int32_t l,
-                   double j) {
+double alkcalc_tau(double T, const char *species, int32_t n, int32_t dn,
+                   int32_t l, double j) {
 
     int32_t lp, lm, nmnlp1, nmxlp1, nlp1, nmnlm1, nmxlm1, nlm1, J, k;
     double En, Gamma, jp, jm, hnu, fftoi, nocc, tau;
@@ -788,7 +788,7 @@ s64imulOverflow:
 }
 
 /* Secure 64-bit integer multiplication (n times)                             */
-static int64_t ns64imul(int32_t n, int64_t *a) {
+static int64_t ns64imul(int32_t n, const int64_t *a) {
     int32_t k; int64_t result = 1;
     for (k = 0; k < n; result = s64imul(result, a[k++]));
     return result;
@@ -904,7 +904,7 @@ static double thermal_photon_occupation(double hnu, double T) {
 }
 
 /* Fetch extremal principal quantum numbers */
-static void nextrm(char *species, int32_t *nmin, int32_t *nmax, int32_t l,
+static void nextrm(const char *species, int32_t *nmin, int32_t *nmax, int32_t l,
                    double j) {
 
     char file[LEN_PATH_TO_ALKCALC + 101], filename[101];
