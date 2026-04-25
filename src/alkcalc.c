@@ -166,7 +166,7 @@ alkcalc_state *alkcalc_fnlsj(char result, const char *species, int32_t n,
     }
     state->t[N - 2 + 1] = parse(bfr += c, ndf);
     state->h[N - 2] = parse(bfr += a, ndf);
-    free(buffer); buffer = NULL;
+    free(buffer); buffer = NULL; bfr = NULL;
 
     /* Close file */
     fclose(fd); fd = NULL;
