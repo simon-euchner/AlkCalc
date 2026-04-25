@@ -54,7 +54,7 @@ class State:
         Here, tmax represents the maximally considered radius rmax = tmax * aB
         and N is the number of discretisation points tk. Note that t0 = 0 and
         tN-1 = tmax.
-    h : NDAarray[float64]
+    h : NDArray[float64]
         Step sizes. This is a numpy array of length N-1, with entries
         hk = tk - tk-1, k = 1, ..., N-1. These are the (non-uniform) step sizes
         of the grid defined by tk.
@@ -128,9 +128,9 @@ class Spinor:
     Attributes
     ----------
     u: float
-        Component of spinor associated to +1/2.
+        Component of spinor associated with +1/2.
     d: float
-        Component of spinor associated to +1/2.
+        Component of spinor associated with -1/2.
     """
     u: complex
     d: complex
