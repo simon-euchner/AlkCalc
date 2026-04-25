@@ -110,18 +110,16 @@ cdef class _StateCore:
 
     @property
     def t(self):
+        if self.state_ptr.t == NULL: return empty(0, dtype=float64)
         cdef int32_t ln = self.state_ptr.N
-        if self.state_ptr == NULL:
-            return empty(0, dtype=float64)
         cdef np.ndarray[double, ndim=1, mode="c"] out = empty(ln, dtype=float64)
         memcpy(&out[0], self.state_ptr.t, ln * sizeof(double))
         return out
 
     @property
     def h(self):
+        if self.state_ptr.h == NULL: return empty(0, dtype=float64)
         cdef int32_t ln = self.state_ptr.N - 1
-        if self.state_ptr == NULL:
-            return empty(0, dtype=float64)
         cdef np.ndarray[double, ndim=1, mode="c"] out = empty(ln, dtype=float64)
         memcpy(&out[0], self.state_ptr.h, ln * sizeof(double))
         return out
