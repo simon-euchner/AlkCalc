@@ -40,6 +40,10 @@ directory.
 
 ## Installation
 
+> **Note:** Before installing, ensure you have already compiled and installed
+> the *AlkCalc* C library (providing `libalkcalc.so`) as described in the
+> [Prerequisites](#prerequisites) section.
+
 From source:
 
 ```bash
