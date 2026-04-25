@@ -40,11 +40,7 @@ directory.
 
 ## Installation
 
-```bash
-pip install pyalkcalc
-```
-
-Or from source:
+From source:
 
 ```bash
 git clone https://github.com/simon-euchner/AlkCalc
