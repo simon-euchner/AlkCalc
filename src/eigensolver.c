@@ -132,7 +132,7 @@ eigensolver_data *eigensolver_data_init() {
     dgssv(&options, &H, perm_c, perm_r, &data->L, &data->U, B, stat, info);
     tend = clock(); runtime = (tend - tstart)/(double)CLOCKS_PER_SEC;
     if (*info) {
-        ERROR(("LU DECOMPOSITION FAILED WITH 'INFO = %d'"), *info);
+        ERROR("LU DECOMPOSITION FAILED WITH 'INFO = %d'", *info);
     } else {
         printf("LU DECOMPOSITION SUCCESSFUL (RUNTIME: %1.3f S)\n\n", runtime);
     }
