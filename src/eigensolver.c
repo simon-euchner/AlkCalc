@@ -120,10 +120,10 @@ eigensolver_data *eigensolver_data_init() {
 
     /* Initialise solver */
     set_default_options(&options); options.ColPerm = NATURAL;
-    StatInit(stat=&data->stat);
+    StatInit(stat = &data->stat);
 
     /* Dummy right-hand side (b is already initialised to hold zeros) */
-    dCreate_Dense_Matrix(B=&data->B, dim, 1, b, dim, SLU_DN, SLU_D, SLU_GE);
+    dCreate_Dense_Matrix(B = &data->B, dim, 1, b, dim, SLU_DN, SLU_D, SLU_GE);
 
     /* Perform LU decomposition */
     tend = clock();
@@ -142,6 +142,7 @@ eigensolver_data *eigensolver_data_init() {
     free(vs); vs = NULL;
     free(hs); hs = NULL;
     free(b); b = NULL;
+    ((DNformat *)(data->B.Store))->nzval = NULL;
     Destroy_CompCol_Matrix(&H);
 
     return data;
