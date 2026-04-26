@@ -325,7 +325,7 @@ static void shift_invert_f(eigensolver_data *data, double *x) {
 /* Save computed eigenenergies to file                                        */
 static void save_energies(eigensolver_data *data, const double *energies) {
 
-    char file[71], filename[51];
+    char file[71], filename[51], buffer[101];
     int32_t *ipar, nl, lo, jj, runtime, n;
     double EGS, dti, dtf;
     FILE *fd;
@@ -361,8 +361,8 @@ static void save_energies(eigensolver_data *data, const double *energies) {
     n = 0;
     while (++n < nl) { (void)fprintf(fd, "%03" PRId32 "\n", n); }
     while (n++ < nmax + 1) {
-        (void)fprintf(fd, "%03" PRId32 " %+1.8E\n", n - 1,
-                      energies[n - (nl - 1) - 2]);
+        fmt_2d_exp(buffer, 9, energies[n - (nl - 1) - 2]);
+        (void)fprintf(fd, "%03" PRId32 " %s\n", n - 1, buffer);
     }
 
     /* Close file */
@@ -372,7 +372,7 @@ static void save_energies(eigensolver_data *data, const double *energies) {
 /* Save computed radial eigenstates to file                                   */
 static void save_states(eigensolver_data *data, const double *z) {
 
-    char file[LEN_PATH_TO_STATES + 101], filename[101];
+    char file[LEN_PATH_TO_STATES + 101], filename[101], buffer[101];
     int32_t *ipar, nl, lo, jj, dim, n, k;
     FILE *fd;
 
@@ -406,7 +406,8 @@ static void save_states(eigensolver_data *data, const double *z) {
 
         /* Save radial eigenstate */
         for (k = 0; k < dim; k++) {
-            (void)fprintf(fd, "%+1.14E\n", z[dim * (n - nl) + k]);
+            fmt_2d_exp(buffer, 15, z[dim * (n - nl) + k]);
+            (void)fprintf(fd, "%s\n", buffer);
         }
 
         /* Close file */
@@ -417,7 +418,7 @@ static void save_states(eigensolver_data *data, const double *z) {
 /* Save discretisation points and step sizes to file                          */
 static void save_discretisation() {
 
-    char file[71], filename[51];
+    char file[71], filename[51], buffer_tk[101], buffer_hk[101];
     int32_t k;
     double tk, hk;
     FILE *fd;
@@ -439,10 +440,12 @@ static void save_discretisation() {
                   species, N);
 
     /* Save discretisation data */
-    fprintf(fd, "%08" PRId32 " %+1.14E\n", 0, 0.); tk = 0.;
+    fmt_2d_exp(buffer_tk, 15, 0.);
+    fprintf(fd, "%08" PRId32 " %s\n", 0, buffer_tk); tk = 0.;
     for (k = 1; k < N; k++) {
         tk += (hk = step(k));
-        fprintf(fd, "%08" PRId32 " %+1.14E %+1.14E\n", k, tk, hk);
+        fmt_2d_exp(buffer_tk, 15, tk); fmt_2d_exp(buffer_hk, 15, hk);
+        fprintf(fd, "%08" PRId32 " %s %s\n", k, buffer_tk, buffer_hk);
     }
 
     /* Close file */
