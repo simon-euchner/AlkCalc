@@ -136,22 +136,6 @@ void vint_initpar(double *rpar, int32_t *ipar) {
     fclose(fd); fd = NULL;
 }
 
-/* Move filepointer to next dollar sign and get identifier                    */
-static void move(FILE *fd, char *id) {
-
-    int c;
-
-    while ((c = fgetc(fd)) != EOF && c != '$');
-    if (c != EOF) {
-        (void)fgetc(fd);
-        (void)fscanf(fd, "ID %s ", id);
-        while ((c = fgetc(fd)) != '\n');
-        while ((c = fgetc(fd)) != '\n');
-    } else {
-        id[0] = '\0';
-    }
-}
-
 /* Interaction potential                                                      *
  * To call this function, first select an atom/ion species by initialising    *
  * 'rpar' and 'ipar' with 'vint_initpar'; argument in units of Bohr's radius  */
@@ -168,6 +152,26 @@ double vint(double r, double *rpar, int32_t *ipar) {
     result = vc + vp + VR(r, &data, vc, vp);
 
     return result;
+}
+
+/* -------------------------------------------------------------------------- *
+ * Helper functions                                                           *
+ * -------------------------------------------------------------------------- */
+
+/* Move filepointer to next dollar sign and get identifier                    */
+static void move(FILE *fd, char *id) {
+
+    int c;
+
+    while ((c = fgetc(fd)) != EOF && c != '$');
+    if (c != EOF) {
+        (void)fgetc(fd);
+        (void)fscanf(fd, "ID %s ", id);
+        while ((c = fgetc(fd)) != '\n');
+        while ((c = fgetc(fd)) != '\n');
+    } else {
+        id[0] = '\0';
+    }
 }
 
 /* Modified Coulomb's potential in units of Hartree                           */

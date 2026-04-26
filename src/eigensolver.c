@@ -11,6 +11,14 @@
 
 #include "../inc/eigensolver.h"
 
+static double step(int32_t);
+static void mass_matrix_f(const eigensolver_data *, const double *, double *);
+static void shift_invert_f(eigensolver_data *, double *);
+static void save_energies(eigensolver_data *, const double *);
+static void save_states(eigensolver_data *, const double *);
+static void save_discretisation();
+static void fmt_2d_exp(char *, int32_t, double);
+
 /* --- MAIN ----------------------------------------------------------------- */
 int main(int argc, char **argv)
 {
@@ -19,11 +27,8 @@ int main(int argc, char **argv)
     /* Initialise eigenproblem */
     eigensolver_data *data = eigensolver_data_init();
 
-    /* Compute eigenenergies */
+    /* Solve eigenproblem and save result */
     solve(data);
-
-    /* Save discretisation points and step sizes to file */
-    save_discretisation();
 
     /* Clean up */
     eigensolver_data_free(data);
@@ -160,26 +165,6 @@ void eigensolver_data_free(eigensolver_data *data) {
     free(data); data = NULL;
 }
 
-/* Function returning the k-th (k = 1, ..., N - 1) step size                  */
-double step(int32_t k) {
-
-    /* Here the step sizes hk = tk - tkm1 (km1 means 'k - 1') are defined.    *
-     * The step sizes must be such that their sum is rmax (see                *
-     * 'interface/settings.c'). Note here the step sizes are set rather than  *
-     * the discretisation mesh itself. This is to avoid so-called             *
-     * 'catastrophic cancellation' when computing the step sizes, which       *
-     * ensures numerical stability.                                           *
-     *                                                                        *
-     * Note: One must be careful with overflow in integer multiplication and  *
-     * addition here, if N is very large.                                     */
-
-    double hk;
-
-    hk = rmax * (2 * k - 1)/((double)(N - 1) * (N - 1));
-
-    return hk;
-}
-
 /* Solve eigenproblem                                                         */
 void solve(eigensolver_data *data) {
 
@@ -279,10 +264,38 @@ void solve(eigensolver_data *data) {
     free(select); select = NULL;
     free(d); d = NULL;
     free(z); z = NULL;
+
+    /* Save discretisation points and step sizes to file */
+    save_discretisation();
+}
+
+/* -------------------------------------------------------------------------- *
+ * Helper functions                                                           *
+ * -------------------------------------------------------------------------- */
+
+/* Function returning the k-th (k = 1, ..., N - 1) step size                  */
+static double step(int32_t k) {
+
+    /* Here the step sizes hk = tk - tkm1 (km1 means 'k - 1') are defined.    *
+     * The step sizes must be such that their sum is rmax (see                *
+     * 'interface/settings.c'). Note here the step sizes are set rather than  *
+     * the discretisation mesh itself. This is to avoid so-called             *
+     * 'catastrophic cancellation' when computing the step sizes, which       *
+     * ensures numerical stability.                                           *
+     *                                                                        *
+     * Note: One must be careful with overflow in integer multiplication and  *
+     * addition here, if N is very large.                                     */
+
+    double hk;
+
+    hk = rmax * (2 * k - 1)/((double)(N - 1) * (N - 1));
+
+    return hk;
 }
 
 /* Compute action of mass matrix (result stored in y)                         */
-void mass_matrix_f(const eigensolver_data *data, const double *x, double *y) {
+static void mass_matrix_f(const eigensolver_data *data, const double *x,
+                          double *y) {
 
     int32_t k, k0, dim = data->dim;
     double *Mdata = data->Mdata;
@@ -299,7 +312,7 @@ void mass_matrix_f(const eigensolver_data *data, const double *x, double *y) {
 }
 
 /* Compute action of shift-inverted Hamiltonian (result stored in x)          */
-void shift_invert_f(eigensolver_data *data, double *x) {
+static void shift_invert_f(eigensolver_data *data, double *x) {
 
     /* Prepare input */
     ((DNformat *)(data->B.Store))->nzval = x;
@@ -310,7 +323,7 @@ void shift_invert_f(eigensolver_data *data, double *x) {
 }
 
 /* Save computed eigenenergies to file                                        */
-void save_energies(eigensolver_data *data, const double *energies) {
+static void save_energies(eigensolver_data *data, const double *energies) {
 
     char file[71], filename[51];
     int32_t *ipar, nl, lo, jj, runtime, n;
@@ -357,7 +370,7 @@ void save_energies(eigensolver_data *data, const double *energies) {
 }
 
 /* Save computed radial eigenstates to file                                   */
-void save_states(eigensolver_data *data, const double *z) {
+static void save_states(eigensolver_data *data, const double *z) {
 
     char file[LEN_PATH_TO_STATES + 101], filename[101];
     int32_t *ipar, nl, lo, jj, dim, n, k;
@@ -391,7 +404,7 @@ void save_states(eigensolver_data *data, const double *z) {
                       "FK\n\n",
                       species, n, l, jj, rmax, N);
 
-        /* Save radial eigenstates */
+        /* Save radial eigenstate */
         for (k = 0; k < dim; k++) {
             (void)fprintf(fd, "%+1.14E\n", z[dim * (n - nl) + k]);
         }
@@ -402,7 +415,7 @@ void save_states(eigensolver_data *data, const double *z) {
 }
 
 /* Save discretisation points and step sizes to file                          */
-void save_discretisation() {
+static void save_discretisation() {
 
     char file[71], filename[51];
     int32_t k;
@@ -434,4 +447,28 @@ void save_discretisation() {
 
     /* Close file */
     fclose(fd); fd = NULL;
+}
+
+/* Formatter to ensure two-digit exponent (Number of digits: 1.234 -> nd = 4) */
+static void fmt_2d_exp(char *buffer, int32_t nd, double x) {
+
+    char *d;
+    int32_t len;
+    double y;
+
+    /* Check if a two-digit exponent is able to capture the number */
+    y = (x < 0) ? -x: x;
+    if (y > 1e98) {
+        ERROR("IMPOSSIBLE NUMBER DETECTED: EXPONENT OUT OF BOUNDS");
+    }
+    if ( y < 1e-98) { x = 0.; }
+
+    /* Get total length of the string representing x */
+    len = (int32_t)sprintf(buffer, "%+1.*E", nd - 1, x);
+
+    /* Use length of string to infer how many digits the exponent has */
+    if (len > nd + 6) {
+        d = buffer + nd + 4;
+        while (*d) { *d = *(d + 1); d++; }
+    }
 }
