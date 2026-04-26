@@ -456,6 +456,22 @@ static void fmt_2d_exp(char *buffer, int32_t nd, double x) {
     int32_t len;
     double y;
 
+    /* IMPORTANT: The C99 standard specifies (Sec. 7.19.6.1 and               *
+     * Sec. 7.19.6.6 in Ref. [11]):                                           *
+     *                                                                        *
+     *     The sprintf function is equivalent to fprintf, ...                 *
+     *                                                                        *
+     *     ... The exponent always contains at least two digits, and only as  *
+     *     many more digits as necessary to represent the exponent.           *
+     *                                                                        *
+     * Because of this, the checks below allow one to assume that the         *
+     * exponent is printed with exactly two digits on systems that strictly   *
+     * follow the C99 standard. However, Windows does not always do this,     *
+     * which is the reason for the shift logic below. It trims a three-digit  *
+     * exponent, typically employed by Windows, to a two-digit one. Strictly  *
+     * speaking, this is not necessary; it is a nicety offered to Windows     *
+     * users.                                                                 */
+
     /* Check if a two-digit exponent is able to capture the number */
     y = (x < 0) ? -x: x;
     if (y > 1e98) {
@@ -463,12 +479,12 @@ static void fmt_2d_exp(char *buffer, int32_t nd, double x) {
     }
     if ( y < 1e-98) { x = 0.; }
 
-    /* Get total length of the string representing x */
+    /* Get the total length of the string representing x */
     len = (int32_t)sprintf(buffer, "%+1.*E", nd - 1, x);
 
-    /* Use length of string to infer how many digits the exponent has */
+    /* Trim leading zero in a three-digit exponent */
     if (len > nd + 6) {
         d = buffer + nd + 4;
-        while (*d) { *d = *(d + 1); d++; }
+        d[0] = d[1]; d[1] = d[2]; d[2] = '\0';
     }
 }
