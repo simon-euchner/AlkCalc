@@ -46,12 +46,6 @@ void vint_initpar(double *, int32_t *);
 double vint(double, double *, int32_t *);
 eigensolver_data *eigensolver_data_init();
 void eigensolver_data_free(eigensolver_data *);
-double step(int32_t);
 void solve(eigensolver_data *);
-void mass_matrix_f(const eigensolver_data *, const double *, double *);
-void shift_invert_f(eigensolver_data *, double *);
-void save_energies(eigensolver_data *, const double *);
-void save_states(eigensolver_data *, const double *);
-void save_discretisation();
 
 #endif
