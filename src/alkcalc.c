@@ -465,7 +465,7 @@ double alkcalc_fitof(const char *species, int32_t ni, int32_t li, double ji,
     }
 
     /* Assemble result */
-    fitof = 2. / 3. * Efi * r*r * al;
+    fitof = 2. / 3. * Efi * r * r * al;
 
     return fitof;
 }
