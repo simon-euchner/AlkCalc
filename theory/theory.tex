@@ -129,7 +129,7 @@
         \centering
         \begin{tabular}{lllc}
             \toprule
-            $(l,j)$ & $\mapsto$ & $(l',j')$ & $a_L$ \\
+            $(l,j)$ & $\mapsto$ & $(l',j')$ & $a_l$ \\
             \midrule
             $(l,l+s)$ & $\mapsto$ & $(l+1,l+s)$  & $\frac{1}{(2l+3)(2l+1)}$ \\
             $(l,l-s)$ & $\mapsto$ & $(l+1,l+s)$  & $\frac{l+1}{2l+1}$       \\
@@ -868,7 +868,7 @@
     where $l_\mathrm{max}=\mathrm{max}(l,l')$. There are only six transitions
     for which $a_l$ is non-zero. Using relations from
     \cite[p.~298,300]{varshalovic1988} we arrive at the results shown in
-    Tab.~\ref{tab:AngularFactors}. With this is is now straight-forward to
+    Tab.~\ref{tab:AngularFactors}. With this it is now straight-forward to
     compute the oscillator strengths numerically with a computer program. As a
     final remark, note that the oscillator strength does not depend on $m_j$ any
     more, i.e., by summing over final states, we find that the oscillators for
@@ -901,22 +901,22 @@
     \,.
     \end{equation}
     In terms of the oscillator strength we obtain
-    \begin{equation}
+    \begin{equation}\label{eq:SpontaneousRate}
         A_\mathrm{i}
         =
         \frac{2\alpha^3\EH}{\hbar}
         \sum_{n',l',j'}
-        E^2_\mathrm{i,f} f_{\mathrm{f}\to\mathrm{i}}
+        E^2_\mathrm{i,f} (-f_{\mathrm{i}\to\mathrm{f}})
     \,.
     \end{equation}
-    This is the rate of spontaneous emission which only appears for transitions
-    where $E_\mathrm{i}>E_\mathrm{f}$. Note that, implicitly, this restricts the
-    quantum numbers the sum is running over. Further, this is the correct decay
-    rate only for zero temperature case. At finite temperature, spontaneous
-    transitions increasing the energy may be driven as well, if thermal
-    fluctuations are sufficiently strong. The background spectral density is
-    given by Planck's law, which yields for the average photon number at
-    frequency $\omega$ and temperature $T$:
+    The rate in Eq.~\eqref{eq:SpontaneousRate} is the spontaneous emission rate,
+    which only appears for transitions where $E_\mathrm{i}>E_\mathrm{f}$.  Note
+    that, implicitly, this restricts the quantum numbers the sum is running
+    over. Further, this is the correct decay rate only for zero temperature
+    case. At finite temperature, spontaneous transitions increasing the energy
+    may be driven as well, if thermal fluctuations are sufficiently strong. The
+    background spectral density is given by Planck's law, which yields for the
+    average photon number at frequency $\omega$ and temperature $T$:
     \begin{equation}
         n(\omega,T)
         =
@@ -931,7 +931,7 @@
         =
         2\alpha^3
         \sum_{n',l',j'}
-        \bar{E}^2_\mathrm{i,f} f_{\mathrm{f}\to\mathrm{i}}
+        \bar{E}^2_\mathrm{i,f} (-f_{\mathrm{i}\to\mathrm{f}})
         (1+n(E_\mathrm{i,f}\slash\hbar,T))
         +
         2\alpha^3
@@ -957,7 +957,7 @@
 
     There is always a decision to be made when dealing with half-integer quantum
     numbers numerically. Here we agree on the following: say $q$ is a quantum
-    number that may take half-integer values, e.g., $j$, $m_j$. To `clean-up'
+    number that may take half-integer values, e.g., $j$, $m_j$. To `clean up'
     the numerical value we do $2q\mapsto[2.0\times{q}+0.5]$. The `floor'
     function is defined as $[x]=k\in\mathbb{Z}$ ($x\in\mathbb{R}$), where $k$ is
     the unique integer such that $x\in[k,k+1)$. In practice, this means that for
