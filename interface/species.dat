@@ -6,12 +6,12 @@ UNITS.
 
     CHARGE : E.GT.0 (ELEMENTARY CHARGE)
     MASS   : ME (ELECTRON'S MASS)
-    LENGTH : AB = HBAR/(ME*C*ALPHA) (BOHR'S RADIUS, ALPHA: FINE-STRUCTURE)
-    ENERGY : E**2/(4*PI*AB*VAREPSILON0) (HARTREE)
-    K1     : 1/AB
-    K2     : 1/AB
-    K3     : 1/AB
-    ALPHAD : M*E**2*AB**4/HBAR**2
+    LENGTH : AB = HBAR / (ME * C * ALPHA) (BOHR'S RADIUS, ALPHA: FINE-STRUCTURE)
+    ENERGY : E**2 / (4 * PI * AB * VAREPSILON0) (HARTREE)
+    K1     : 1 / AB
+    K2     : 1 / AB
+    K3     : 1 / AB
+    ALPHAD : M * E**2 * AB**4 / HBAR**2
     RC     : AB
     M      : TOTAL ATOM/ION MASS IN UNITS OF ME
     EGS    : GROUND STATE ENERGY
