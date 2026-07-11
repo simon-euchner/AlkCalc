@@ -186,33 +186,34 @@
     \label{sec:introduction}
 
     Bound single-electron eigenfunctions of alkali-metal atoms and
-    alkaline-earth metal ions are of relevance whenever properties of Rydberg
-    atoms are of interest (e.g. in quantum computing and information, quantum
-    simulation, Rydberg physics, quantum optics, \dots). Generally, because,
-    except for the Hydrogen atom, the time-independent Schr\"odinger equation
-    cannot be solved analytically, there is the need to obtain the eigenenergies
-    (atomic spectrum) and eigenstates numerically. The library \alkcalc is
-    intended for this purpose and information is given in the various provided
-    \texttt{README} files. However, there is no discussion on the theory behind
-    the code.
+    alkaline-earth metal ions are of relevance in quantum computing, quantum
+    information processing, quantum simulation, Rydberg physics, quantum optics,
+    \dots. However, expect for Hydrogen, it is not possible to solve the
+    time-independent Schr\"odinger equation analytically. Because of this, there
+    is the need to obtain eigenenergies, i.e., atomic spectra,  and eigenstates
+    numerically. The library \alkcalc is intended for exactly this purpose. In
+    the various \texttt{README} files included in \alkcalc technical details for
+    running the software are provided. However, in these \texttt{README} files,
+    there is no theoretical discussion on the theory behind the code. This is
+    the purpose of the present document.
 
-    This document's purpose is to define the Hamiltonian which \alkcalc is
-    designed to diagonalise. Moreover, it formally defines the numerically
-    computed quantities and hence serves as a reference for the user. In
-    particular, the final section is a reference manual for the library
-    functions.
+    In this document the class of Hamiltonians which \alkcalc is designed to
+    diagonalise is presented. Moreover, this document formally defines each
+    quantity which \alkcalc is designed to compute. Therefore, this document
+    serves as a reference for the user. In particular, the final section is a
+    complete reference manual for the library functions of \alkcalc.
 
     %%% SECTION
     \section{Theory}
     \label{sec:Theory}
 
-    We start by considering a single atom or ion. Then we describe the \ac{fem}
-    used to numerically solve the Schr\"odinger equation. Finally, we describe
-    how we compute radial matrix elements, oscillator strengths, and
-    state lifetimes.
+    We start by considering a single atom/ion. Subsequently, we describe the
+    \ac{fem} used to numerically solve the Schr\"odinger equation. Finally, we
+    describe how \alkcalc computes radial matrix elements, oscillator strengths,
+    and state lifetimes.
 
     %%% SUBSECTION
-    \subsection{Single-ion theory}
+    \subsection{Single-atom/ion theory}
     \label{subsec:SingleIonTheory}
 
     The starting point is an alkali-metal atom or alkaline-earth-metal ion. We
