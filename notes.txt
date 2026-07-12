@@ -1,0 +1,22 @@
+The way I write this now is that one just make sure the order is
+increasing in l, i.e., I want in species.dat S, P, D, F, ..., in such
+order. However, P, F, G, H is also fine. Just there will be an error if
+the requested was not in found in the entries AND l < lmax, i.e., the
+final l which was read. If l > lmax, so largen than thelas read lread,
+just use the values of the largest privided l.
+
+The fact that we just use the largest l parameters for larger l which have not been explictkly given follows what Marinescu does. However, there is an additonal assumtpion: nl, so the smallest possible principal quantum number must be "normal" in the sense that it is assume that for the omitted entries for large l we have nl = l + 1, so the typoical Hydriogenic law. This means that all entries wuith parameters must be given explicitly if nl is anomalous.
+
+There must be at least on entry with parameters.
+
+
+l = 0, ..., n - 1
+
+l = 0 ==> n >= 1
+l = 1 ==> n >= 2
+.
+.
+.
+==> n >= l + 1
+
+==> n must be at least l + 1, so the smallest possible n is nl = l + 1
