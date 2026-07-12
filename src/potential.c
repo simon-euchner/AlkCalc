@@ -109,20 +109,15 @@ void vint_initpar(double *rpar, int32_t *ipar) {
     if (l < lread) {
         ERROR("NO DATA FOUND FOR ANGULAR MOMENTUM 'L = %" PRId32 "'", l);
     }
+    if (l > lread) {
+        ipar[3] = l + 1;
+    }
     while ((c = fgetc(fd)) != '=');
     while ((c = fgetc(fd)) != '\n');
     (void)fscanf(fd, "Z %" SCNd32 " ", ipar);
     (void)fscanf(fd, "ZC %" SCNd32 " ", ipar + 1);
     (void)fscanf(fd, "ALPHAD %lf" " ", rpar + 5);
     (void)fscanf(fd, "M %lf(%lf) ", rpar + 6, &dummy);
-    printf("%d\n", *(ipar + 0));
-    // The way I write this now is that one just make sure the order is          FIXME!!!
-    // increasing in l, i.e., I want in species.dat S, P, D, F, ..., in such
-    // order. However, P, F, G, H is also fine. Just there will be an error if
-    // the requested was not in found in the entries AND l < lmax, i.e., the
-    // final l which was read. If l > lmax, so largen than thelas read lread,
-    // just use the values of the largest privided l.
-    exit(0);
     /* IMPORTANT: Here is the position in the code where the mass correction, *
      * i.e., the fact that the reduced mass is NOT the electron's mass, can   *
      * be accounted for. However, we do not actually include the mass         *
@@ -136,17 +131,27 @@ void vint_initpar(double *rpar, int32_t *ipar) {
      * automatically.                                                         */
     /* rpar[7] = 1. / (1. + ME / rpar[6]); */
     rpar[7] = 1.;
-    switch (l) {
-        case 'S': ipar[2] =  0; break;
-        case 'P': ipar[2] =  1; break;
-        case 'D': ipar[2] =  2; break;
-        case 'F': ipar[2] =  3; break;
-        case 'G': ipar[2] =  4; break;
-        case 'H': ipar[2] =  5; break;
-        default: break;
-    }
+    ipar[2] =  l;
     rpar[8] = .5 * (2 * (int32_t)j + 1);
     (void)fscanf(fd, "EGS %lf ", rpar + 9);
+
+    // Testing
+    printf("Z = %d\n", ipar[0]);
+    printf("Zc = %d\n", ipar[1]);
+    printf("l = %d\n", ipar[2]);
+    printf("nl = %d\n", ipar[3]);
+    printf("k1 = %lf\n", rpar[0]);
+    printf("k2 = %lf\n", rpar[1]);
+    printf("k3 = %lf\n", rpar[2]);
+    printf("k4 = %lf\n", rpar[3]);
+    printf("rc = %lf\n", rpar[4]);
+    printf("alphaD = %lf\n", rpar[5]);
+    printf("M = %lf\n", rpar[6]);
+    printf("C = %lf\n", rpar[7]);
+    printf("j = %lf\n", rpar[8]);
+    printf("EGS = %lf\n", rpar[9]);
+
+    exit(0);
 
     /* Close file */
     fclose(fd); fd = NULL;
