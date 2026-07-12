@@ -74,7 +74,7 @@ static double VR(double, const vint_data *, double, double);
 void vint_initpar(double *rpar, int32_t *ipar) {
 
     char id[101];
-    int c;
+    int c, lread;
     double dummy;
     FILE *fd;
 
@@ -92,16 +92,22 @@ void vint_initpar(double *rpar, int32_t *ipar) {
         }
     }
 
-    /* Read data for atom/ion species */
-    while (l != (c = fgetc(fd)) && c != '=') {
-        while ((c = fgetc(fd)) != '\n');
+    /* Check validity of orbital angular momentum quantum number */
+    if (l < 0) {
+        ERROR("INVALID ORBITAL ANGULAR MOMENTUM 'L = %" PRId32 "'", l);
     }
-    if (c == '=') {
-        ERROR("REQUESTED QUANTUM NUMBER 'L = %c' IS NOT KNOWN", l);
-    } else {
-        (void)fgetc(fd);
-        (void)fscanf(fd, "%lf %lf %lf %lf %lf %" SCNd32 " ", rpar, rpar + 1,
-                     rpar + 2, rpar + 3, rpar + 4, ipar + 3);
+
+    /* Read data for atom/ion species */
+    if ((c = fgetc(fd)) == '=') {
+        ERROR("THERE MUST BE DATA FOR AT LEAST ONE ANGULAR MOMENTUM L");
+    }
+    while ((c = fgetc(fd)) != '=') {
+        (void)fscanf(fd, "%d %lf %lf %lf %lf %lf %" SCNd32 " ", &lread, rpar,
+                     rpar + 1, rpar + 2, rpar + 3, rpar + 4, ipar + 3);
+        if (lread == l) break;
+    }
+    if (l < lread) {
+        ERROR("NO DATA FOUND FOR ANGULAR MOMENTUM 'L = %" PRId32 "'", l);
     }
     while ((c = fgetc(fd)) != '=');
     while ((c = fgetc(fd)) != '\n');
@@ -109,6 +115,14 @@ void vint_initpar(double *rpar, int32_t *ipar) {
     (void)fscanf(fd, "ZC %" SCNd32 " ", ipar + 1);
     (void)fscanf(fd, "ALPHAD %lf" " ", rpar + 5);
     (void)fscanf(fd, "M %lf(%lf) ", rpar + 6, &dummy);
+    printf("%d\n", *(ipar + 0));
+    // The way I write this now is that one just make sure the order is          FIXME!!!
+    // increasing in l, i.e., I want in species.dat S, P, D, F, ..., in such
+    // order. However, P, F, G, H is also fine. Just there will be an error if
+    // the requested was not in found in the entries AND l < lmax, i.e., the
+    // final l which was read. If l > lmax, so largen than thelas read lread,
+    // just use the values of the largest privided l.
+    exit(0);
     /* IMPORTANT: Here is the position in the code where the mass correction, *
      * i.e., the fact that the reduced mass is NOT the electron's mass, can   *
      * be accounted for. However, we do not actually include the mass         *

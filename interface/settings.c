@@ -33,7 +33,7 @@
 const char      *species     =         "1H"                                    ;
 const int32_t    N           =      1000000                                    ;
 const int32_t    nmax        =            6                                    ;
-const char       l           =          'S'                                    ;
+const int32_t    l           =            0                                    ;
 const double     j           =             .5                                  ;
 const double     rmax        =        20000.                                   ;
 const double     offset      =            1.3                                  ;
