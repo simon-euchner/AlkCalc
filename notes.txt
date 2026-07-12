@@ -20,3 +20,7 @@ l = 1 ==> n >= 2
 ==> n >= l + 1
 
 ==> n must be at least l + 1, so the smallest possible n is nl = l + 1
+
+The update in this form would not be backwards compatbible ...
+This is because now I save the angular momentum ion teh energies and states fiels not in spectroscopic notation but as integers.
+I need to make a decision here and think about how to handle this best.

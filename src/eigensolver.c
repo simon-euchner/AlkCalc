@@ -347,7 +347,7 @@ static void save_energies(eigensolver_data *data, const double *energies) {
                   "EIGENENERGIES FOR '%s' [HARTREE]\n\n"
                   "CPU TIME TO GENERATE DATA SET [S]: %" PRId32 "\n"
                   "GROUND STATE ENERGY [HARTREE]: %1.8lf\n"
-                  "ORBITAL ANGULAR MOMENTUM [HBAR]: %c\n"
+                  "ORBITAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "\n"
                   "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "/2\n"
                   "RMAX [BOHR'S RADIUS]: %1.3E\n"
                   "NUMBER OF DISCRETISATION POINTS: %" PRId32 "\n"
@@ -355,7 +355,7 @@ static void save_energies(eigensolver_data *data, const double *energies) {
                   "MINIMAL PRINCIPAL QUANTUM NUMBER: %" PRId32 "\n"
                   "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" PRId32 "\n\n\n\n"
                   "N   ENERGY\n\n",
-                  species, runtime, EGS, l, jj, rmax, N, dti, dtf, nl, nmax);
+                  species, runtime, EGS, lo, jj, rmax, N, dti, dtf, nl, nmax);
 
     /* Save eigenenergies */
     n = 0;
@@ -397,12 +397,12 @@ static void save_states(eigensolver_data *data, const double *z) {
                       "RADIAL EIGENSTATE FOR '%s' [DIMENSIONLESS]\n\n"
                       "COEFFICIENTS 'FK' (K = 1, ..., N-2)\n"
                       "PRINCIPAL QUANTUM NUMBER (N): %" PRId32 "\n"
-                      "ORBITAL ANGULAR MOMENTUM [HBAR]: %c\n"
+                      "ORBITAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "\n"
                       "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "/2\n"
                       "RMAX [BOHR'S RADIUS]: %1.3E\n"
                       "NUMBER OF DISCRETISATION POINTS: %" PRId32 "\n\n\n\n"
                       "FK\n\n",
-                      species, n, l, jj, rmax, N);
+                      species, n, lo, jj, rmax, N);
 
         /* Save radial eigenstate */
         for (k = 0; k < dim; k++) {

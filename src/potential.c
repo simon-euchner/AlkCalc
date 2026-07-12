@@ -151,7 +151,7 @@ void vint_initpar(double *rpar, int32_t *ipar) {
     printf("j = %lf\n", rpar[8]);
     printf("EGS = %lf\n", rpar[9]);
 
-    exit(0);
+    //exit(0);
 
     /* Close file */
     fclose(fd); fd = NULL;
