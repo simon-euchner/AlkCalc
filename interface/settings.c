@@ -35,6 +35,6 @@ const int32_t    N           =      1000000                                    ;
 const int32_t    nmax        =            6                                    ;
 const char       l           =          'S'                                    ;
 const double     j           =             .5                                  ;
-const double     rmax        =        10000.                                   ;
+const double     rmax        =        20000.                                   ;
 const double     offset      =            1.3                                  ;
 const double     shift       =            1.                                   ;

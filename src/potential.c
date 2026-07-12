@@ -93,17 +93,19 @@ void vint_initpar(double *rpar, int32_t *ipar) {
     }
 
     /* Read data for atom/ion species */
-    while (l != (c = fgetc(fd)) && c != 'Z')
+    while (l != (c = fgetc(fd)) && c != '=') {
         while ((c = fgetc(fd)) != '\n');
-    if (c == 'Z') {
+    }
+    if (c == '=') {
         ERROR("REQUESTED QUANTUM NUMBER 'L = %c' IS NOT KNOWN", l);
     } else {
         (void)fgetc(fd);
         (void)fscanf(fd, "%lf %lf %lf %lf %lf %" SCNd32 " ", rpar, rpar + 1,
                      rpar + 2, rpar + 3, rpar + 4, ipar + 3);
     }
-    while ((c = fgetc(fd)) != 'Z');
-    (void)fscanf(fd, "%" SCNd32 " ", ipar);
+    while ((c = fgetc(fd)) != '=');
+    while ((c = fgetc(fd)) != '\n');
+    (void)fscanf(fd, "Z %" SCNd32 " ", ipar);
     (void)fscanf(fd, "ZC %" SCNd32 " ", ipar + 1);
     (void)fscanf(fd, "ALPHAD %lf" " ", rpar + 5);
     (void)fscanf(fd, "M %lf(%lf) ", rpar + 6, &dummy);
@@ -158,7 +160,7 @@ double vint(double r, double *rpar, int32_t *ipar) {
  * Helper functions                                                           *
  * -------------------------------------------------------------------------- */
 
-/* Move filepointer to next dollar sign and get identifier                    */
+/* Move filepointer to next entry and get identifier                          */
 static void move(FILE *fd, char *id) {
 
     int c;
@@ -167,6 +169,7 @@ static void move(FILE *fd, char *id) {
     if (c != EOF) {
         (void)fgetc(fd);
         (void)fscanf(fd, "ID %s ", id);
+        while ((c = fgetc(fd)) != '\n');
         while ((c = fgetc(fd)) != '\n');
         while ((c = fgetc(fd)) != '\n');
     } else {
