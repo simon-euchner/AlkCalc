@@ -64,7 +64,7 @@ eigensolver_data *eigensolver_data_init() {
 
     /* Initialise potential (see '../interface/settings.c') */
     tstart = clock();
-    vint_initpar(rpar = data->rpar, ipar = data->ipar);
+    v_initpar(rpar = data->rpar, ipar = data->ipar);
 
     /* Sanity check for specified maximal principal quantum number */
     if (nmax < ipar[3]) {
@@ -83,7 +83,7 @@ eigensolver_data *eigensolver_data_init() {
     for (k = 1; k < N - 1; k++) {
         tk += (hs[k - 1] = step(k));
         vs[k - 1] = lo * (lo + 1.) / (2. * tk * tk)
-                  + C * vint(tk, rpar, ipar) + offset - shift;
+                  + C * v(tk, rpar, ipar) + offset - shift;
     }
     hs[N - 2] = step(N - 1);
 

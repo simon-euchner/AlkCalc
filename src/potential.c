@@ -7,7 +7,7 @@
  *                                                                            *
  * The model potential consists of three terms:                               *
  *                                                                            *
- *     Vint = VC + VP + VR                                                    *
+ *     V = VC + VP + VR                                                       *
  *                                                                            *
  * Here, VC is a modified Coulomb potential, VP accounts for polarisation of  *
  * the screened ionic core due to the valence electron, and VR is the         *
@@ -60,18 +60,18 @@
  *     ipar[2], l      : Orbital angular momentum quantum number              *
  *     ipar[3], nl     : Minimal principal quantum number for series 'l'      *
  * -------------------------------------------------------------------------- */
-typedef struct vint_data_s {
+typedef struct v_data_s {
     double *rpar;
     int32_t *ipar;
-} vint_data;
+} v_data;
 
 static void move(FILE *, char *);
-static double VC(double, const vint_data *);
-static double VP(double, const vint_data *);
-static double VR(double, const vint_data *, double, double);
+static double VC(double, const v_data *);
+static double VP(double, const v_data *);
+static double VR(double, const v_data *, double, double);
 
 /* Initialise parameters (rpar, ipar), depending on atom/ion species          */
-void vint_initpar(double *rpar, int32_t *ipar) {
+void v_initpar(double *rpar, int32_t *ipar) {
 
     char id[101];
     int c, lread;
@@ -141,11 +141,11 @@ void vint_initpar(double *rpar, int32_t *ipar) {
 
 /* Interaction potential                                                      *
  * To call this function, first select an atom/ion species by initialising    *
- * 'rpar' and 'ipar' with 'vint_initpar'; argument in units of Bohr's radius  */
-double vint(double r, double *rpar, int32_t *ipar) {
+ * 'rpar' and 'ipar' with 'v_initpar'; argument in units of Bohr's radius     */
+double v(double r, double *rpar, int32_t *ipar) {
 
     double vc, vp, result;
-    vint_data data;
+    v_data data;
 
     data.rpar = rpar; data.ipar = ipar;
 
@@ -179,7 +179,7 @@ static void move(FILE *fd, char *id) {
 }
 
 /* Modified Coulomb's potential in units of Hartree                           */
-static double VC(double r, const vint_data *data) {
+static double VC(double r, const v_data *data) {
 
     int32_t *ipar, Z, Zc;
     double *rpar, k1, k2, k3, k4, Zn, result;
@@ -203,7 +203,7 @@ static double VC(double r, const vint_data *data) {
 }
 
 /* Polarisation term in units of Hartree                                      */
-static double VP(double r, const vint_data *data) {
+static double VP(double r, const v_data *data) {
 
     double *rpar, rc, alphaD, result;
 
@@ -218,7 +218,7 @@ static double VP(double r, const vint_data *data) {
 }
 
 /* Relativistic spin-orbit coupling in units of Hartree                       */
-static double VR(double r, const vint_data *data, double vc, double vp) {
+static double VR(double r, const v_data *data, double vc, double vp) {
 
     /* In 'theory/theory.pdf' the variable K is called N. Here, it is named   *
      * K to avoid clash with the global variables in 'interface/settings.h'.  */

@@ -42,8 +42,8 @@ typedef struct eigensolver_data_s {
     SuperLUStat_t stat;
 } eigensolver_data;
 
-void vint_initpar(double *, int32_t *);
-double vint(double, double *, int32_t *);
+void v_initpar(double *, int32_t *);
+double v(double, double *, int32_t *);
 eigensolver_data *eigensolver_data_init();
 void eigensolver_data_free(eigensolver_data *);
 void solve(eigensolver_data *);
