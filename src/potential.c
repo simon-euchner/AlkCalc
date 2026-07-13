@@ -99,17 +99,17 @@ void vint_initpar(double *rpar, int32_t *ipar) {
 
     /* Read data for atom/ion species */
     if ((c = fgetc(fd)) == '=') {
-        ERROR("THERE MUST BE DATA FOR AT LEAST ONE ANGULAR MOMENTUM L");
+        ERROR("THERE MUST BE DATA FOR AT LEAST ONE ANGULAR MOMENTUM 'L'");
     }
-    while ((c = fgetc(fd)) != '=') {
+    do {
         (void)fscanf(fd, "%d %lf %lf %lf %lf %lf %" SCNd32 " ", &lread, rpar,
                      rpar + 1, rpar + 2, rpar + 3, rpar + 4, ipar + 3);
-        if (lread == l) break;
-    }
-    if (l < lread) {
+
+    } while ((c = fgetc(fd)) != '=' && lread != l);
+    if (l < lread) { /* Case where it is unclear which parameters to use */
         ERROR("NO DATA FOUND FOR ANGULAR MOMENTUM 'L = %" PRId32 "'", l);
     }
-    if (l > lread) {
+    if (l > lread) { /* Case where parameters for largest supplied l are used */
         ipar[3] = l + 1;
     }
     while ((c = fgetc(fd)) != '=');
@@ -131,27 +131,9 @@ void vint_initpar(double *rpar, int32_t *ipar) {
      * automatically.                                                         */
     /* rpar[7] = 1. / (1. + ME / rpar[6]); */
     rpar[7] = 1.;
-    ipar[2] =  l;
+    ipar[2] = l;
     rpar[8] = .5 * (2 * (int32_t)j + 1);
     (void)fscanf(fd, "EGS %lf ", rpar + 9);
-
-    // Testing
-    printf("Z = %d\n", ipar[0]);
-    printf("Zc = %d\n", ipar[1]);
-    printf("l = %d\n", ipar[2]);
-    printf("nl = %d\n", ipar[3]);
-    printf("k1 = %lf\n", rpar[0]);
-    printf("k2 = %lf\n", rpar[1]);
-    printf("k3 = %lf\n", rpar[2]);
-    printf("k4 = %lf\n", rpar[3]);
-    printf("rc = %lf\n", rpar[4]);
-    printf("alphaD = %lf\n", rpar[5]);
-    printf("M = %lf\n", rpar[6]);
-    printf("C = %lf\n", rpar[7]);
-    printf("j = %lf\n", rpar[8]);
-    printf("EGS = %lf\n", rpar[9]);
-
-    //exit(0);
 
     /* Close file */
     fclose(fd); fd = NULL;
