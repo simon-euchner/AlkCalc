@@ -200,6 +200,9 @@ Data generation.
        If a new species is added, make sure to keep the formatting correct (cf.
        already available entries).
 
+
+       In any case, the formatting follows certain rules:
+
     2. Open the file settings.c and set the parameters. The species identifier
        which refers to the species X is defined in species.dat. There are two
        important parameters: offset and shift. These should be chosen in the
