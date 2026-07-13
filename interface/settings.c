@@ -14,6 +14,12 @@
  *                                                                            *
  * Note further that this file has no effect on the functions in 'alkcalc.h'. *
  * These merely use the already generated data.                               *
+ *                                                                            *
+ * For convenience, spectroscopic notation (SN) can optionally be used for    *
+ * specifying the orbital angular momentum quantum number l (see below)       *
+ * within the range 0 <= l <= 20. For l > 20 one must use integers. To use    *
+ * SN, write l = SN_S for l = 0, l = SN_P for l = 1, ..., and l = SN_Z for    *
+ * l = 20. For the definition of 'SN_...' see 'interface/settings.h'.         *
  * -------------------------------------------------------------------------- */
 
 #include "./settings.h"
@@ -32,7 +38,7 @@
  * -------------------------------------------------------------------------- */
 const char      *species     =         "1H"                                    ;
 const int32_t    N           =      1000000                                    ;
-const int32_t    nmax        =            6                                    ;
+const int32_t    nmax        =            9                                    ;
 const int32_t    l           =            0                                    ;
 const double     j           =             .5                                  ;
 const double     rmax        =        20000.                                   ;
