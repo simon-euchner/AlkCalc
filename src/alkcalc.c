@@ -39,7 +39,7 @@ double alkcalc_Enlsj(const char *species, int32_t n, int32_t l, double j) {
     /* Open file for reading */
     J = CONVERT(j);
     (void)sprintf(filename,
-                  "data/energies-%s-%02" PRId32 "-%02" PRId32 ".dat", species,
+                  "data/energies-%s-%03" PRId32 "-%03" PRId32 ".dat", species,
                   l, J);
     (void)strcpy(file, PATH_TO_ALKCALC);
     (void)strcat(file, filename);
@@ -91,7 +91,7 @@ alkcalc_state *alkcalc_fnlsj(char result, const char *species, int32_t n,
     /* Open file with requested state */
     J = CONVERT(j);
     (void)sprintf(filename,
-                  "state-%s-%03" PRId32 "-%02" PRId32 "-%02" PRId32 ".dat",
+                  "state-%s-%03" PRId32 "-%03" PRId32 "-%03" PRId32 ".dat",
                   species, n, l, J);
     (void)strcpy(file, PATH_TO_STATES);
     (void)strcat(file, filename);

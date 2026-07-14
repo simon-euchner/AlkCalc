@@ -334,7 +334,7 @@ static void save_energies(eigensolver_data *data, const double *energies) {
     nl = (ipar = data->ipar)[3]; lo = ipar[2]; jj = 2 * (int32_t)j + 1;
     EGS = data->rpar[9]; runtime = (int32_t)data->runtime;
     dti = step(1); dtf = step(N - 1);
-    (void)sprintf(filename, "energies-%s-%02" PRId32 "-%02" PRId32 ".dat",
+    (void)sprintf(filename, "energies-%s-%03" PRId32 "-%03" PRId32 ".dat",
                   species, lo, jj);
     (void)strcpy(file, "./data/");
     (void)strcat(file, filename);
@@ -384,7 +384,7 @@ static void save_states(eigensolver_data *data, const double *z) {
         /* Open file for writing */
         file[0] = filename[0] = '\0';
         (void)sprintf(filename,
-                      "state-%s-%03" PRId32 "-%02" PRId32 "-%02" PRId32 ".dat",
+                      "state-%s-%03" PRId32 "-%03" PRId32 "-%03" PRId32 ".dat",
                       species, n, lo, jj);
         (void)strcpy(file, PATH_TO_STATES);
         (void)strcat(file, filename);
