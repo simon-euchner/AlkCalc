@@ -29,4 +29,4 @@ I need to make a decision here and think about how to handle this best.
 
 
 
-Fix file formatting, it cannot take numbe l >= 50, since j > 100 and 2 digits arenot enough. So l and j should have 3 digits
+Fix file formatting, it cannot take numbe l >= 50, since j > 100 and 2 digits arenot enough. So l and j should have 3 digits <-- I iumplemented tihs, but what about old file dpeople have?
