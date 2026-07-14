@@ -6,9 +6,9 @@
 
 
 Table containing information on the data files. The symbol X is a placeholder
-for a species identifier, i.e., X=6LI, X=40CA+, etc., l is the orbital angular
-momentum quantum number, 2j represents the value 2*j, where j is the total
-angular momentum quantum number, and n is the principal quantum number.
+for a species identifier, i.e., X = 6LI, X = 40CA+, etc., l is the orbital
+angular momentum quantum number, 2j represents the value 2 * j, where j is the
+total angular momentum quantum number, and n is the principal quantum number.
 
 --------------------------------------------------------------------------------
 Quantity              Naming convention        Description
