@@ -224,7 +224,7 @@ Data generation.
               follows the Hydrogenic law (i.e., nl = l + 1) or nl is anomalous
               in the sense that nl > l + 1. The correct nl can be extracted
               directly from the configuration of the atom or ion species. For
-              example, rubidium has the configuration [Kr]5s1, meaning that for
+              example, Rubidium has the configuration [Kr]5s1, meaning that for
               S states (l = 0), nl = n0 = 5 > 0 + 1. This is the anomalous case
               and must be specified in species.dat explicitly. When data for a
               requested orbital angular momentum quantum number is not supplied
