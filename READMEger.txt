@@ -200,17 +200,54 @@ Installation.
 
 Datenerzeugung.
 
-        In diesem Abschnitt beschreiben wir wie AlkCalc dazu benutzt werden kann
-    um (zumindest teilweise) den vollen Einelektronenhamiltonoperator, definiert
-    in "theory/theory.pdf", zu diagonalisieren. Dieser Teil ist unverzichtbar um
-    die für die Bibliotheksfunktionen benötigten Daten (Eigenenergien und
-    radiale Eigenzustände) zu erzeugt. Im Folgenden ist das Vorgehen in vier
-    Schritten anhand des Atoms oder Ions X erklärt.
+        In diesem Abschnitt beschreiben wir, wie AlkCalc dazu benutzt werden
+    kann, um (zumindest teilweise) den vollen Einelektronenhamiltonoperator,
+    definiert in "theory/theory.pdf", zu diagonalisieren. Dieser Teil ist
+    unverzichtbar, um die für die Bibliotheksfunktionen benötigten Daten
+    (Eigenenergien und radiale Eigenzustände) zu erzeugen. Im Folgenden ist das
+    Vorgehen in vier Schritten anhand des Atoms oder Ions X erklärt.
 
-    1. Navigieren Sie in den Ordner interface und öffnen Sie die Datei
+    1. Navigieren Sie in den Ordner "interface" und öffnen Sie die Datei
        species.dat. Stellen Sie sicher, dass in dieser Datei die notwendigen
        Einträge für X vorhanden sind. Falls X neu hinzugefügt werden muss,
-       folgen Sie der Formatierung der bestehenden Einträge.
+       folgen Sie der Formatierung der bestehenden Einträge. Beim Erstellen
+       neuer Einträge beachten Sie die folgenden Regelungen und Annahmen:
+
+       (1) Stellen Sie sicher, dass die Einträge aufsteigend in der
+           Bahndrehimpulsquantenzahl angeordnet sind. Zum Beispiel heißt das,
+           dass die Daten für P-Zustände vor den Daten für F-Zustände zu
+           platzieren sind.
+
+       (2) Es müssen nicht zwangsläufig Daten für alle
+           Bahndrehimpulsquantenzahlen angegeben sein. Beispielsweise genügt es
+           auch nur die Daten für P-, D- und G-Zustände anzugeben. Das kann
+           nützlich sein, wenn beispielsweise nur P-Zustände oder bestimmte
+           zirkuläre Zustände von Bedeutung sind.
+
+       (3) Für mindestens eine Bahndrehimpulsquantenzahl müssen in species.dat
+           Daten hinterlegt sein.
+
+       (4) Angenommen, es wird in der Datei settings.c eine
+           Bahndrehimpulsquantenzahl, l, eingestellt, welche größer ist als die
+           Größte, l0, die in species.dat hinterlegt ist. Für l > l0 verwendet
+           AlkCalc zwar l, jedoch mit den Daten, die unter l0 hinterlegt sind.
+           Beachten Sie, dass dieses Verhalten von AlkCalc mit den Ergebnissen
+           in Ref. [8] in Einklang steht.
+
+       (5) Unter anderem ist in der Datei species.dat zu jeder
+           Bahndrehimpulsquantenzahl, l, eine minimale Hauptquantenzahl, nl,
+           hinterlegt. Es gibt zwei Möglichkeiten: Entweder nl folgt den Regeln,
+           die auch für das Wasserstoff Atom gelten (d. h. nl = l + 1), oder nl
+           verhält sich zuwider den Regeln für das Wasserstoff Atom, was
+           bedeuten soll, dass nl > l + 1 ist. Das richtige nl kann der
+           Elektronenkonfiguration von X entnommen werden. Zum Beispiel besitzt
+           Rubidium die Elektronenkonfiguration [Kr]5s1, was bedeutet, dass für
+           S-Zustände (l = 0) nl = n0 = 5 > 0 + 1 ist, also nl für S-Zustände
+           nicht den Regel für das Wasserstoff Atom folgt. In diesen Fällen muss
+           nl ausdrücklich in species.dat hinterlegt sein. Im Gegensatz dazu
+           wird in Fällen in denen die Bahndrehimpulsquantenzahl (und damit auch
+           nl) nicht ausdrücklich hinterlegt ist, die Regel für das Wasserstoff
+           Atom angewandt (d. h. nl = l + 1).
 
     2. Öffnen Sie die Datei settings.c und setzen Sie die Parameter. Der
        Identifikator für X ist definiert in species.dat. Die zwei wichtigsten
