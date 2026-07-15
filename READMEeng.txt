@@ -221,7 +221,7 @@ Data generation.
 
           (5) In species.dat, a minimum principal quantum number, nl, is
               specified for each l. There are two possibilities: either nl
-              follows the hydrogenic law (i.e., nl = l + 1) or nl is anomalous
+              follows the Hydrogenic law (i.e., nl = l + 1) or nl is anomalous
               in the sense that nl > l + 1. The correct nl can be extracted
               directly from the configuration of the atom or ion species. For
               example, rubidium has the configuration [Kr]5s1, meaning that for
@@ -229,7 +229,7 @@ Data generation.
               and must be specified in species.dat explicitly. When data for a
               requested orbital angular momentum quantum number is not supplied
               explicitly in species.dat, AlkCalc internally assumes the
-              hydrogenic law (i.e., nl = l + 1).
+              Hydrogenic law (i.e., nl = l + 1).
 
     2. Open the file settings.c and set the parameters. The species identifier
        which refers to the species X is defined in species.dat. There are two
