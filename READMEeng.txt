@@ -195,10 +195,41 @@ Data generation.
     the atom or ion species X. The four steps below describe how the data for X
     can be generated.
 
-    1. Navigate to the directory interface and open the file species.dat. Make
-       sure that in this file the necessary data for the species X is located.
-       If a new species is added, make sure to keep the formatting correct (cf.
-       already available entries).
+    1. Navigate to the directory 'interface' and open the file species.dat. Make
+       sure that this file contains the necessary data for the species X. When
+       adding a new species, make sure to keep the formatting correct (cf. the
+       already available entries). For adding new species, please note the
+       following rules and assumptions:
+
+          (1) Make sure that the entries are sorted in ascending order of the
+              orbital angular momentum quantum number, e.g., placing data for P
+              states before data for F states.
+
+          (2) Data for some orbital angular momentum quantum numbers can be
+              skipped, e.g., it is valid to have data only for P, D, and G
+              states. This can be useful when, for instance, only P states or
+              specific circular states are of interest.
+
+          (3) There must be data for at least one orbital angular momentum
+              quantum number in species.dat.
+
+          (4) Suppose an orbital angular momentum quantum number, l, is
+              requested in settings.c, which is larger than the largest one, l0,
+              specified in species.dat. For l > l0, AlkCalc internally uses l
+              but with the data in species.dat associated with l0. Note that
+              this behaviour is aligned with Ref. [8].
+
+          (5) In species.dat, a minimum principal quantum number, nl, is
+              specified for each l. There are two possibilities: either nl
+              follows the hydrogenic law (i.e., nl = l + 1) or nl is anomalous
+              in the sense that nl > l + 1. The correct nl can be extracted
+              directly from the configuration of the atom or ion species. For
+              example, rubidium has the configuration [Kr]5s1, meaning that for
+              S states (l = 0), nl = n0 = 5 > 0 + 1. This is the anomalous case
+              and must be specified in species.dat explicitly. When data for a
+              requested orbital angular momentum quantum number is not supplied
+              explicitly in species.dat, AlkCalc internally assumes the
+              hydrogenic law (i.e., nl = l + 1).
 
     2. Open the file settings.c and set the parameters. The species identifier
        which refers to the species X is defined in species.dat. There are two
