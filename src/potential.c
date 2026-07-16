@@ -7,7 +7,7 @@
  *                                                                            *
  * The model potential consists of three terms:                               *
  *                                                                            *
- *     Vint = VC + VP + VR                                                    *
+ *     V = VC + VP + VR                                                       *
  *                                                                            *
  * Here, VC is a modified Coulomb potential, VP accounts for polarisation of  *
  * the screened ionic core due to the valence electron, and VR is the         *
@@ -60,21 +60,21 @@
  *     ipar[2], l      : Orbital angular momentum quantum number              *
  *     ipar[3], nl     : Minimal principal quantum number for series 'l'      *
  * -------------------------------------------------------------------------- */
-typedef struct vint_data_s {
+typedef struct v_data_s {
     double *rpar;
     int32_t *ipar;
-} vint_data;
+} v_data;
 
 static void move(FILE *, char *);
-static double VC(double, const vint_data *);
-static double VP(double, const vint_data *);
-static double VR(double, const vint_data *, double, double);
+static double VC(double, const v_data *);
+static double VP(double, const v_data *);
+static double VR(double, const v_data *, double, double);
 
 /* Initialise parameters (rpar, ipar), depending on atom/ion species          */
-void vint_initpar(double *rpar, int32_t *ipar) {
+void v_initpar(double *rpar, int32_t *ipar) {
 
     char id[101];
-    int c;
+    int c, lread;
     double dummy;
     FILE *fd;
 
@@ -92,18 +92,29 @@ void vint_initpar(double *rpar, int32_t *ipar) {
         }
     }
 
-    /* Read data for atom/ion species */
-    while (l != (c = fgetc(fd)) && c != 'Z')
-        while ((c = fgetc(fd)) != '\n');
-    if (c == 'Z') {
-        ERROR("REQUESTED QUANTUM NUMBER 'L = %c' IS NOT KNOWN", l);
-    } else {
-        (void)fgetc(fd);
-        (void)fscanf(fd, "%lf %lf %lf %lf %lf %" SCNd32 " ", rpar, rpar + 1,
-                     rpar + 2, rpar + 3, rpar + 4, ipar + 3);
+    /* Check validity of orbital angular momentum quantum number */
+    if (l < 0) {
+        ERROR("INVALID ORBITAL ANGULAR MOMENTUM 'L = %" PRId32 "'", l);
     }
-    while ((c = fgetc(fd)) != 'Z');
-    (void)fscanf(fd, "%" SCNd32 " ", ipar);
+
+    /* Read data for atom/ion species */
+    if ((c = fgetc(fd)) == '=') {
+        ERROR("THERE MUST BE DATA FOR AT LEAST ONE ANGULAR MOMENTUM 'L'");
+    }
+    do {
+        (void)fscanf(fd, "%d %lf %lf %lf %lf %lf %" SCNd32 " ", &lread, rpar,
+                     rpar + 1, rpar + 2, rpar + 3, rpar + 4, ipar + 3);
+
+    } while ((c = fgetc(fd)) != '=' && lread != l);
+    if (l < lread) { /* Case where it is unclear which parameters to use */
+        ERROR("NO DATA FOUND FOR ANGULAR MOMENTUM 'L = %" PRId32 "'", l);
+    }
+    if (l > lread) { /* Case where parameters for largest supplied l are used */
+        ipar[3] = l + 1;
+    }
+    while ((c = fgetc(fd)) != '=');
+    while ((c = fgetc(fd)) != '\n');
+    (void)fscanf(fd, "Z %" SCNd32 " ", ipar);
     (void)fscanf(fd, "ZC %" SCNd32 " ", ipar + 1);
     (void)fscanf(fd, "ALPHAD %lf" " ", rpar + 5);
     (void)fscanf(fd, "M %lf(%lf) ", rpar + 6, &dummy);
@@ -120,15 +131,7 @@ void vint_initpar(double *rpar, int32_t *ipar) {
      * automatically.                                                         */
     /* rpar[7] = 1. / (1. + ME / rpar[6]); */
     rpar[7] = 1.;
-    switch (l) {
-        case 'S': ipar[2] =  0; break;
-        case 'P': ipar[2] =  1; break;
-        case 'D': ipar[2] =  2; break;
-        case 'F': ipar[2] =  3; break;
-        case 'G': ipar[2] =  4; break;
-        case 'H': ipar[2] =  5; break;
-        default: break;
-    }
+    ipar[2] = l;
     rpar[8] = .5 * (2 * (int32_t)j + 1);
     (void)fscanf(fd, "EGS %lf ", rpar + 9);
 
@@ -138,11 +141,11 @@ void vint_initpar(double *rpar, int32_t *ipar) {
 
 /* Interaction potential                                                      *
  * To call this function, first select an atom/ion species by initialising    *
- * 'rpar' and 'ipar' with 'vint_initpar'; argument in units of Bohr's radius  */
-double vint(double r, double *rpar, int32_t *ipar) {
+ * 'rpar' and 'ipar' with 'v_initpar'; argument in units of Bohr's radius     */
+double v(double r, double *rpar, int32_t *ipar) {
 
     double vc, vp, result;
-    vint_data data;
+    v_data data;
 
     data.rpar = rpar; data.ipar = ipar;
 
@@ -158,7 +161,7 @@ double vint(double r, double *rpar, int32_t *ipar) {
  * Helper functions                                                           *
  * -------------------------------------------------------------------------- */
 
-/* Move filepointer to next dollar sign and get identifier                    */
+/* Move filepointer to next entry and get identifier                          */
 static void move(FILE *fd, char *id) {
 
     int c;
@@ -169,13 +172,14 @@ static void move(FILE *fd, char *id) {
         (void)fscanf(fd, "ID %s ", id);
         while ((c = fgetc(fd)) != '\n');
         while ((c = fgetc(fd)) != '\n');
+        while ((c = fgetc(fd)) != '\n');
     } else {
         id[0] = '\0';
     }
 }
 
 /* Modified Coulomb's potential in units of Hartree                           */
-static double VC(double r, const vint_data *data) {
+static double VC(double r, const v_data *data) {
 
     int32_t *ipar, Z, Zc;
     double *rpar, k1, k2, k3, k4, Zn, result;
@@ -199,7 +203,7 @@ static double VC(double r, const vint_data *data) {
 }
 
 /* Polarisation term in units of Hartree                                      */
-static double VP(double r, const vint_data *data) {
+static double VP(double r, const v_data *data) {
 
     double *rpar, rc, alphaD, result;
 
@@ -214,7 +218,7 @@ static double VP(double r, const vint_data *data) {
 }
 
 /* Relativistic spin-orbit coupling in units of Hartree                       */
-static double VR(double r, const vint_data *data, double vc, double vp) {
+static double VR(double r, const v_data *data, double vc, double vp) {
 
     /* In 'theory/theory.pdf' the variable K is called N. Here, it is named   *
      * K to avoid clash with the global variables in 'interface/settings.h'.  */

@@ -29,6 +29,31 @@
 #define LEN_PATH_TO_STATES 38
 
 /* -------------------------------------------------------------------------- *
+ * Definitions for spectroscopic notation (SN)                                *
+ * -------------------------------------------------------------------------- */
+#define SN_S  0
+#define SN_P  1
+#define SN_D  2
+#define SN_F  3
+#define SN_G  4
+#define SN_H  5
+#define SN_I  6
+#define SN_K  7
+#define SN_L  8
+#define SN_M  9
+#define SN_N 10
+#define SN_O 11
+#define SN_Q 12
+#define SN_R 13
+#define SN_T 14
+#define SN_U 15
+#define SN_V 16
+#define SN_W 17
+#define SN_X 18
+#define SN_Y 19
+#define SN_Z 20
+
+/* -------------------------------------------------------------------------- *
  * Settings                                                                   *
  *                                                                            *
  * species   : Atom or ion species                                            *
@@ -43,7 +68,7 @@
 extern const char *species;
 extern const int32_t N;
 extern const int32_t nmax;
-extern const char l;
+extern const int32_t l;
 extern const double j;
 extern const double rmax;
 extern const double offset;

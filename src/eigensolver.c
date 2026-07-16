@@ -64,7 +64,7 @@ eigensolver_data *eigensolver_data_init() {
 
     /* Initialise potential (see '../interface/settings.c') */
     tstart = clock();
-    vint_initpar(rpar = data->rpar, ipar = data->ipar);
+    v_initpar(rpar = data->rpar, ipar = data->ipar);
 
     /* Sanity check for specified maximal principal quantum number */
     if (nmax < ipar[3]) {
@@ -83,7 +83,7 @@ eigensolver_data *eigensolver_data_init() {
     for (k = 1; k < N - 1; k++) {
         tk += (hs[k - 1] = step(k));
         vs[k - 1] = lo * (lo + 1.) / (2. * tk * tk)
-                  + C * vint(tk, rpar, ipar) + offset - shift;
+                  + C * v(tk, rpar, ipar) + offset - shift;
     }
     hs[N - 2] = step(N - 1);
 
@@ -334,7 +334,7 @@ static void save_energies(eigensolver_data *data, const double *energies) {
     nl = (ipar = data->ipar)[3]; lo = ipar[2]; jj = 2 * (int32_t)j + 1;
     EGS = data->rpar[9]; runtime = (int32_t)data->runtime;
     dti = step(1); dtf = step(N - 1);
-    (void)sprintf(filename, "energies-%s-%02" PRId32 "-%02" PRId32 ".dat",
+    (void)sprintf(filename, "energies-%s-%03" PRId32 "-%03" PRId32 ".dat",
                   species, lo, jj);
     (void)strcpy(file, "./data/");
     (void)strcat(file, filename);
@@ -347,7 +347,7 @@ static void save_energies(eigensolver_data *data, const double *energies) {
                   "EIGENENERGIES FOR '%s' [HARTREE]\n\n"
                   "CPU TIME TO GENERATE DATA SET [S]: %" PRId32 "\n"
                   "GROUND STATE ENERGY [HARTREE]: %1.8lf\n"
-                  "ORBITAL ANGULAR MOMENTUM [HBAR]: %c\n"
+                  "ORBITAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "\n"
                   "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "/2\n"
                   "RMAX [BOHR'S RADIUS]: %1.3E\n"
                   "NUMBER OF DISCRETISATION POINTS: %" PRId32 "\n"
@@ -355,7 +355,7 @@ static void save_energies(eigensolver_data *data, const double *energies) {
                   "MINIMAL PRINCIPAL QUANTUM NUMBER: %" PRId32 "\n"
                   "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" PRId32 "\n\n\n\n"
                   "N   ENERGY\n\n",
-                  species, runtime, EGS, l, jj, rmax, N, dti, dtf, nl, nmax);
+                  species, runtime, EGS, lo, jj, rmax, N, dti, dtf, nl, nmax);
 
     /* Save eigenenergies */
     n = 0;
@@ -384,7 +384,7 @@ static void save_states(eigensolver_data *data, const double *z) {
         /* Open file for writing */
         file[0] = filename[0] = '\0';
         (void)sprintf(filename,
-                      "state-%s-%03" PRId32 "-%02" PRId32 "-%02" PRId32 ".dat",
+                      "state-%s-%03" PRId32 "-%03" PRId32 "-%03" PRId32 ".dat",
                       species, n, lo, jj);
         (void)strcpy(file, PATH_TO_STATES);
         (void)strcat(file, filename);
@@ -397,12 +397,12 @@ static void save_states(eigensolver_data *data, const double *z) {
                       "RADIAL EIGENSTATE FOR '%s' [DIMENSIONLESS]\n\n"
                       "COEFFICIENTS 'FK' (K = 1, ..., N-2)\n"
                       "PRINCIPAL QUANTUM NUMBER (N): %" PRId32 "\n"
-                      "ORBITAL ANGULAR MOMENTUM [HBAR]: %c\n"
+                      "ORBITAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "\n"
                       "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "/2\n"
                       "RMAX [BOHR'S RADIUS]: %1.3E\n"
                       "NUMBER OF DISCRETISATION POINTS: %" PRId32 "\n\n\n\n"
                       "FK\n\n",
-                      species, n, l, jj, rmax, N);
+                      species, n, lo, jj, rmax, N);
 
         /* Save radial eigenstate */
         for (k = 0; k < dim; k++) {
