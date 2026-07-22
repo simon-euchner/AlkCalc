@@ -914,7 +914,7 @@ static void nextrm(const char *species, int32_t *nmin, int32_t *nmax, int32_t l,
     /* Open file for reading */
     J = CONVERT(j);
     (void)sprintf(filename,
-                  "data/energies-%s-%02" PRId32 "-%02" PRId32 ".dat", species,
+                  "data/energies-%s-%03" PRId32 "-%03" PRId32 ".dat", species,
                   l, J);
     (void)strcpy(file, PATH_TO_ALKCALC);
     (void)strcat(file, filename);
