@@ -1072,20 +1072,21 @@
     \section{Manual}
     \label{sec:Manual}
 
-    Reference manual for the \alkcalc library functions. Prototypes for the
+    Reference manual for the library functions of \alkcalc. Prototypes for the
     following functions are defined in the header `interface/alkcalc.h'.
 
     There is always a decision to be made when dealing with half-integer quantum
-    numbers numerically. Here we agree on the following: say $q$ is a quantum
-    number that may take half-integer values, e.g., $j$, $m_j$. To `clean up'
-    the numerical value we do $2q\mapsto[2.0\times{q}+0.5]$. The `floor'
-    function is defined as $[x]=k\in\mathbb{Z}$ ($x\in\mathbb{R}$), where $k$ is
-    the unique integer such that $x\in[k,k+1)$. In practice, this means that for
-    any $q\in[-0.75,-0.25)$ we use $q=-1\slash{2}$, for $q\in[-0.25,0.25)$ we
-    use $q=0$, for $q\in[0.25,0.75)$ we use $q=1\slash{2}$, and so on, in both
-    the negative and positive direction. In the following manual, this
-    convention is applied to all quantum numbers that can take half-integer
-    values, unless stated otherwise.
+    numbers numerically. Here the following agreement is made: say $q$ is a
+    quantum number that may take half-integer values, e.g., $j$, $m_j$. To
+    `clean up' the numerical value it is understood that $2q$ is equivalent to
+    $[2.0\times{q}+0.5]$. The `floor' function is defined as
+    $[x]=k\in\mathbb{Z}$ ($x\in\mathbb{R}$), where $k$ is the unique integer
+    such that $x\in[k,k+1)$. In practice, this means that for any
+    $q\in[-0.75,-0.25)$, $q=-1\slash{2}$ is used, for any $q\in[-0.25,0.25)$,
+    $q=0$, for any $q\in[0.25,0.75)$, $q=1\slash{2}$, and so on, in both the
+    negative and positive directions. In the following manual, this convention
+    is applied to all quantum numbers that can take half-integer values, unless
+    stated otherwise.
 
     \sffamily%
     \pagestyle{plain}%
@@ -1241,7 +1242,7 @@
         Clebsch-Gordan coefficients, $C^{j_1,m_1,j_2,m_2}_{j,m_j}=\braket*{j_1,
         m_1;j_2,m_2}{j_1,j_2,j,m_j}$, where $j$ is the total angular momentum
         composed of the two individual ones $j_1$ and $j_2$. To fix the phase
-        uniquely, we adopt the Condon-Shortley sign convention, that is, the
+        uniquely, the Condon-Shortley sign convention is adopted, that is, the
         Clebsch-Gordan coefficients with $m_j=j_1+j_2$ are positive. In
         particular, for the case $j_1=l$ and $j_2=s$,
         \begin{equation}\label{eq:definitionCGC}
@@ -1461,8 +1462,8 @@
             processes in Eq.~\eqref{eq:LifetimeFormula} allow `decay' to states
             with higher energy. In principle, one needs to take into account all
             transitions to these states, of which there are infinitely many.
-            Here, we only take into account \texttt{dn} levels above
-            $\bm{\Psi}_{n,l,s,j,m_j}$ to truncate the series, for both
+            Here, solely \texttt{dn} levels above $\bm{\Psi}_{n,l,s,j,m_j}$ are
+            taken into account, in order to truncate the series, for both
             $l'=l\pm1$. In other words, the sum in
             Eq.~\eqref{eq:LifetimeFormula}, taking into account absorption,
             contains $2\times\text{\texttt{dn}}$ terms for $l>0$ and \texttt{dn}
