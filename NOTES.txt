@@ -1,0 +1,13 @@
+Fix references
+
+Update README's
+
+Fix Licenses of FORTRAN code
+
+Add references for FORTRAN code
+
+Update code for eigensolver
+
+Update code for reading states in alkcalc.h
+
+Update theory
