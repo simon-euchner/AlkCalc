@@ -332,10 +332,10 @@
         \frac{\alpha}{2r^3} \bm{L}\cdot\bm{S}
     \end{equation}
     is employed for alkali-metal atoms. Here, $\alpha$ is the fine-structure
-    constant. Throughout \alkcalc we employ the relativistically correct version
-    in Eq.~\eqref{eq:LSCoupling}, not the simplifies version in
-    Eq.~\ref{eq:SimplifiedLSCoupling}. Finally, for expressing the spin-operator
-    $\bm{S}$ in Eq.~\eqref{eq:LSCoupling} and
+    constant. Throughout \alkcalc relativistically correct version
+    in Eq.~\eqref{eq:LSCoupling}, not the simplified version in
+    Eq.~\ref{eq:SimplifiedLSCoupling}, is employed. Finally, for expressing the
+    spin-operator $\bm{S}$ in Eq.~\eqref{eq:LSCoupling} and
     Eq.~\eqref{eq:SimplifiedLSCoupling} the representation in Pauli's (spin)
     matrices is chosen:
     \begin{equation}
@@ -351,9 +351,9 @@
         \sigma_z = \mqty[1&0 \\ 0&-1]
     \,.
     \end{equation}
-    This simple choice for representing the spin is possible, because throughout
-    this work we are interested only in single electron systems with total spin
-    $s=1\slash{2}$.
+    This simple choice for representing the spin degreed of freedom is possible
+    because throughout this work the interest is in the case where the total
+    spin is $s=1\slash{2}$.
 
     At this point the Hamiltonian which determines the eigenenergies and the
     eigenstates is defined. In the following, the goal is to cast eigenvalue
@@ -367,8 +367,8 @@
         \frac{1}{2}\big[\bm{J}^2-\bm{L}^2-\bm{S}^2\big]
     \,.
     \end{equation}
-    Next, we express the square of the momentum operator in spherical
-    co-ordinates,
+    Next, the square of the momentum operator in spherical co-ordinates is
+    rewritten:
     \begin{equation}
         \bm{p}^2
         =
@@ -459,8 +459,8 @@
         \bm{\chi}_{\frac{1}{2},-\frac{1}{2}}=\mqty[0 \\ 1]
     \,.
     \end{equation}
-    Explicitly (for the case of interest $s=1\slash{2}$), we find the following
-    expressions for the coupled basis states $\bm{\Phi}_{l,s,j,m_j}$:
+    Explicitly (for the case of interest $s=1\slash{2}$) the coupled basis
+    states $\bm{\Phi}_{l,s,j,m_j}$ are:
     \begin{equation}\label{eq:coupledBasis}
         \bm{\Phi}_{l,s,j,m_j}
         =
@@ -567,7 +567,7 @@
     where $R_{n,l,s,j}$ is the $n$-th radial eigenstate of $H_{l,s,j}$. The
     total eigenstate $\bm{\Psi}$ is then given by the product of the radial
     eigenstates and the spinors:
-    \begin{equation}\label{eq:GeneralRadialEquation}
+    \begin{equation}\label{eq:GeneralRadialEquations}
         \bm{\Psi}_{n,l,s,j,m_j}(r,\vartheta,\varphi)
         =
         R_{n,l,s,j}(r)
@@ -580,27 +580,31 @@
     $R_{n,l,s,j}$ must be calculated numerically. This task is exactly what
     \alkcalc is designed to do.
 
+    {\color{blue}
     %%% SUBSECTION
     \subsection{Numerical method}
     \label{subsec:NumericalMethod}
 
-    The radial eigenstates, generally, cannot be obtained analytically.
-    \alkcalc provides a platform to solve for these states numerically. To make
-    the problem addressable by a computer, we express the eigenproblem in terms
-    of dimensionless quantities. To this end we express the Hamiltonians
-    $H_{l,s,j}$ in units of Hartree,
-    $E_\mathrm{H}=1\slash{(4\pii\varepsilon_0a_\mathrm{B})}$, where
+    In this subsection the numerical method which is employed by \alkcalc to
+    solve the radial eigenvalue problems in
+    Eq.~\eqref{eq:GeneralRadialEquations} for the eigenenergies and the radial
+    eigenstates $R_{n,l,s,j}$ is discussed.  The first step is to express the
+    eigenvalue problems in terms of dimensionless quantities. To this end the
+    Hamiltonians $H_{l,s,j}$ is expressed in units of Hartree,
+    $E_\mathrm{H}=e^2\slash{(4\pii\varepsilon_0a_\mathrm{B})}$, where
     $a_\mathrm{B}=\hbar\slash{(m_\mathrm{e}c\alpha)}\approx52.9\,\mathrm{pm}$ is
-    Bohr's radius. The radial eigenfunctions we parametrise as
-    \begin{equation}\label{eq:fRconversion}
+    Bohr's radius. Further, the radial eigenfunctions are parametrised as
+    \begin{equation}\label{eq:DimensionlessEigenfunctions}
         R_{n,l,s,j}(r)
         =
         \frac{1}{\sqrt{\aB^3}}\frac{f_{n,l,s,j}(r\slash\aB)}{r\slash\aB}
-        \,.
+        \,,
     \end{equation}
-    where $f_{n,l,s,j}$ is dimensionless. The eigenproblem in
-    Eq.~\eqref{eq:radialEigenproblem} in the new eigenfunctions takes the form
-    \begin{equation}\label{eq:eigenproblem}
+    where $f_{n,l,s,j}$ is dimensionless. The eigenvalue problems in
+    Eq.~\eqref{eq:GeneralRadialEquations} expressed in the dimensionless
+    eigenfunctions \eqref{eq:DimensionlessEigenfunctions}
+    takes the form
+    \begin{equation}\label{eq:Eigenproblem}
         \bigg[
         -
         \frac{1}{2}
@@ -614,7 +618,7 @@
         f_{n,l,s,j}(t)
     \,,
     \end{equation}
-    where we defined
+    where
     \begin{equation}
         C = \frac{1}{1+\me\slash{M}}
     \end{equation}
@@ -638,38 +642,35 @@
         \int^\infty_0\dd{t}f^2_{n,l,s,j}(t)
     \,.
     \end{equation}
-    Here we assumed that the (radial) eigenfunctions are real-valued, which is
+    Here is is assumed that the radial eigenfunctions are real-valued, which is
     justified as the Hamiltonian is not only an hermitian but also a symmetric
     operator. In conclusion, computing the normalised eigenfunctions
     $f_{n,l,s,j}$ yields the (automatically normalised) radial eigenstates by
-    employing Eq.~\eqref{eq:fRconversion} for the conversion.
+    employing Eq.~\eqref{eq:DimensionlessEigenfunctions} for the conversion.
 
-    To solve the eigenproblem in Eq.~\eqref{eq:eigenproblem} numerically, we
-    employ a \ac{fem} instead of the conceptually (and programmatically) more
-    simple \ac{fdm} for, mainly\footnote{It also helps to save some disk space,
-    because one must store much less data to represent the eigenfunctions
-    $f_{n,l,s,j}$. Typically, disk space is not a relevant factor these days,
-    but we see no need to be unnecessarily wasteful with it either.}, one
-    reason: With a \ac{fem} we are completely free in choosing the mesh (the
-    position of the discretisation points) for the radial domain, while keeping
-    the associated finite-dimensional matrix problem real and symmetric. This
-    is important because the problem we face presents itself with drastically
-    different energy scales, introduced by the diverging potential: the
-    eigenfunctions $f_{n,l,s,j}$ oscillate quickly for small arguments and
-    slowly for large ones, where the valence electron is almost free. Thus, a
-    mesh tailored to this behaviour leads to a significant reduction of
-    computational resources (the fast oscillation can be efficiently resolved
-    without introducing `too many' points in the slowly oscillating regime).
+    To solve the eigenvalue problem in Eq.~\eqref{eq:Eigenproblem} numerically,
+    so-called \emph{B-splines} are employed.\footnote{This method may be
+    conceptually and programmatically more involved than a simple
+    finite-difference or finite-element method, however, it is preferred here
+    for two reasons: it allows to work with much smaller matrix dimensions and
+    it allows to store the resulting eigenenergies and radial eigenstates much
+    more efficiently.} Ultimately, this allows to express the eigenvalue problem
+    for the radial eigenfunctions $f_{n,l,s,j}$ as a simple matrix eigenvalue
+    problem. The remainder of this subsection will be concerned with
+    two different steps: first, the notion of B-splines is introduced. Second,
+    the final form of the matrix eigenproblem which yields the eigenenergies and
+    the radial eigenstates is formulated.
 
-    The first step in setting-up the \ac{fem} is to agree on a finite closed
-    interval $I=[0, t_\mathrm{tmax}]$, where $t_\mathrm{max}>0$ sets the maximal
-    value of the domain we consider. The value $t_\mathrm{max}$ must be chosen
-    large enough to ensure that the boundary condition
-    $f_{n,l,s,j}(t\geq{t}_\mathrm{max})=0$ is fulfilled. This equal sign is
-    actually never true, because the radial eigenstates asymptotically approach
-    zero. However, if we reach zero up to machine precision, it is numerically
-    true. Of course, one must ensure that the finite set of solutions that shall
-    be computed has support within this interval. The mesh we define as a family
+    The first step in setting-up the final matrix eigenvalue problem is to agree
+    on a finite closed interval $I=[0, t_\mathrm{tmax}]$, where
+    $t_\mathrm{max}>0$ sets the maximal value of the domain we consider. The
+    value $t_\mathrm{max}$ must be chosen large enough to ensure that the
+    boundary condition $f_{n,l,s,j}(t\geq{t}_\mathrm{max})=0$ is satisfied. This
+    equal sign is actually never true, because the radial eigenstates
+    asymptotically approach zero. However, if zero is reached within machine
+    precision, the boundary condition is numerically satisfied. Of course, one
+    must ensure that the finite set of solutions that shall be computed has
+    support within this interval. The mesh we define as a family
     $(t_k)_{k=1,\dots,N-1}$ in $I$ with the properties $t_0=0$,
     $t_{N-1}=t_\mathrm{max}$, and $t_0<t_1<\dots<t_{N-2}<t_{N-1}$, where we say
     $N\geq{3}$. Of course, typical values are $N\,{\sim}\,10^5\text{-}10^7$.
@@ -883,14 +884,15 @@
     the range $p=-2,\dots,10$ yields reasonably good results. Finally, we remark
     that one can improve on the precision by employing higher-order Gau\ss{i}an
     quadrature algorithms as described in \cite{burden2011}.
+    }
 
     %%% SUBSECTION
     \subsection{Oscillator strengths}
     \label{subsec:OscillatorStrengths}
 
-    The so-called `oscillator strength', for a transition from an initial state
-    $\bm{\Psi}_\mathrm{i}\equiv\bm{\Psi}_{n',l',s,j',m'_j}$ to a final state
-    $\bm{\Psi}_\mathrm{f}\equiv\bm{\Psi}_{n,l,s,j,m_j}$ is
+    The so-called \emph{oscillator strength} of a transition from an initial
+    state $\bm{\Psi}_\mathrm{i}\equiv\bm{\Psi}_{n',l',s,j',m'_j}$ to a final
+    state $\bm{\Psi}_\mathrm{f}\equiv\bm{\Psi}_{n,l,s,j,m_j}$ is
     \cite{friedrich2017}
     \begin{equation}
         f_{\mathrm{i}\to\mathrm{f}}
@@ -902,17 +904,17 @@
     \,,
     \end{equation}
     with the energy difference
-    $\EH\bar{E}_\mathrm{f,i}=E_\mathrm{f}-E_\mathrm{i}$. Note that we sum over
-    all final $m'_j$, because we are interested in transitions between the
-    fine-structure states without resolving the Zeeman sub-levels. The oscillator
+    $\EH\bar{E}_\mathrm{f,i}=E_\mathrm{f}-E_\mathrm{i}$. Note that the sum runs
+    over all final $m'_j$ because one is interested in transitions between the
+    fine-structure states without selecting Zeeman sub-levels. The oscillator
     strength is a measure for how strongly the induced Hertzian (electric)
     dipole oscillates: the radiation power is large for spatially large dipoles
     and fast oscillation frequencies, captured by the matrix element and energy
-    difference, respectively. In principle, we already have all the machinery
-    to numerically compute this quantity, however, one can reduce the expression
-    to a much simpler form by using angular momentum algebra, in particular,
-    relations from \cite{varshalovic1988}. To simplify the expression, we first
-    use (Condon-Shortley phase)
+    difference, respectively. In principle, all the machinery to numerically
+    compute this quantity is already there, however, one can reduce the
+    expression to a much simpler form by using angular momentum algebra, in
+    particular, relations from \cite{varshalovic1988}. To simplify the
+    expression, first note (Condon-Shortley phase convention)
     \begin{equation}
         r_x
         =
@@ -952,7 +954,7 @@
     \end{equation}
     expressed in terms of a Wigner $3jm$-symbol, a Wigner $6j$-symbol, and a
     Clebsch-Gordan coefficient. With symmetry relations and a sum rule from
-    \cite[p.~236,259]{varshalovic1988} we can compute the sum over $q$ and
+    \cite[p.~236,259]{varshalovic1988} one can compute the sum over $q$ and
     $m'_j$ in the expression for the oscillator strength, which yields
     \begin{equation}\label{eq:OscillatorStrengthSimplified}
         \sum_{m'_j} f_{\mathrm{i}\to\mathrm{f}}
@@ -969,12 +971,12 @@
     \end{equation}
     where $l_\mathrm{max}=\mathrm{max}(l,l')$. There are only six transitions
     for which $a_l$ is non-zero. Using relations from
-    \cite[p.~298,300]{varshalovic1988} we arrive at the results shown in
-    Tab.~\ref{tab:AngularFactors}. With this it is now straight-forward to
+    \cite[p.~298,300]{varshalovic1988} one arrives at the results shown in
+    Tab.~\ref{tab:AngularFactors}. With this it is now straight forward to
     compute the oscillator strengths numerically with a computer program. As a
     final remark, note that the oscillator strength does not depend on $m_j$ any
-    more, i.e., by summing over final states, we find that the oscillators for
-    different $m_j$ all have the same strength.
+    more, i.e., after summing over final states, the oscillators for different
+    $m_j$ all have the same strength.
 
     %%% TABLE
     \TabAngularFactors
@@ -983,12 +985,18 @@
     \subsection{State lifetimes}
     \label{subsec:StateLifetimes}
 
-    To compute the lifetime of a fine-structure state, we need to calculate the
-    so-called `Einstein-A' coefficient \cite{einstein1917,friedrich2017}. It is
-    a rate that describes the number of spontaneous emissions per unit time at
-    zero temperature. The total decay rate, at zero temperature, is given by the
-    sum over all Einstein-A coefficients. In the dipole approximation this sum
-    is given by the expression \cite{friedrich2017}:
+    The lifetime $\tau$ of a fine-structure state is given by the formula
+    \begin{equation}
+        \tau = \Gamma^{-1}
+    \,,
+    \end{equation}
+    where $\Gamma$ is the total rate at which the state is depopulated. At
+    sufficiently low temperatures this rate is given by the sum over the
+    so-called \emph{Einstein-A} coefficients $A_\mathrm{i\to{f}}$
+    \cite{einstein1917,friedrich2017}. These coefficients are the rates at which
+    the state of interest, here referred to as the `initial state', radiatively
+    decays to some final state. In the dipole approximation the sum over
+    Einstein-A coefficients can be expressed as \cite{friedrich2017}:
     \begin{equation}\label{eq:DecayRateGeneralForm}
         A_\mathrm{i}
         =
@@ -999,10 +1007,12 @@
         =
         \frac{\EH}{\hbar} \frac{4}{3} \alpha^2 \bar{E}^3_\mathrm{i,f}
         \sum_{u=x,y,z}
-        \abs*{\langle\bm{\Psi}_\mathrm{f},r_u\slash\aB\bm{\Psi}_\mathrm{i}\rangle}^2
+        \abs*{
+            \langle\bm{\Psi}_\mathrm{f},r_u\slash\aB\bm{\Psi}_\mathrm{i}\rangle
+        }^2
     \,.
     \end{equation}
-    In terms of the oscillator strength we obtain
+    In terms of oscillator strengths one obtains
     \begin{equation}\label{eq:SpontaneousRate}
         A_\mathrm{i}
         =
@@ -1011,23 +1021,31 @@
         \bar{E}^2_\mathrm{i,f} (-f_{\mathrm{i}\to\mathrm{f}})
     \,.
     \end{equation}
-    The rate in Eq.~\eqref{eq:SpontaneousRate} is the spontaneous emission rate,
-    which only appears for transitions where $E_\mathrm{i}>E_\mathrm{f}$.  Note
-    that, implicitly, this restricts the quantum numbers the sum is running
-    over. Further, this is the correct decay rate only for zero temperature
-    case. At finite temperature, spontaneous transitions increasing the energy
-    may be driven as well, if thermal fluctuations are sufficiently strong. The
-    background spectral density is given by Planck's law, which yields for the
-    average photon number at frequency $\omega$ and temperature $T$:
+    The rate $A_\mathrm{i}$ in Eq.~\eqref{eq:SpontaneousRate} is the spontaneous
+    emission rate, which is only non-zero for transitions where a photon is
+    emitted and the final state's energy is lower than the energy of the initial
+    state, i.e., $E_\mathrm{i}>E_\mathrm{f}$. Note that this restricts the
+    quantum numbers in the sum.
+
+    At sufficiently high temperatures the spectral density of the environment
+    cannot be neglected. To approximate the spectral density of the environment
+    one can employ Plank's famous formula \cite{plank1901} for the spectral
+    density of a black-body. This yields an average number of photons at
+    frequency $\omega$ and temperature $T$:
     \begin{equation}
         n(\omega,T)
         =
         \frac{1}{\exp(\hbar\omega\slash(\kBT))-1}
-    \,,
+    \,.
     \end{equation}
-    where $k_\mathrm{B}$ is Boltzmann's constant. From Einstein's rate equations
-    \cite{einstein1917} it follows that the total rate for decay out of the
-    initial state is
+    Here, $k_\mathrm{B}$ is Boltzmann's constant. Compared to the low
+    temperature regime, the additional photons at temperature $T$ stimulate the
+    emission of photons and thereby the decay of the initial state to
+    lower-energy final states. Even depopulation of the initial state is
+    possible by the absorption of photons from the environment. This process
+    drives transitions to final states which are higher in energy than the
+    initial state. According to Einstein's rate equations \cite{einstein1917}
+    the total rate for depopulation of the initial state is
     \begin{equation}\label{eq:LifetimeFormula}
         \frac{\hbar}{\EH}\Gamma
         =
@@ -1042,11 +1060,11 @@
         n(E_\mathrm{f,i}\slash\hbar,T)
     \,,
     \end{equation}
-    where each sum only runs over quantum numbers such that the associated term
-    is positive. That is, the first sum is only over final states with lower,
-    and the second one only over final states with larger, energy than the
-    initial state. With this formula, the lifetime of a fine-structure state is
-    $\tau=\Gamma^{-1}$.
+    where each sum is restricted to quantum numbers for which each summand is
+    positive. This entails that the first sum runs only over final states with
+    lower energy compared to the initial state; this describes the emission of
+    photons. The second sum runs solely over final states with larger energy
+    than the initial state; this corresponds to the case of photon absorption.
 
     \clearpage
 
