@@ -358,36 +358,17 @@
     At this point the Hamiltonian which determines the eigenenergies and the
     eigenstates is defined. In the following, the goal is to cast eigenvalue
     problem posed by Hamiltonian \eqref{eq:RawHamiltonian} into a more practical
-    form for the numerical procedure.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    The first step is to rewrite the product $\bm{L}\cdot\bm{S}$ in terms of the
-    total angular momentum operator $\bm{J}=\bm{L}+\bm{S}$:
+    form for the numerical procedure. The first step is to rewrite the product
+    $\bm{L}\cdot\bm{S}$ in terms of the total angular momentum operator
+    $\bm{J}=\bm{L}+\bm{S}$:
     \begin{equation}
         \bm{L}\cdot\bm{S}
         =
         \frac{1}{2}\big[\bm{J}^2-\bm{L}^2-\bm{S}^2\big]
     \,.
     \end{equation}
-    For further simplification the square of the momentum operator is expressed
-    in spherical co-ordinates,
+    Next, we express the square of the momentum operator in spherical
+    co-ordinates,
     \begin{equation}
         \bm{p}^2
         =
@@ -398,9 +379,10 @@
         -\frac{\hbar^2}{r^2}\pdv{r}(r^2\pdv{r})+\frac{\bm{L}^2}{r^2}
     \,.
     \end{equation}
-    The second contribution is the standard centrifugal energy contribution,
-    analogously to the Kepler problem. With these simplification we rewrite the
-    Hamiltonian as
+    The second contribution is the centrifugal barrier. In a classical Kepler
+    problem this is what prevents the electron crashing into the nucleus.
+    Expressed in the spherical coordinates, Hamiltonian
+    \eqref{eq:RawHamiltonian} takes the form
     \begin{equation}
         H
         =
@@ -410,33 +392,37 @@
     \,, \
         V_\mathrm{eff}(r;\bm{L}^2,\bm{S}^2,\bm{J}^2)
         =
-        \frac{\bm{L}^2}{2mr^2}+V(r;\bm{L}^2,\bm{S}^2,\bm{J}^2)
+        V(r;\bm{L}^2,\bm{S}^2,\bm{J}^2)
+        +
+        \frac{\bm{L}^2}{2mr^2}
     \,.
     \end{equation}
-    The full Hilbert space this Hamiltonian acts on is split into an angular
-    momentum factor and a radial one. By construction, a basis of the angular
-    momentum Hilbert space is given by the states $\ket*{l,s,j,m_j}$, which are
-    eigenstates of $\bm{L}^2$, $\bm{S}^2$, $\bm{J}^2$, and $J_z$, i.e.,
-    constitute the coupled basis, also called `fine-structure' basis. Note that
-    it must be possible to construct an eigenbasis of $\bm{L}^2$, $\bm{S}^2$,
-    $\bm{J}^2$, and $J_z$ simultaneously, because they commute pairwise. In
-    particular, these states are constructed as linear combinations of the
-    uncoupled basis states $Y_{l,m_l}\otimes\bm{\chi}_{s,m_s}$, employing
-    Clebsch-Gordan coefficients. Here,
+    The full Hilbert space this Hamiltonian acts on can be split into an angular
+    momentum factor and a radial one. A basis of the angular momentum Hilbert
+    space is given by the simultaneous eigenstates $\Phi_{l,s,j,m_j}$ of the
+    operators (Cartan subalgebra) $\bm{L}^2$, $\bm{S}^2$, $\bm{J}^2$, and $J_z$.
+    Note that a simultaneous eigenbasis of $\bm{L}^2$, $\bm{S}^2$, $\bm{J}^2$,
+    and $J_z$ exists, because these operators commute pairwise. The so-called
+    \emph{spinors} $\bm{\Phi}_{l,s,j,m_j}$ constitute the so-called
+    \emph{coupled basis}, also known as the \emph{fine-structure} basis in the
+    literature. These spinors are given by linear combinations of the uncoupled
+    basis states
+    \begin{equation}\label{eq:UncoupledSpinors}
+        Y_{l,m_l}\otimes\bm{\chi}_{s,m_s}
+    \end{equation}
+    via SU(2) Clebsch-Gordan coefficients \cite{friedrich2017}. Here,
     $Y_{l,m_l}\colon[0,\pii]\times[0,2\pii]\to\mathbb{C}$ are spherical
-    harmonics defined as (the so-called `Condon-Shortley phase' we include in
-    the definition of the Legendre polynomials below, i.e., the factor
-    $(-1)^{m_l}$ is \emph{not} missing here; see e.g. Ref.~\cite{friedrich2017})
+    harmonics defined as
     \begin{equation}\label{eq:sphericalHarmonics}
         Y_{l,m_l}(\vartheta,\varphi)
         =
         \sqrt{\frac{2l+1}{4\pii}\frac{(l-m_l)!}{(l+m_l)!}}
         P^{m_l}_l(\cos(\vartheta))\,\ee^{\ii m_l \varphi}
-    \,,
+    \,.
     \end{equation}
-    where the associated Legendre polynomials
-    $P^{m_l}_l\colon[-1,1]\to\mathbb{R}$ are defined for $l=0,1,2,\dots$ and
-    $m_l=0,1,\dots,l-1,l$, via the recursion relation
+    In this expression $P^{m_l}_l\colon[-1,1]\to\mathbb{R}$ are the associated
+    Legendre polynomials defined for $l=0,1,2,\dots$ and $m_l=0,1,\dots,l-1,l$.
+    These polynomials can be computed via the recursion
     \begin{equation}
         (l-m_l) P^{m_l}_l(x)
         =
@@ -458,7 +444,15 @@
         P^{-m_l}_l = (-1)^{m_l} \frac{(l-m_l)!}{(l+m_l)!}P^{m_l}_l
     \,.
     \end{equation}
-    Moreover, $\bm{\chi}_{s,m_s}$ are two-spinors defined as
+    In this definition of the associated Legendre polynomial the so-called
+    \emph{Condon-Shortley phase} is included. This follows the definition in
+    Ref.~\cite{friedrich2017}.\footnote{This definition entails that the factor
+    $(-1)^{m_l}$ does not explicitly appear in the definition of the spherical
+    harmonics. This remark is placed here to avoid confusion of whether the
+    spherical harmonics are with or without the Condon-Shortley phase. In the
+    definition of $Y_{l,m_l}$ used in this work, the Condon-Shortley phase
+    included.} Finally, $\bm{\chi}_{s,m_s}$ in Eq.~\eqref{eq:UncoupledSpinors}
+    are two-spinors defined as
     \begin{equation}\label{eq:twoSpinsors}
         \bm{\chi}_{\frac{1}{2},\frac{1}{2}}=\mqty[1 \\ 0]
     \,, \
@@ -478,64 +472,113 @@
     \,,
     \end{equation}
     where the scalar products are (possibly vanishing) Clebsch-Gordan
-    coefficients. We further find that these states transform according to the
-    irreducible representations of the group $\mathrm{SU}(2)$ under the action
-    of the $\mathrm{SU}(2)$-representation
+    coefficients. These spinor transform according to irreducible
+    representations of SU(2). This is seen in the following way: consider the
+    unitary and faithful representation
     $\rho(\bm{\alpha})=\exp(\ii\bm{\alpha}\cdot\bm{J})$, where
     $\bm{\alpha}\in\mathbb{R}^3$ is a vector of length
-    $\norm*{\bm{\alpha}}\in[0,2\pii)$. Moreover, the angular momentum
-    Hamiltonian is invariant under the action of $\rho$, such that it is
-    automatically block diagonal. The irreducible representations of
-    $\mathrm{SU}(2)$ are $(2j+1)$-dimensional, with
-    $j=0,1\slash{2},1,3\slash{2},2,\dots$, such that the blocks have dimensions
-    $\mu_j(2j+1)$, where $\mu_j$ is the multiplicity of the irreducible
-    representation $j$ in the direct sum decomposition of $\rho$. The
-    eigenvalues associated to the blocks are operators on the radial Hilbert
-    space. The multiplicities are $\mu_{j}=2$ and $\mu_0=0$, because for each
-    fixed $j$ there are two possibilities: $l=j-1\slash{2}$ and
-    $l=j+1\slash{2}$. Explicitly, the Hamiltonian is written as
+    $\norm*{\bm{\alpha}}\in[0,2\pii)$. Its action on the spinors is
     \begin{equation}
-        \bigoplus^j_{m_j=-j}
-        \langle \bm{\Phi}_{l,s,j,m_j}, H \bm{\Phi}_{l,s,j,m_j} \rangle
-        \equiv
-        \bigoplus^j_{m_j=-j} H_{l,s,j}
-    \,,
+        \rho(\bm{\alpha})
+        \Phi_{l,s,j,m_j}(\vartheta,\varphi)
+        =
+        \sum^{d_j}_{q=1} D^{(\Gamma_j)}(\bm{\alpha})_{m_j,q}
+        \Phi_{l,s,j,q}(\vartheta,\varphi)
+    \,.
     \end{equation}
-    where (with the arbitrary choice $m_j=j$) we defined
+    In this expression, $d_j$ is the dimension of the irreducible representation
+    $\Gamma_j$ of SU(2) and $D^{(\Gamma_j)}$ is a unitary matrix representation
+    of the irreducible representation $\Gamma_j$.
+
+    To rewrite the Hamiltonian the crucial step is to use the fact that it has
+    SU(2) symmetry, i.e., $\comm*{\rho(\bm{\alpha})}{H}=0$ for all
+    $\bm{\alpha}$.\footnote{The symmetry group is even bigger because parity is
+    also conserved. So the full symmetry group is
+    $\mathrm{SU}(2)\times\mathbb{Z}_2$.} Due to this symmetry the Hamiltonian is
+    automatically block diagonal with block dimensions given by integer
+    multiplicities $\mu_j$ of the dimensions $d_j=2j+1$ of the irreducible
+    representations $\Gamma_j$ labelled by
+    $j=0,1\slash{2},1,3\slash{2},2,\dots$. The multiplicities $\mu_j$ are
+    $\mu_{j}=2$ for $j\neq0$ and $\mu_0=0$. This is because for each $l>0$ there
+    are the two possible orbital angular momentum quantum numbers
+    $l=j-1\slash{2}$ and $l=j+1\slash{2}$ and for $s=1\slash{2}$ a total angular
+    momentum of $j=0$ is not possible. This entails that the Hamiltonian in the
+    basis of the spinors $\bm{\Phi}_{l,s,j,m_j}$ can be decomposed into the
+    following direct sum:
+    \begin{equation}
+        \bigoplus^\infty_{l=0}
+        \bigoplus_{j \in \{\abs*{l-s},l+s\}}
+        \bigoplus^j_{m_j=-j}
+        H_{l,s,j,m_j}
+    \,, \ \ \
+        H_{l,s,j,m_j}
+        =
+        \langle \bm{\Phi}_{l,s,j,m_j}, H \bm{\Phi}_{l,s,j,m_j} \rangle
+    \,.
+    \end{equation}
+    Note that the off-diagonal matrix elements within the blocks associated with
+    each irreducible representation $\Gamma_j$ vanish, i.e.,
+    $\langle\bm{\Phi}_{l,s,j,m'_j},H\bm{\Phi}_{l,s,j,m_j}\rangle=0$ for
+    $m_j'\neq{m}_j$. This is a result of the
+    $\mathrm{U}(1)\subset\mathrm{SU}(2)$ symmetry of the full Hamiltonian in
+    Eq.~\eqref{eq:RawHamiltonian}, which is associated to the generator $L_z$.
+    This symmetry further entails that the diagonal matrix elements
+    $\langle\bm{\Phi}_{l,s,j,m_j},H\bm{\Phi}_{l,s,j,m_j}\rangle$ do not depend
+    on $m_j$. Therefore, the full Hamiltonian \eqref{eq:RawHamiltonian} in the
+    basis of the spinors $\bm{\Phi}_{l,s,j}$ can be expressed as the more simple
+    direct sum
+    \begin{equation}
+        \bigoplus^\infty_{l=0}
+        \bigoplus_{j \in \{\abs*{l-s},l+s\}}
+        1_{2j+1} \otimes H_{l,s,j}
+    \,.
+    \end{equation}
+    Here, $1_{2j+1}$ is the identity matrix of dimension $2j+1$ and
     \begin{equation}
         H_{l,s,j}
-        =
-        \langle \bm{\Phi}_{l,s,j,j}, H \bm{\Phi}_{l,s,j,j} \rangle
         =
         -\frac{\hbar^2}{2mr^2}\pdv{r}(r^2\pdv{r})
         +
         V_\mathrm{eff}(r;\hbar^2l[l+1],\hbar^2s[s+1],\hbar^2j[j+1])
     \,.
     \end{equation}
-    We note that the fact that the matrix element does not depend on $m_j$ is a
-    consequence of the $\mathrm{SU}(2)$-symmetry of the Hamiltonian. Therefore,
-    exactly this is the reason for the energies being degenerate in the total
-    magnetic angular momentum quantum number $m_j$\footnote{Generally, there is
-    no reason that the blocks $H_{l,s,j}$ are separate blocks for
-    $l=j+1\slash{2}$ and $l=j-1\slash{2}$, because they correspond to the same
-    irreducible representation $j$. However, the states we choose are already
-    chosen in a way such that the blocks are already separated. In this case we
-    know how we should choose the states already from the fact that the
-    Hamiltonian explicitly depends on $\bm{L}$: if it would not be so obvious,
-    we would not immediately know what the multiplicity index $l$ (and $s$)
-    should physically be to sort the eigenvalues into separate blocks.} The
-    symmetry consideration up until now simplified the problem to the block
-    associated to the irreducible representation of $\mathrm{SU}(2)$. What is
-    left to solve are the eigenproblems
+    For completeness $\rho$ can be expressed in the basis of
+    $\bm{\Phi}_{l,s,j}$ as well. It is given by the following direct sum of
+    the irreducible representations $\Gamma_j$ os SU(2):
+    \begin{equation}
+        \rho
+        =
+        \bigoplus_{j>0}
+        2\Gamma_j
+    \,.
+    \end{equation}
+    The block structure of the Hamiltonian reduces the eigenvalue problem
+    defined by the time-independent Schr\"odinger equation
+    \begin{equation}
+        H \bm{\psi} = E \bm{\Psi}
+    \end{equation}
+    to the blocks $H_{l,s,j}$ on the Hilbert space associated with the radial
+    degrees of freedom. In particular, solving for the full eigenenergies and
+    eigenstates is reduced to solving the radial eigenvalue problems
     \begin{equation}\label{eq:radialEigenproblem}
         H_{l,s,j} R_{n,l,s,j} = E_{n,l,s,j} R_{n,l,s,j}
     \,,
     \end{equation}
-    where $R_{n,l,s}$ is the $n$-th (radial) eigenstate of $H_{l,s,j}$.
-    Therefore, if we manage to obtain $R_{n,l,s,j}$ the full spectrum is known.
-    Of course, resonances (states associated to the channel
-    $\bm{\Phi}_{l,s,j,m_j}$ which are not bound) exist, but in the following we
-    will focus on bound states.
+    where $R_{n,l,s,j}$ is the $n$-th radial eigenstate of $H_{l,s,j}$. The
+    total eigenstate $\bm{\Psi}$ is then given by the product of the radial
+    eigenstates and the spinors:
+    \begin{equation}\label{eq:GeneralRadialEquation}
+        \bm{\Psi}_{n,l,s,j,m_j}(r,\vartheta,\varphi)
+        =
+        R_{n,l,s,j}(r)
+        \bm{\Phi}_{l,s,j,m_j}(\vartheta,\varphi)
+    \,.
+    \end{equation}
+    This shows that solving for the full eigenstates $\bm{\Psi}_{n,l,s,j,m_j}$
+    is equivalent to solving for the radial eigenstates $R_{n,l,s,j}$.  In
+    general, the eigenenergies $E=E_{n,l,s,j}$ and the radial eigenstates
+    $R_{n,l,s,j}$ must be calculated numerically. This task is exactly what
+    \alkcalc is designed to do.
 
     %%% SUBSECTION
     \subsection{Numerical method}
