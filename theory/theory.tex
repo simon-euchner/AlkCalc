@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% THEORY FOR 'ALKCALC'                                                     %%%
+%%% THEORY & MANUAL FOR 'ALKCALC'                                            %%%
 %%%                                                                          %%%
 %%% AUTHOR OF THIS FILE: SIMON EUCHNER                                       %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -116,7 +116,7 @@
 \usepackage{lipsum}
 
 %%% TITLE PAGE
-\title{Theory and manual\par\vspace*{5mm}for\par\vspace*{5mm}\alkcalc}%
+\title{Theory \& Manual\par\vspace*{5mm}for\par\vspace*{5mm}\alkcalc}%
 \setcounter{footnote}{1}%
 \author{Simon Euchner\footnote{Electronic Mail: %
         $\langle$\texttt{euchner.se@gmail.com}$\rangle$}%
@@ -186,68 +186,94 @@
     \label{sec:introduction}
 
     Bound single-electron eigenfunctions of alkali-metal atoms and
-    alkaline-earth metal ions are of relevance in quantum computing, quantum
-    information processing, quantum simulation, Rydberg physics, quantum optics,
-    \dots. However, expect for Hydrogen, it is not possible to solve the
-    time-independent Schr\"odinger equation analytically. Because of this, there
-    is the need to obtain eigenenergies, i.e., atomic spectra,  and eigenstates
-    numerically. The library \alkcalc is intended for exactly this purpose. In
-    the various \texttt{README} files included in \alkcalc technical details for
-    running the software are provided. However, in these \texttt{README} files,
-    there is no theoretical discussion on the theory behind the code. This is
-    the purpose of the present document.
+    alkaline-earth metal ions are of significant relevance in quantum computing,
+    quantum information processing, quantum simulation, Rydberg physics, quantum
+    optics, \dots. However, expect for the special case of the Hydrogen atom, it
+    is not possible to solve the time-independent Schr\"odinger equation
+    analytically. Because of this, there is the need to obtain eigenenergies and
+    eigenstates numerically. The library \alkcalc is designed for exactly this
+    purpose: it allows the user to compute the relevant part of the bound-state
+    energy spectrum with the associated eigenstates.
 
-    In this document the class of Hamiltonians which \alkcalc is designed to
-    diagonalise is presented. Moreover, this document formally defines each
-    quantity which \alkcalc is designed to compute. Therefore, this document
-    serves as a reference for the user. In particular, the final section is a
-    complete reference manual for the library functions of \alkcalc.
+    The software \alkcalc is split into two parts: a first part used to compute
+    the eigenenergies and eigenstates \emph{once} and store the resulting data.
+    And a second part, referred to as the \emph{library functions}, which
+    implement useful functionality for reading and processing the precomputed
+    atomic data. For instance, there is as function to compute radial transition
+    matrix elements.
+
+    In the various \texttt{README} files included in the file tree of \alkcalc,
+    technical details for computing the eigenenergies and eigenstates are
+    provided. However, these files do not include a discussion on the theory and
+    physics behind the code. Further, there is no reference manual for the
+    library functions.
+
+    This documents purpose is to add the missing pieces: in
+    Sec.~\ref{sec:Theory} the theory and the physics associated with the code
+    are discussed. Section \ref{sec:Manual} is a comprehensive reference manual
+    for the library functions of \alkcalc.
 
     %%% SECTION
     \section{Theory}
     \label{sec:Theory}
 
-    We start by considering a single atom/ion. Subsequently, we describe the
-    \ac{fem} used to numerically solve the Schr\"odinger equation. Finally, we
-    describe how \alkcalc computes radial matrix elements, oscillator strengths,
-    and state lifetimes.
+    This section is organised as follows: in
+    Subsec.~\ref{subsec:SingleAtomIonTheory} the theory and the physics of
+    single-atom/ion systems are discussed. In
+    Subsec.~\ref{subsec:NumericalMethod} the numerical method based on B-splines
+    is presented. In Subsec.~\ref{subsec:RadialMatrixElements} it is shown how
+    radial transitions matrix elements are computed by \alkcalc.  In
+    Subsec.~\ref{subsec:OscillatorStrengths} it is shown how oscillator
+    strengths for electronic transitions are computed. Finally, in
+    Subsec.~\ref{subsec:OscillatorStrengths} it is shown how lifetimes of
+    electronic states are computed by \alkcalc.
 
     %%% SUBSECTION
     \subsection{Single-atom/ion theory}
-    \label{subsec:SingleIonTheory}
+    \label{subsec:SingleAtomIonTheory}
 
     The starting point is an alkali-metal atom or alkaline-earth-metal ion. We
     are interested in systems where all electrons are in closed shells except
-    for one (e.g., $\mathrm{^1H}$, $\mathrm{^{38}Rb}$, $\mathrm{^{88}Sr^+}$).
-    This allows a Kepler-problem description for the `effective nucleus' (the
-    nucleus `screened' by the closed-shell electrons) and the valence electron.
-    To be concrete, we study the Hamiltonian
-    \begin{equation}
-        H = \frac{\bm{p}^2}{2m}+V(\norm*{\bm{r}};\bm{L}^2,\bm{S}^2,\bm{J}^2)
-    \,,
+    for one valence electron. Examples of such systems are $\mathrm{^1H}$,
+    $\mathrm{^{38}Rb}$, $\mathrm{^{88}Sr^+}$. This property allows a
+    Kepler-problem description for the `effective nucleus' (the nucleus
+    `screened' by the closed-shell electrons) and the valence electron. The
+    dynamics of the valence electron and the effective nucleus can be described
+    with the following Hamiltonian:
+    \begin{equation}\label{eq:RawHamiltonian}
+        H = \frac{\bm{p}^2}{2m}+V(r;\bm{L}^2,\bm{S}^2,\bm{J}^2)
+    \,.
     \end{equation}
-    where $m=Mm_\mathrm{e}\slash(M+m_\mathrm{e})$ is the reduced mass of the
+    Here, $m=Mm_\mathrm{e}\slash(M+m_\mathrm{e})$ is the reduced mass of the
     system, composed of the electron's mass $m_\mathrm{e}$ and the atom's or
-    ion's mass $M$ without the valence electron. The centre-of-mass motion is
-    decoupled, such that $\bm{r},\bm{p}$ are the relative canonical
-    co-ordinates, i.e., $\bm{r}$ is the distance vector between the
-    centre-of-mass position of the effective nucleus and the valence electron.
-    Moreover, $\bm{L}$, $\bm{S}$, and $\bm{J}=\bm{L}+\bm{S}$ are the orbital
-    angular momentum operator, the electron's spin operator, and the total
-    angular momentum operator, respectively. The potential $V$ is not a simple
-    Coulomb potential, but a generalised potential which includes different
-    contributions (these arise when one starts with the full many-body electron
-    Hamiltonian and incorporates relativistic and quantum electrodynamics
-    effects). Following Refs.~\cite{aymar1996,marinescu1994,wilkinson2025} we
-    write:
-    \begin{equation}
-        V(\norm*{\bm{r}};\bm{L}^2,\bm{S}^2,\bm{J}^2)
+    ion's mass $M$. The centre-of-mass motion is decoupled and $\bm{r},\bm{p}$
+    are the relative canonical co-ordinates, i.e., $\bm{r}$ is the distance
+    vector between the centre-of-mass position of the effective nucleus and the
+    position of the valence electron. Further, $\bm{L}$, $\bm{S}$, and
+    $\bm{J}=\bm{L}+\bm{S}$ are the orbital angular momentum operator, the
+    electron's spin operator, and the total angular momentum operator,
+    respectively. Finally, the radial potential $V$, depending on the distance
+    $r=\norm*{\bm{r}}$, describes the interaction between the valence electron
+    and the effective nucleus. It accounts for several effects: far from the
+    nucleus the valence electron experiences a Coulomb potential with effective
+    charge $Z_\mathrm{eff}=1$ for alkali-metal atom and $Z_\mathrm{eff}=2$ for
+    singly ionised alkaline-earth metal atoms.  This is because the nucleus of
+    charge $Z$ is `screened' by the $Z-1$ (or $Z-2$, for alkaline-earth metal
+    ions) ground-state electrons in closed-shells. However, valence electrons
+    with orbits sufficiently close to the nucleus experience the non-trivial
+    charge distribution posed by the nucleus in conjugation with the tightly
+    bound electron cloud. This leads to short-ranged corrections to the
+    effective Coulomb potential with charge $Z_\mathrm{eff}$ at long distances.
+    Following Refs.~\cite{aymar1996,marinescu1994,condon1951,wilkinson2025}
+    these corrections are described by the following potential:
+    \begin{equation}\label{eq:ParametricModelPotential}
+        V(r;\bm{L}^2,\bm{S}^2,\bm{J}^2)
         =
-        V_\mathrm{C}(\bm{r})
+        V_\mathrm{C}(r)
         +
-        V_\mathrm{P}(\bm{r})
+        V_\mathrm{P}(r)
         +
-        V_\mathrm{R}(\bm{r};\bm{L}^2,\bm{S}^2,\bm{J}^2)
+        V_\mathrm{R}(r;\bm{L}^2,\bm{S}^2,\bm{J}^2)
     \,.
     \end{equation}
     The first contribution is
@@ -265,24 +291,25 @@
         k_4r^2\ee^{-k_3r}
     \,.
     \end{equation}
-    This is a modified Coulomb potential, adjusted for small radii due to the
-    effective nucleus. Here, $Z$ is the nuclear charge, $Z_\mathrm{c}$ the
-    nuclear charge of the effective nucleus, and the $k_j$ ($j=1,2,3,4$) are
-    empirically determined fitting parameters; see
-    Refs.~\cite{aymar1996,marinescu1994,wilkinson2025}. The second contribution
-    is
+    This is a modified Coulomb potential which has the tail of a Coulomb
+    potential with charge $Z_\mathrm{eff}$ and short-ranged corrections for
+    small radii accounting for the charge-distribution of the effective nucleus.
+    Here, the parameters $k_j$ ($j=1,2,3,4$) are empirically determined from
+    spectroscopic data \cite{aymar1996,marinescu1994}. The second contribution
+    to the potential \eqref{eq:ParametricModelPotential} is
     \begin{equation}
         V_\mathrm{P}(r)
         =
         -\frac{e^2}{(4\pii\varepsilon_0)^2}
         \frac{\alpha_\mathrm{d}}{2r^4}
         \bigg[1-\exp(-\frac{r^6}{r^6_\mathrm{c}})\bigg]
-    \,,
+    \,.
     \end{equation}
-    which accounts for the polarisation of the screened nucleus due to the
-    presence of the valence electron. Here, $r_\mathrm{c}$ is the effective
-    nucleus' size and $\alpha_\mathrm{d}$ its polarisability. Finally,
-    \begin{equation}\label{eq:vrIons}
+    It accounts for the polarisability of the screened nucleus, which gets
+    polarised by the presence of the valence electron. Here, $r_\mathrm{c}$ is
+    the effective nucleus' size and $\alpha_\mathrm{d}$ its static electric
+    polarisability. Finally,
+    \begin{equation}\label{eq:LSCoupling}
         V_\mathrm{R}(r;\bm{L}^2,\bm{S}^2,\bm{J}^2)
         =
         \frac{1}{2m^2c^2}\frac{V'_\mathrm{NR}(r)}{rN(r)}\bm{L}\cdot\bm{S}
@@ -290,38 +317,69 @@
         N(r) = \bigg[ 1 - \frac{V_\mathrm{NR}(r)}{2mc^2} \bigg]^2
     \,, \
         V_\mathrm{NR}(r) = V_\mathrm{C}(r) + V_\mathrm{P}(r)
-    \,,
+    \,.
     \end{equation}
-    which describes (relativistic) coupling between the orbital angular momentum
-    and the valence electrons' spin. In this expression, $V_\mathrm{NR}$ is the
+    It describes (relativistic) coupling between the orbital angular momentum
+    and the valence electrons' spin. This expression results from relativistic
+    perturbation theory \cite{condon1951}. Here, $V_\mathrm{NR}$ is the
     non-relativistic model potential and $c$ the speed of light. In
-    Refs.~\cite{wilkinson2025,aymar1996} this potential is used for ions. We
-    note that in Ref.~\cite{sibalic2017} the simplified version
-    \begin{equation}\label{eq:vrAtoms}
+    Ref.~\cite{wilkinson2025} the potential \eqref{eq:LSCoupling} is employed
+    for the treatment of alkaline-earth metal ions. In Ref.~\cite{sibalic2017}
+    the simplified version
+    \begin{equation}\label{eq:SimplifiedLSCoupling}
         V_\mathrm{R}(r)
         =
         \frac{\alpha}{2r^3} \bm{L}\cdot\bm{S}
     \end{equation}
-    is employed for atoms. Here, $\alpha$ is the fine-structure constant.
-    However, we use the first, more precise, version for both ions and atoms.
-    The spin-operator $\bm{S}$ in Eqs.~(\ref{eq:vrAtoms},\,\ref{eq:vrIons}) is
-    conveniently expressed as
+    is employed for alkali-metal atoms. Here, $\alpha$ is the fine-structure
+    constant. Throughout \alkcalc we employ the relativistically correct version
+    in Eq.~\eqref{eq:LSCoupling}, not the simplifies version in
+    Eq.~\ref{eq:SimplifiedLSCoupling}. Finally, for expressing the spin-operator
+    $\bm{S}$ in Eq.~\eqref{eq:LSCoupling} and
+    Eq.~\eqref{eq:SimplifiedLSCoupling} the representation in Pauli's (spin)
+    matrices is chosen:
     \begin{equation}
         \bm{S} = \frac{\hbar}{2}\mqty[\sigma_x \\ \sigma_y \\ \sigma_z]
-    \,,
+    \,.
     \end{equation}
-    with the Pauli matrices
+    The Pauli spin matrices are
     \begin{equation}
         \sigma_x = \mqty[0&1 \\ 1&0]
     \,, \
         \sigma_y = \mqty[0&-\ii \\ \ii&0]
     \,, \
         \sigma_z = \mqty[1&0 \\ 0&-1]
-    \,,
+    \,.
     \end{equation}
-    which is possible because we deal with a single electron, i.e., a particle
-    with spin $1\slash{2}$. Moreover, we rewrite the product $\bm{L}\cdot\bm{S}$
-    in terms of the total angular momentum operator $\bm{J}=\bm{L}+\bm{S}$:
+    This simple choice for representing the spin is possible, because throughout
+    this work we are interested only in single electron systems with total spin
+    $s=1\slash{2}$.
+
+    At this point the Hamiltonian which determines the eigenenergies and the
+    eigenstates is defined. In the following, the goal is to cast eigenvalue
+    problem posed by Hamiltonian \eqref{eq:RawHamiltonian} into a more practical
+    form for the numerical procedure.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    The first step is to rewrite the product $\bm{L}\cdot\bm{S}$ in terms of the
+    total angular momentum operator $\bm{J}=\bm{L}+\bm{S}$:
     \begin{equation}
         \bm{L}\cdot\bm{S}
         =
@@ -481,7 +539,7 @@
 
     %%% SUBSECTION
     \subsection{Numerical method}
-    \label{subsec:NumericalMathod}
+    \label{subsec:NumericalMethod}
 
     The radial eigenstates, generally, cannot be obtained analytically.
     \alkcalc provides a platform to solve for these states numerically. To make
