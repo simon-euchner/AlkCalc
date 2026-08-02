@@ -588,9 +588,11 @@
     In this subsection the numerical method which is employed by \alkcalc to
     solve the radial eigenvalue problems in
     Eq.~\eqref{eq:GeneralRadialEquations} for the eigenenergies and the radial
-    eigenstates $R_{n,l,s,j}$ is discussed.  The first step is to express the
-    eigenvalue problems in terms of dimensionless quantities. To this end the
-    Hamiltonians $H_{l,s,j}$ is expressed in units of Hartree,
+    eigenstates $R_{n,l,s,j}$ is formulated.
+
+    The first step is to express the eigenvalue problems in terms of
+    dimensionless quantities. To this end the Hamiltonians $H_{l,s,j}$ is
+    expressed in units of Hartree,
     $E_\mathrm{H}=e^2\slash{(4\pii\varepsilon_0a_\mathrm{B})}$, where
     $a_\mathrm{B}=\hbar\slash{(m_\mathrm{e}c\alpha)}\approx52.9\,\mathrm{pm}$ is
     Bohr's radius. Further, the radial eigenfunctions are parametrised as
@@ -602,9 +604,8 @@
     \end{equation}
     where $f_{n,l,s,j}$ is dimensionless. The eigenvalue problems in
     Eq.~\eqref{eq:GeneralRadialEquations} expressed in the dimensionless
-    eigenfunctions \eqref{eq:DimensionlessEigenfunctions}
-    takes the form
-    \begin{equation}\label{eq:Eigenproblem}
+    eigenfunctions \eqref{eq:DimensionlessEigenfunctions} take the form
+    \begin{equation}\label{eq:DimensionlessEigenproblem}
         \bigg[
         -
         \frac{1}{2}
@@ -631,7 +632,7 @@
     \end{equation}
     Rewriting the normalisation condition in terms of the eigenfunctions
     $f_{n,l,s,j}$ leads to
-    \begin{equation}\label{eq:normalisation}
+    \begin{equation}\label{eq:Normalisation}
         1
         =
         \int^\infty_0\dd{r}r^2R^2_{n,l,s,j}(r)
@@ -642,56 +643,116 @@
         \int^\infty_0\dd{t}f^2_{n,l,s,j}(t)
     \,.
     \end{equation}
-    Here is is assumed that the radial eigenfunctions are real-valued, which is
+    Here it is assumed that the radial eigenfunctions are real-valued, which is
     justified as the Hamiltonian is not only an hermitian but also a symmetric
     operator. In conclusion, computing the normalised eigenfunctions
     $f_{n,l,s,j}$ yields the (automatically normalised) radial eigenstates by
     employing Eq.~\eqref{eq:DimensionlessEigenfunctions} for the conversion.
 
-    To solve the eigenvalue problem in Eq.~\eqref{eq:Eigenproblem} numerically,
-    so-called \emph{B-splines} are employed.\footnote{This method may be
-    conceptually and programmatically more involved than a simple
-    finite-difference or finite-element method, however, it is preferred here
-    for two reasons: it allows to work with much smaller matrix dimensions and
-    it allows to store the resulting eigenenergies and radial eigenstates much
-    more efficiently.} Ultimately, this allows to express the eigenvalue problem
-    for the radial eigenfunctions $f_{n,l,s,j}$ as a simple matrix eigenvalue
-    problem. The remainder of this subsection will be concerned with
-    two different steps: first, the notion of B-splines is introduced. Second,
-    the final form of the matrix eigenproblem which yields the eigenenergies and
-    the radial eigenstates is formulated.
+    The next step is to choose basis for the space of functions in which the
+    radial eigenfunctions $f_{n,l,s,j}$ live. Ultimately, this basis allows to
+    express the dimensionless eigenvalue problem in posed by
+    Eq.~\ref{fig:DimensionlessEigenproblem} as a matrix eigenvalue problem,
+    which can be directly addressed with a computer. Of course, there are many
+    different choices for the basis states. Here, so so-called \emph{B-splines}
+    are chosen.\footnote{This method may be conceptually and programmatically
+    more involved than a simple finite-difference or finite-element method,
+    however, it is preferred here for two reasons: it allows to work with much
+    smaller matrix dimensions and it allows to store the resulting eigenenergies
+    and radial eigenstates much more efficiently.} B-splines are piecewise
+    polynomials with finite support. In the following it is discussed how the
+    B-splines (basis functions) are constructed and subsequently the matrix
+    eigenproblem is formulated.
 
-    The first step in setting-up the final matrix eigenvalue problem is to agree
-    on a finite closed interval $I=[0, t_\mathrm{tmax}]$, where
-    $t_\mathrm{max}>0$ sets the maximal value of the domain we consider. The
-    value $t_\mathrm{max}$ must be chosen large enough to ensure that the
-    boundary condition $f_{n,l,s,j}(t\geq{t}_\mathrm{max})=0$ is satisfied. This
-    equal sign is actually never true, because the radial eigenstates
-    asymptotically approach zero. However, if zero is reached within machine
-    precision, the boundary condition is numerically satisfied. Of course, one
-    must ensure that the finite set of solutions that shall be computed has
-    support within this interval. The mesh we define as a family
-    $(t_k)_{k=1,\dots,N-1}$ in $I$ with the properties $t_0=0$,
-    $t_{N-1}=t_\mathrm{max}$, and $t_0<t_1<\dots<t_{N-2}<t_{N-1}$, where we say
-    $N\geq{3}$. Of course, typical values are $N\,{\sim}\,10^5\text{-}10^7$.
-    Next, we define the derived family of step sizes $(h_k)_{k=1,\dots,N-1}$,
-    $h_k=t_k-t_{k-1}$. The elements $(\phi_k)_{k=0,\dots,N-1}$,
-    $\phi_k\colon{I}\to[0,1]$, we define as
+    The starting point is to truncate the domain of the radial eigenfunctions
+    $f_{n,l,s,j}$ from $\mathbb{R}_{\geq0}$ to a finite interval
+    $I=[0,t_\mathrm{max}]\subset\mathbb{R}_{\geq0}$, where $t_\mathrm{max}$
+    defined the maximal radius $r_\mathrm{max}=\aB{t}_\mathrm{max}$. This
+    truncation is justified whenever the maximal $t_\mathrm{max}$ is chosen
+    sufficiently large such that the support of the radial eigenfunctions
+    $f_{n,l,s,j}$ of interest lays within the interval $I$. Strictly speaking
+    the support of the radial eigenstates is not finite, as they typically
+    approach zero only asymptotically. However, in practice the support can be
+    considered finite whenever the value of the radial eigenstates stays below
+    machine precision. To construct the B-splines one chooses a family of points
+    $(t_i)_{i=0,\dots,N-1+2d}$ in the interval $I$, the so-called
+    \emph{knots}.\footnote{The family $(t_i)_{i=0,\dots,N-1+2d}$ is sometimes
+    called the knot vector in the literature.} Here, $d\geq0$ is the degree of the
+    degree of the B-splines, i.e., the degree of the polynomials that
+    constitute the basis functions. The knots $t_i$ are defined as
     \begin{equation}
-        \phi_k(t)
+        t_i
         =
         \begin{cases}
-            (t-t_{k-1})\slash(t_k-t_{k-1})\,, \ & t\in(t_{k-1},t_k)
+            t_0
+            &, \hspace*{10mm} 0 \leq i \leq k - 1
         \\
-            (t_{k+1}-t)\slash(t_{k+1}-t_k)\,, \ & t\in(t_k,t_{k+1})
-        \\  0                             \,, \ & \text{else}
+            t_i
+            &, \hspace*{10mm} k \leq i \leq k + N - 3
+        \\
+            t_\mathrm{max}
+            &, \hspace*{10mm} k + N - 2 \leq i \leq 2k + N - 3
+        \end{cases}
+    \,,
+    \end{equation}
+    where the knots are assumed to be strictly ascending:
+    $t_{k-1}<\dots<t_{k+N-2}$. Here, $N$ is the number of distinct
+    discretisation points and the $N-2$ knots $t_{k,\dots,k+N-3}$ are the
+    so-called \emph{internal knots}. This construction can be visualised as
+    follows:
+    \begin{equation}
+        \underbrace{t_0, \dots, t_0}_{k \ \text{times}},
+        \underbrace{t_k, \dots, t_{k + N -3}}_{\text{Internal knots}},
+        \underbrace{t_\mathrm{max}, \dots, t_\mathrm{max}}_{k \ \text{times}}
+    \,.
+    \end{equation}
+    On the set of knots, the B-splines are defined via de Boor's recursion
+    formula:
+    \begin{equation}
+        u^{(r)}_i(t)
+        =
+        \frac{t-t_i}{t_{i+r}-t_i}
+        u^{(r-1)}_i(t)
+        +
+        \frac{t_{i+r-1}-t}{t_{i+r-1}-t_{i+1}}
+        u^{(r-1)}_{i+1}(t)
+    \,, \ \ \
+        u^{(0)}_i(t)
+        =
+        \begin{cases}
+            1
+            &, \hspace*{10mm} t_i \leq t \leq t_{i+k}
+        \\
+            0
+            &, \hspace*{10mm} \text{else}
         \end{cases}
     \,.
     \end{equation}
-    for $k=1,\dots,N-2$, and for $k=0$ and $k=N-1$ the Dirichlet boundary
-    conditions $f_{n,l,s,j}(0)=f_{n,l,s,j}(t_\mathrm{max})=0$ lead to the
-    canonical choice $\phi_0=\phi_{N-1}\equiv0$. To obtain a matrix problem
-    which approximates Eq.~\eqref{eq:eigenproblem} we compute projections of it
+    In conjugation with the normalisation condition this yields a result that is
+    unique. To evaluate the B-splines at some point numerically de Boor's
+    algorithm is employed \cite{}, rewritten by E. Amos for double precision
+    floating point arithmetic. The final basis is denoted as
+    \begin{equation}
+        (u^{(d)}_i)_{i=0,\dots,N_\mathrm{bs}-1}
+    \,, \ \ \
+        N_\mathrm{bs} = k + N - 1
+    \,, \ \ \
+        u^{(d)}_i\colon[t_i,t_{i+k}) \to \mathbb{R}
+    \,,
+    \end{equation}
+    where $N_\mathrm{bs}$ is the total number of B-splines.
+
+    At this point the B-splines, i.e., the basis functions, are constructed. The
+    next step is to express the eigenvalue problem posed by
+    Eq.~\eqref{eq:DimensionlessEigenproblem} in this basis.
+
+    % Notes
+    %To understand why each B-spline must spane an aread of k knots, note that
+    %otherwise I canot bring it doen to zero again for a degree k Polynomial
+    %The multiplicity on the boundary of the knots will be useful for ...
+
+    To obtain a matrix problem which approximates
+    Eq.~\eqref{eq:eigenproblem} one computes projections of it
     onto the elements with the real scalar product (`dummy' functions
     $\alpha,\beta\colon{I}\to\mathbb{R}$)
     \begin{equation}
@@ -700,112 +761,179 @@
         \int_I \dd{t} \alpha(t) \beta(t)
     \,.
     \end{equation}
-    To simplify the notation we fix the quantum numbers $n$, $l$, $s$, and $j$
-    and say $f\equiv{f_{n,l,s,j}}$. Moreover, we collect all potential
-    contributions into the new potential $v$, defined as
-    \begin{equation}
-        v(t)
-        =
-        \frac{l(l+1)}{2t^2}
-        +C\frac{V(\aB{t};\hbar^2l[l+1],\hbar^2s[s+1],\hbar^2j[j+1])}{\EH}
-    \,.
-    \end{equation}%
-    %
-    Finally, we say $\lambda=\bar{E}_{n,l,s,j}$, such that
-    Eq.~\eqref{eq:eigenproblem} simply becomes
-    \begin{equation}
-        -\frac{1}{2}f''(t) + v(t) f(t) = \lambda f(t)
-    \,.
-    \end{equation}
-    Before we project this equation onto the elements, we approximately expand
-    $f$ in them:
-    \begin{equation}\label{eq:expansionOfState}
-        f = \sum^{N-2}_{k=1} f_k \phi_k
-    \,.
-    \end{equation}
-    This expansion automatically fulfils the Dirichlet boundary conditions
-    $f(0)=f(t_\mathrm{max})=0$. Projection, i.e., applying the map
-    $B(\phi_k,\cdot)$ for all $k=1,\dots,N-2$, yields a matrix eigenproblem
-    whose solutions converge to solutions of Eq.~\eqref{eq:eigenproblem} as $N$
-    tends to infinity:
-    \begin{equation}\label{eq:matrixEigenproblem}
-        (K+V) \bm{f} = \lambda M \bm{f}
-    \,.
-    \end{equation}
-    In this expression $M_{kk'}=B(\phi_k,\phi_{k'})$ is the so-called mass
-    matrix, $K_{kk'}=B(\phi'_k,\phi'_{k'})\slash{2}$ the so-called stiffness
-    matrix\footnote{Note that because the elements obey the Dirichlet boundary
-    conditions $\phi_k(0)=\phi_k(t_\mathrm{max})=0$, $k=1,\dots,N-2$,
-    integrating by parts allows to write
-    $B(\phi''_k,\phi_{k'})=-B(\phi'_k,\phi'_{k'})$.}, and
-    $V_{kk'}=B(\phi_k,v\phi_{k'})$ the potential energy contribution. Each
-    matrix is $(N-2)$-dimensional, since $k,k'=1,\dots,N-2$, and $M$ and $K$ can
-    be computed analytically; in particular
-    \begin{equation}
-        M
-        =
-        \frac{1}{6}
-        \mqty[2(h_1+h_2) &  h_2 & & & \\
-              h_2 & 2(h_2+h_3) & h_3 & & \\
-              & h_3 & 2(h_3+h_4) & h_4 & \\
-              & & \ddots & \ddots & h_{N-2} \\
-              & & & h_{N-2} & 2(h_{N-2}+h_{N-1})]
-    \end{equation}
-    and
-    \begin{equation}
-        K = \frac{1}{2}
-            \mqty[\frac{1}{h_1}+\frac{1}{h_2} & -\frac{1}{h_2} & \\
-                  -\frac{1}{h_2} & \frac{1}{h_2}+\frac{1}{h_3} & -\frac{1}{h_3}
-                  & \\
-                  & -\frac{1}{h_3} & \frac{1}{h_3}+\frac{1}{h_4} &
-                  -\frac{1}{h_4} & \\
-                  & & \ddots & \ddots & -\frac{1}{h_{N-2}} \\
-                  & & & -\frac{1}{h_{N-2}} & \frac{1}{h_{N-2}}+\frac{1}{h_{N-1}}
-                  ]
-    \,.
-    \end{equation}
-    Note that both of these matrices are symmetric. The potential matrix,
-    generally, must be computed numerically. However, here we choose the simple
-    approximation
-    \begin{equation}
-        B(\phi_k,v\phi_{k'})
-        \approx
-        \frac{v(t_k)+v(t_{k'})}{2}
-        M_{k{k'}}
-    \,,
-    \end{equation}
-    which is justified if the step size is small enough. Note that this
-    particular choice of approximations keeps the matrix symmetric, such that
-    $K+V$ is symmetric. Furthermore, $M$ represents a scalar product and is thus
-    positive definite. This means that the matrix eigenproblem in
-    Eq.~\eqref{eq:matrixEigenproblem} can be efficiently solved with the Lanczos
-    algorithm.
 
-    Next, we express the normalisation condition in
-    Eq.~\eqref{eq:normalisation} in terms of our elements and the vector
-    $\bm{f}$. To this end we calculate
+    One expresses
     \begin{equation}
-        \int^\infty_0\dd{t}f^2(t)
-        \approx
-        \int_I  \dd{t} f^2(t)
+        f(t)
         =
-        \sum^{N-2}_{k=1}\sum^{N-2}_{k'=1}f_kf_{k'} B(\phi_k,\phi_{k'})
-        =
-        \bm{f}^\mathrm{T}M\bm{f}
-        =
-        \norm*{\bm{f}}^2_M
-        \overset{!}{=}
-        1
-    \,,
+        \sum^{N_\mathrm{bs}-1}_{i=0}
+        f_i u^{(d)}_i(t)
+    \,.
     \end{equation}
-    i.e., the length of $\bm{f}$ must be unity in the by the scalar product $M$
-    induced norm $\norm*{\,\cdot\,}_M$.
+    The Dirichlet boundary conditions are $f(0)=f(t_\mathrm{max})=0$. To enforce
+    these, one sets $c_0=c_{N_\mathrm{bs}-1}=0$. In this case, one can write the
+    function as
+    \begin{equation}
+        f(t)
+        =
+        \sum^{N_\mathrm{bs}-2}_{i=1}
+        f_i u^{(d)}_i(t)
+    \,.
+    \end{equation}
+    This shows that any radial eigenfunction $f$ is represented by
+    $N_\mathrm{bs}-2$ many coefficients, which in the following are collected in
+    the vector $\bm{f}^\mathrm{T}=[f_1,\dots,f_{N_\mathrm{bs}-1}]$.
+
+    %The first step in formulating the eigenvalue problem posed by
+    %Eq.~\eqref{eq:DimensionlessEigenproblem} is to focus on a finite closed
+    %interval $I=[0, t_\mathrm{tmax}]$, where $t_\mathrm{max}>0$ sets the maximal
+    %radius that is considered. The value $t_\mathrm{max}$ must be chosen large
+    %enough to ensure that the Dirichlet boundary condition
+    %$f_{n,l,s,j}(t\geq{t}_\mathrm{max})=0$ is satisfied, i.e., that the support
+    %of the desired eigenfunction lays within the interval $I$. For finite
+    %$t_\mathrm{max}$ this is not possible exactly, because the radial
+    %eigenstates asymptotically approach zero. However, numerically, the value
+    %zero means less than machine precision such the boundary condition can
+    %be satisfied numerically even for finite $I$.
+
+    %The mesh we define as a family
+    %$(t_k)_{k=1,\dots,N-1}$ in $I$ with the properties $t_0=0$,
+    %$t_{N-1}=t_\mathrm{max}$, and $t_0<t_1<\dots<t_{N-2}<t_{N-1}$, where we say
+    %$N\geq{3}$. Of course, typical values are $N\,{\sim}\,10^5\text{-}10^7$.
+    %Next, we define the derived family of step sizes $(h_k)_{k=1,\dots,N-1}$,
+    %$h_k=t_k-t_{k-1}$. The elements $(\phi_k)_{k=0,\dots,N-1}$,
+    %$\phi_k\colon{I}\to[0,1]$, we define as
+    %\begin{equation}
+    %    \phi_k(t)
+    %    =
+    %    \begin{cases}
+    %        (t-t_{k-1})\slash(t_k-t_{k-1})\,, \ & t\in(t_{k-1},t_k)
+    %    \\
+    %        (t_{k+1}-t)\slash(t_{k+1}-t_k)\,, \ & t\in(t_k,t_{k+1})
+    %    \\  0                             \,, \ & \text{else}
+    %    \end{cases}
+    %\,.
+    %\end{equation}
+    %for $k=1,\dots,N-2$, and for $k=0$ and $k=N-1$ the Dirichlet boundary
+    %conditions $f_{n,l,s,j}(0)=f_{n,l,s,j}(t_\mathrm{max})=0$ lead to the
+    %canonical choice $\phi_0=\phi_{N-1}\equiv0$.
+
+
+
+
+
+
+
+
+
+
+
+    %To simplify the notation we fix the quantum numbers $n$, $l$, $s$, and $j$
+    %and say $f\equiv{f_{n,l,s,j}}$. Moreover, we collect all potential
+    %contributions into the new potential $v$, defined as
+    %\begin{equation}
+    %    v(t)
+    %    =
+    %    \frac{l(l+1)}{2t^2}
+    %    +C\frac{V(\aB{t};\hbar^2l[l+1],\hbar^2s[s+1],\hbar^2j[j+1])}{\EH}
+    %\,.
+    %\end{equation}%
+    %%
+    %Finally, we say $\lambda=\bar{E}_{n,l,s,j}$, such that
+    %Eq.~\eqref{eq:eigenproblem} simply becomes
+    %\begin{equation}
+    %    -\frac{1}{2}f''(t) + v(t) f(t) = \lambda f(t)
+    %\,.
+    %\end{equation}
+    %Before we project this equation onto the elements, we approximately expand
+    %$f$ in them:
+    %\begin{equation}\label{eq:expansionOfState}
+    %    f = \sum^{N-2}_{k=1} f_k \phi_k
+    %\,.
+    %\end{equation}
+    %This expansion automatically fulfils the Dirichlet boundary conditions
+    %$f(0)=f(t_\mathrm{max})=0$. Projection, i.e., applying the map
+    %$B(\phi_k,\cdot)$ for all $k=1,\dots,N-2$, yields a matrix eigenproblem
+    %whose solutions converge to solutions of Eq.~\eqref{eq:eigenproblem} as $N$
+    %tends to infinity:
+    %\begin{equation}\label{eq:matrixEigenproblem}
+    %    (K+V) \bm{f} = \lambda M \bm{f}
+    %\,.
+    %\end{equation}
+    %In this expression $M_{kk'}=B(\phi_k,\phi_{k'})$ is the so-called mass
+    %matrix, $K_{kk'}=B(\phi'_k,\phi'_{k'})\slash{2}$ the so-called stiffness
+    %matrix\footnote{Note that because the elements obey the Dirichlet boundary
+    %conditions $\phi_k(0)=\phi_k(t_\mathrm{max})=0$, $k=1,\dots,N-2$,
+    %integrating by parts allows to write
+    %$B(\phi''_k,\phi_{k'})=-B(\phi'_k,\phi'_{k'})$.}, and
+    %$V_{kk'}=B(\phi_k,v\phi_{k'})$ the potential energy contribution. Each
+    %matrix is $(N-2)$-dimensional, since $k,k'=1,\dots,N-2$, and $M$ and $K$ can
+    %be computed analytically; in particular
+    %\begin{equation}
+    %    M
+    %    =
+    %    \frac{1}{6}
+    %    \mqty[2(h_1+h_2) &  h_2 & & & \\
+    %          h_2 & 2(h_2+h_3) & h_3 & & \\
+    %          & h_3 & 2(h_3+h_4) & h_4 & \\
+    %          & & \ddots & \ddots & h_{N-2} \\
+    %          & & & h_{N-2} & 2(h_{N-2}+h_{N-1})]
+    %\end{equation}
+    %and
+    %\begin{equation}
+    %    K = \frac{1}{2}
+    %        \mqty[\frac{1}{h_1}+\frac{1}{h_2} & -\frac{1}{h_2} & \\
+    %              -\frac{1}{h_2} & \frac{1}{h_2}+\frac{1}{h_3} & -\frac{1}{h_3}
+    %              & \\
+    %              & -\frac{1}{h_3} & \frac{1}{h_3}+\frac{1}{h_4} &
+    %              -\frac{1}{h_4} & \\
+    %              & & \ddots & \ddots & -\frac{1}{h_{N-2}} \\
+    %              & & & -\frac{1}{h_{N-2}} & \frac{1}{h_{N-2}}+\frac{1}{h_{N-1}}
+    %              ]
+    %\,.
+    %\end{equation}
+    %Note that both of these matrices are symmetric. The potential matrix,
+    %generally, must be computed numerically. However, here we choose the simple
+    %approximation
+    %\begin{equation}
+    %    B(\phi_k,v\phi_{k'})
+    %    \approx
+    %    \frac{v(t_k)+v(t_{k'})}{2}
+    %    M_{k{k'}}
+    %\,,
+    %\end{equation}
+    %which is justified if the step size is small enough. Note that this
+    %particular choice of approximations keeps the matrix symmetric, such that
+    %$K+V$ is symmetric. Furthermore, $M$ represents a scalar product and is thus
+    %positive definite. This means that the matrix eigenproblem in
+    %Eq.~\eqref{eq:matrixEigenproblem} can be efficiently solved with the Lanczos
+    %algorithm.
+
+    %Next, we express the normalisation condition in
+    %Eq.~\eqref{eq:normalisation} in terms of our elements and the vector
+    %$\bm{f}$. To this end we calculate
+    %\begin{equation}
+    %    \int^\infty_0\dd{t}f^2(t)
+    %    \approx
+    %    \int_I  \dd{t} f^2(t)
+    %    =
+    %    \sum^{N-2}_{k=1}\sum^{N-2}_{k'=1}f_kf_{k'} B(\phi_k,\phi_{k'})
+    %    =
+    %    \bm{f}^\mathrm{T}M\bm{f}
+    %    =
+    %    \norm*{\bm{f}}^2_M
+    %    \overset{!}{=}
+    %    1
+    %\,,
+    %\end{equation}
+    %i.e., the length of $\bm{f}$ must be unity in the by the scalar product $M$
+    %induced norm $\norm*{\,\cdot\,}_M$.
 
     %%% SUBSECTION
     \subsection{Radial matrix elements}
     \label{subsec:RadialMatrixElements}
 
-    To compute radial matrix elements, we first calculate, for $p\in\mathbb{R}$
+    To compute radial matrix elements one calculates, for $p\in\mathbb{R}$
     such that the integral exists,
     \begin{align}\label{eq:radialMatrixElement}
         \begin{split}
@@ -821,6 +949,12 @@
         \\
             &=
             \int^\infty_0 (\dd{t} \aB) (\aB t)^2
+            f_{n,l,s,j}(t)
+            \frac{(\aB t)^p}{\aB^p} \frac{1}{\aB^3}
+            \frac{f_{n',l',s',j'}(t)}{t^2}
+        \\
+            &\approx
+            \int_I (\dd{t} \aB) (\aB t)^2
             f_{n,l,s,j}(t)
             \frac{(\aB t)^p}{\aB^p} \frac{1}{\aB^3}
             \frac{f_{n',l',s',j'}(t)}{t^2}
