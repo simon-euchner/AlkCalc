@@ -963,15 +963,15 @@
         \,.
         \end{split}
     \end{align}
-    Here, `$\mathrm{id}$' denotes the identity on the non-negative real numbers.
-    Next, we approximate this result with solutions to the matrix eigenproblem
-    in Eq.~\eqref{eq:matrixEigenproblem}, i.e., we represent $f_{n,l,s,j}$ and
-    $f_{n',l',s',j'}$ approximately with the vectors $\bm{f}_{n,l,s,j}$ and
-    $\bm{f}_{n',l',s',j'}$, respectively [see Eq.~\eqref{eq:expansionOfState}].
-    This allows to write
+    Here, `$\mathrm{id}$' denotes the identity map. The remaining scalar product
+    can be approximated with solutions of the matrix eigenproblem in
+    Eq.~\eqref{eq:MatrixEigenproblem}, i.e., $f_{n,l,s,j}$ and $f_{n',l',s',j'}$
+    are represented by the vectors $\bm{f}_{n,l,s,j}$ and
+    $\bm{f}_{n',l',s',j'}$, respectively [see Eq.~\eqref{eq:ExpansionOfState}].
+    Within this approximations
     \begin{equation}
         B(f_{n,l,s,j}, \mathrm{id}^p f_{n',l',s',j'})
-        \approx
+        =
         \bm{f}_{n,l,s,j}^\mathrm{T} R_p \bm{f}_{n',l',s',j'}
     \,,
     \end{equation}
