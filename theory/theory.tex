@@ -649,38 +649,42 @@
     $f_{n,l,s,j}$ with respect to the standard one-dimensional $L^2$-norm
     automatically yields the correctly normalised radial eigenstates.
 
-    {\color{blue}
-    The ultimate goad is to express Eq.~\ref{fig:DimensionlessEigenproblem} as a
-    matrix eigenvalue problem which can be directly addressed with a computer.
+    The ultimate goal is to express Eq.~\eqref{eq:DimensionlessEigenproblem} as
+    a matrix eigenvalue problem which can be directly addressed with a computer.
     To obtain a matrix-eigenvalue problem the first step is to choose a basis in
     which the dimensionless eigenfunctions can be represented. There are many
-    different basis states to choose from. In \alkcalc the so-called
-    \emph{B-splines} are chosen.\footnote{This method may be conceptually and
-    programmatically somewhat more involved compared to a standard
-    finite-difference or finite-element method, however, it is preferred here
-    for two reasons: B-splines allow to work with much smaller matrix
-    dimensions and therefore allow to store the resulting eigenenergies and
-    radial eigenstates much more efficiently. Additionally, the matrices will
-    be symmetric and much smaller in dimension compared } B-splines are piecewise polynomials with finite support. In the following it is discussed how the
-    B-splines (basis functions) are constructed and subsequently the matrix
-    eigenproblem is formulated.
+    different sets of basis functions to choose from. In the case of \alkcalc
+    so-called \emph{B-splines} \cite{deboor2001} are chosen.\footnote{This
+    method may be conceptually and programmatically somewhat more involved
+    compared to a standard finite-difference or finite-element method, however,
+    it is preferred here for two reasons: first, B-splines allow to work with
+    much smaller matrix dimensions and therefore allow to efficiently solve the
+    associated matrix-eigenvalue problems on a computer. Second, the small
+    matrix dimensions allow to space-efficiently store the computed radial
+    eigenstates.} B-splines are piecewise polynomial functions with finite
+    support. In the following it is first discussed how these B-splines, i.e.,
+    the basis functions, are constructed and subsequently the matrix
+    eigenproblems are formulated.
 
-    The starting point is to truncate the domain of the radial eigenfunctions
-    $f_{n,l,s,j}$ from $\mathbb{R}_{\geq0}$ to a finite interval
-    $I=[0,t_\mathrm{max}]\subset\mathbb{R}_{\geq0}$, where $t_\mathrm{max}$
-    defined the maximal radius $r_\mathrm{max}=\aB{t}_\mathrm{max}$. This
-    truncation is justified whenever the maximal $t_\mathrm{max}$ is chosen
-    sufficiently large such that the support of the radial eigenfunctions
-    $f_{n,l,s,j}$ of interest lays within the interval $I$. Strictly speaking
-    the support of the radial eigenstates is not finite, as they typically
-    approach zero only asymptotically. However, in practice the support can be
-    considered finite whenever the value of the radial eigenstates stays below
-    machine precision. To construct the B-splines one chooses a family of points
-    $(t_i)_{i=0,\dots,N-1+2d}$ in the interval $I$, the so-called
-    \emph{knots}.\footnote{The family $(t_i)_{i=0,\dots,N-1+2d}$ is sometimes
-    called the knot vector in the literature.} Here, $d\geq0$ is the degree of the
-    degree of the B-splines, i.e., the degree of the polynomials that
-    constitute the basis functions. The knots $t_i$ are defined as
+    The first step in constructing the B-splines is to truncate the domain of
+    the radial eigenfunctions $f_{n,l,s,j}$ from $\mathbb{R}_{\geq0}$ to a
+    finite interval $I=[0,t_\mathrm{max}]\subset\mathbb{R}_{\geq0}$, where
+    $t_\mathrm{max}$ defines the maximally considered radius
+    $r_\mathrm{max}=\aB{t}_\mathrm{max}$. This truncation is justified whenever
+    the maximal $t_\mathrm{max}$ is chosen sufficiently large such that the
+    support of the radial eigenfunctions $f_{n,l,s,j}$ of interest lays within
+    the interval $I$. Strictly speaking the support of the radial eigenstates is
+    not finite, as they typically approach zero only asymptotically. However, in
+    practice the support can be considered finite whenever the value of the
+    radial eigenstates beyond a certain value of $r$ (or equivalently $t$) stays
+    below machine precision. The next step in the construction of the B-splines
+    is to choose a family of points $(t_i)_{i=0,\dots,N-1+2d}$ in the interval
+    $I$, the so-called \emph{knots}.\footnote{The family
+    $(t_i)_{i=0,\dots,N-1+2d}$ is sometimes called the \emph{knot vector} in the
+    literature.} Here, $N\in\mathbb{N}$ is the number of unique knots and
+    $d\geq0$ is the degree of the B-splines: each B-spline is a piecewise
+    polynomial function; a degree-$d$ B-spline is a B-spline where all these
+    polynomials have (maximally) degree $d$. The knots $t_i$ are defined as
     \begin{equation}
         t_i
         =
@@ -696,72 +700,149 @@
         \end{cases}
     \,,
     \end{equation}
-    where the knots are assumed to be strictly ascending:
-    $t_{k-1}<\dots<t_{k+N-2}$. Here, $N$ is the number of distinct
-    discretisation points and the $N-2$ knots $t_{k,\dots,k+N-3}$ are the
-    so-called \emph{internal knots}. This construction can be visualised as
-    follows:
+    where the so-called $N-2$ \emph{internal knots} $t_{k}<\dots<{t}_{k+N-3}$
+    are chosen in strictly ascending order. This construction can be visualised
+    as follows:
     \begin{equation}
         \underbrace{t_0, \dots, t_0}_{k \ \text{times}},
         \underbrace{t_k, \dots, t_{k + N -3}}_{\text{Internal knots}},
         \underbrace{t_\mathrm{max}, \dots, t_\mathrm{max}}_{k \ \text{times}}
     \,.
     \end{equation}
-    On the set of knots, the B-splines are defined via de Boor's recursion
-    formula:
-    \begin{equation}
-        u^{(r)}_i(t)
+    There are $N$ different knots. The first and the last one are repeated
+    $k=d+1$ times, where $k$ is called the \emph{order} of the B-splines.
+
+    On the knots $(t_i)_{i=0,\dots,N-1+2d}$ the $N_\mathrm{bs}=N+d-1$ many
+    B-splines $u^{(d)}_i$ of degree $d$ (or order $k$) are defined via de Boor's
+    recursion formula \cite{deboor2001} ($q=1,\dots,d$,
+    $i=0,\dots,N_\mathrm{bs}-1$):
+    \begin{equation}\label{eq:DeBoorsRecursion}
+        u^{(q)}_i(t)
         =
-        \frac{t-t_i}{t_{i+r}-t_i}
-        u^{(r-1)}_i(t)
+        \frac{t-t_i}{t_{i+q}-t_i}
+        u^{(q-1)}_i(t)
         +
-        \frac{t_{i+r-1}-t}{t_{i+r-1}-t_{i+1}}
-        u^{(r-1)}_{i+1}(t)
+        \frac{t_{i+q+1}-t}{t_{i+q+1}-t_{i+1}}
+        u^{(q-1)}_{i+1}(t)
     \,, \ \ \
         u^{(0)}_i(t)
         =
         \begin{cases}
             1
-            &, \hspace*{10mm} t_i \leq t \leq t_{i+k}
+            &, \hspace*{10mm} t_i \leq t \leq t_{i+1}
         \\
             0
             &, \hspace*{10mm} \text{else}
         \end{cases}
     \,.
     \end{equation}
-    In conjugation with the normalisation condition this yields a result that is
-    unique. To evaluate the B-splines at some point numerically de Boor's
-    algorithm is employed \cite{}, rewritten by E. Amos for double precision
-    floating point arithmetic. The final basis is denoted as
+    The support of the resulting B-splines is restricted to the finite interval
+    $[t_i,t_{i+k})$, i.e., the B-splines can be interpreted as real functions
+    $u^{(d)}_i\colon[t_i,t_{i+k})\to\mathbb{R}$. One can show that with the
+    chosen initial condition in Eq.~\eqref{eq:DeBoorsRecursion} all B-splines
+    $u^{(d)}_i\colon[t_i,t_{i+k})\to[0,1]$, i.e., map into the interval [0,1].
+    Further one shows that
     \begin{equation}
-        (u^{(d)}_i)_{i=0,\dots,N_\mathrm{bs}-1}
-    \,, \ \ \
-        N_\mathrm{bs} = k + N - 1
-    \,, \ \ \
-        u^{(d)}_i\colon[t_i,t_{i+k}) \to \mathbb{R}
-    \,,
+        \sum^{N_\mathrm{bs}-1}_{i=0} u^{(d)}_i = 1
+    \,.
     \end{equation}
-    where $N_\mathrm{bs}$ is the total number of B-splines.
-
-    At this point the B-splines, i.e., the basis functions, are constructed. The
-    next step is to express the eigenvalue problem posed by
+    These properties entail that the basis of B-splines
+    \begin{equation}
+        \big(
+            u^{(d)}_0, \dots, u^{(d)}_{N_\mathrm{bs}-1}
+        \big)
+    \end{equation}
+    is a partition of unity. With this normalisation the B-spline basis is
+    uniquely defined for the choice of knots $(t_i)_{i=0,\dots,N-1+2d}$. With
+    this the construction of the B-spline basis is constructed. The next step is
+    to express the eigenvalue problem posed by
     Eq.~\eqref{eq:DimensionlessEigenproblem} in this basis.
 
-    % Notes
-    %To understand why each B-spline must spane an aread of k knots, note that
-    %otherwise I canot bring it doen to zero again for a degree k Polynomial
-    %The multiplicity on the boundary of the knots will be useful for ...
+    {\color{blue}
 
-    To obtain a matrix problem which approximates
-    Eq.~\eqref{eq:eigenproblem} one computes projections of it
-    onto the elements with the real scalar product (`dummy' functions
-    $\alpha,\beta\colon{I}\to\mathbb{R}$)
+    With the B-spline basis at hand, the next step is to express the eigenvalue
+    problem posed by Eq.~\eqref{eq:DimensionlessEigenproblem} in that basis. To
+    this end one integrates over the eigenvalue problem with a test function $g$
+    to reduce it to its so-called \emph{weak form}:
+    \begin{equation}\label{eq:WeakDimensionlessEigenproblem}
+        \int^\infty_{-\infty} \dd{t}
+        g(t) \bigg(-\frac{1}{2}\dv[2]{t} + v(t)\bigg) f(t)
+        =
+        \lambda
+        \int^\infty_{-\infty} \dd{t}
+        g(t) f(t)
+    \,.
+    \end{equation}
+    To simplify the notation the indices on $f_{n,l,s,j}$ were dropped and the
+    dimensionless energy renamed to $\lambda=\bar{E}_{n,l,s,j}$. Further, the
+    potential terms in Eq.~\eqref{eq:DimensionlessEigenproblem} are collected
+    into the function
+    \begin{equation}
+        v(t)
+        =
+        \frac{l(l+1)}{2t^2}
+        +C\frac{V(\aB{t};\hbar^2l[l+1],\hbar^2s[s+1],\hbar^2j[j+1])}{\EH}
+    \,.
+    \end{equation}%
+
+    To reduce the weak form of the eigenvalue problem to a matrix eigenvalue
+    problem one expands the eigenfunctions $f$ in the B-spline basis:
+    \begin{equation}\label{eq:ExpansionOfEigenfunctions}
+        f
+        \approx
+        \sum^{N_\mathrm{bs}-1}_{i=0}
+        f_i u^{(d)}_i
+    \,.
+    \end{equation}
+    Here, $\bm{f}=(f_1,\dots,f_{N_\mathrm{bs}-1})^\mathrm{T}$ is the vector
+    containing the expansion coefficients $f_i$. It is important to note that
+    this is an approximation, because in general one must employ an infinite
+    basis to exactly represent the eigenfunctions $f$. A brief discussion
+    regarding this approximation is reserved for later in this section. For now,
+    the expansion of the eigenfunctions $f$ given in
+    Eq.~\eqref{eq:ExpansionOfEigenfunctions} can be plugged into
+    Eq.~\eqref{eq:WeakDimensionlessEigenproblem}. With the choice $g=u^{(d)}_i$
+    one arrives at the expression
+    \begin{equation}
+        \sum^{N_\mathrm{bs}-1}_{j=0}
+        f_j
+        B\bigg(
+            u^{(d)}_i(t),
+            -\frac{1}{2}(u^{(d)}_j)''(t)+v(t)u^{(d)}_j(t)
+        \bigg)
+        =
+        \lambda
+        \sum^{N_\mathrm{bs}-1}_{i=0}
+        f_j
+        B(u^{(d)}_i(t), u^{(d)}_j(t))
+    \,.
+    \end{equation}
+    Here, for convenience, the bilinear form
     \begin{equation}
         B(\alpha,\beta)
         =
         \int_I \dd{t} \alpha(t) \beta(t)
+    \end{equation}
+    was introduced for any two sufficiently well-behaved functions
+    $\alpha,\beta\colon{I}\to\mathbb{R}$. To finally bring the eigenproblem into
+    matrix form the following matrices are defined: first, the so-called
+    \emph{stiffness} matrix $K$ with components
+    \begin{equation}
+        K_{ij}
+        =
     \,.
     \end{equation}
+    Note that the matrices $K$, $M$, and $W$ are real, symmetric, and banded.
+    These properties later allow to employ efficient specialised numerical
+    methods to solve for the coefficient vectors $\bm{f}$ and the eigenvalues
+    $\lambda$.
+
+
+
+    \newpage
+
+
+
 
     One expresses
     \begin{equation}
