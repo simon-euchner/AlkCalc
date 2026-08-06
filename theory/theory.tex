@@ -534,7 +534,7 @@
     \,.
     \end{equation}
     Here, $1_{2j+1}$ is the identity matrix of dimension $2j+1$ and
-    \begin{equation}
+    \begin{equation}\label{eq:BlockHamiltoniansSIUnits}
         H_{l,s,j}
         =
         -\frac{\hbar^2}{2mr^2}\pdv{r}(r^2\pdv{r})
@@ -580,7 +580,6 @@
     $R_{n,l,s,j}$ must be calculated numerically. This task is exactly what
     \alkcalc is designed to do.
 
-    {\color{blue}
     %%% SUBSECTION
     \subsection{Numerical method}
     \label{subsec:NumericalMethod}
@@ -591,11 +590,12 @@
     eigenstates $R_{n,l,s,j}$ is formulated.
 
     The first step is to express the eigenvalue problems in terms of
-    dimensionless quantities. To this end the Hamiltonians $H_{l,s,j}$ is
-    expressed in units of Hartree,
+    dimensionless quantities. To this end the Hamiltonians $H_{l,s,j}$ in
+    Eq.~\eqref{eq:BlockHamiltoniansSIUnits} are expressed in units of Hartree
+    \cite{friedrich2017},
     $E_\mathrm{H}=e^2\slash{(4\pii\varepsilon_0a_\mathrm{B})}$, where
     $a_\mathrm{B}=\hbar\slash{(m_\mathrm{e}c\alpha)}\approx52.9\,\mathrm{pm}$ is
-    Bohr's radius. Further, the radial eigenfunctions are parametrised as
+    Bohr's radius. The radial eigenfunctions are parametrised as
     \begin{equation}\label{eq:DimensionlessEigenfunctions}
         R_{n,l,s,j}(r)
         =
@@ -630,8 +630,8 @@
         \frac{\bar{E}_{n,l,s,j}}{C}
     \,.
     \end{equation}
-    Rewriting the normalisation condition in terms of the eigenfunctions
-    $f_{n,l,s,j}$ leads to
+    Rewriting the normalisation condition in terms of the dimensionless
+    eigenfunctions $f_{n,l,s,j}$ yields
     \begin{equation}\label{eq:Normalisation}
         1
         =
@@ -645,22 +645,23 @@
     \end{equation}
     Here it is assumed that the radial eigenfunctions are real-valued, which is
     justified as the Hamiltonian is not only an hermitian but also a symmetric
-    operator. In conclusion, computing the normalised eigenfunctions
-    $f_{n,l,s,j}$ yields the (automatically normalised) radial eigenstates by
-    employing Eq.~\eqref{eq:DimensionlessEigenfunctions} for the conversion.
+    operator. In conclusion, normalising the dimensionless eigenfunctions
+    $f_{n,l,s,j}$ with respect to the standard one-dimensional $L^2$-norm
+    automatically yields the correctly normalised radial eigenstates.
 
-    The next step is to choose basis for the space of functions in which the
-    radial eigenfunctions $f_{n,l,s,j}$ live. Ultimately, this basis allows to
-    express the dimensionless eigenvalue problem in posed by
-    Eq.~\ref{fig:DimensionlessEigenproblem} as a matrix eigenvalue problem,
-    which can be directly addressed with a computer. Of course, there are many
-    different choices for the basis states. Here, so so-called \emph{B-splines}
-    are chosen.\footnote{This method may be conceptually and programmatically
-    more involved than a simple finite-difference or finite-element method,
-    however, it is preferred here for two reasons: it allows to work with much
-    smaller matrix dimensions and it allows to store the resulting eigenenergies
-    and radial eigenstates much more efficiently.} B-splines are piecewise
-    polynomials with finite support. In the following it is discussed how the
+    {\color{blue}
+    The ultimate goad is to express Eq.~\ref{fig:DimensionlessEigenproblem} as a
+    matrix eigenvalue problem which can be directly addressed with a computer.
+    To obtain a matrix-eigenvalue problem the first step is to choose a basis in
+    which the dimensionless eigenfunctions can be represented. There are many
+    different basis states to choose from. In \alkcalc the so-called
+    \emph{B-splines} are chosen.\footnote{This method may be conceptually and
+    programmatically somewhat more involved compared to a standard
+    finite-difference or finite-element method, however, it is preferred here
+    for two reasons: B-splines allow to work with much smaller matrix
+    dimensions and therefore allow to store the resulting eigenenergies and
+    radial eigenstates much more efficiently. Additionally, the matrices will
+    be symmetric and much smaller in dimension compared } B-splines are piecewise polynomials with finite support. In the following it is discussed how the
     B-splines (basis functions) are constructed and subsequently the matrix
     eigenproblem is formulated.
 
