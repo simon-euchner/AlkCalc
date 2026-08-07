@@ -182,7 +182,7 @@
     Bound single-electron eigenfunctions of alkali-metal atoms and
     alkaline-earth metal ions are of significant relevance in quantum computing,
     quantum information processing, quantum simulation, Rydberg physics, quantum
-    optics, \dots. However, expect for the special case of the Hydrogen atom and
+    optics, \dots. However, except for the special case of the Hydrogen atom and
     hydrogenic ions, it is not possible to solve the time-independent
     Schr\"odinger equation analytically. Because of this, there is the need to
     obtain eigenenergies and eigenstates numerically. The library \alkcalc is
@@ -201,7 +201,7 @@
     technical details for computing the eigenenergies and eigenstates are
     provided. However, these files do not include a discussion on the theory and
     physics behind the code. Further, there is no reference manual for the
-    library functions. This documents purpose is to add the missing pieces: in
+    library functions. This document's purpose is to add the missing pieces: in
     Sec.~\ref{sec:Theory} the theory, the physics, and the numerical method
     associated with \alkcalc is discussed. Section \ref{sec:Manual} is a
     comprehensive reference manual for the library functions of \alkcalc.
@@ -218,8 +218,8 @@
     radial transition matrix elements are computed by \alkcalc. In
     Subsec.~\ref{subsec:OscillatorStrengths} it is shown how oscillator
     strengths for electronic transitions are computed. Finally, in
-    Subsec.~\ref{subsec:OscillatorStrengths} it is shown how lifetimes of
-    electronic states are computed by \alkcalc.
+    Subsec.~\ref{subsec:StateLifetimes} it is shown how lifetimes of electronic
+    states are computed by \alkcalc.
 
     %%% SUBSECTION
     \subsection{Single-atom/ion theory}
@@ -228,7 +228,7 @@
     The starting point is an alkali-metal atom or alkaline-earth-metal ion. In
     the ground-state of these systems all electrons are in closed shells except
     for one valence electron. Examples of such systems are $\mathrm{^1H}$,
-    $\mathrm{^{38}Rb}$, $\mathrm{^{88}Sr^+}$. This property allows a
+    $\mathrm{^{85}Rb}$, $\mathrm{^{88}Sr^+}$. This property allows a
     Kepler-problem description for the `effective nucleus' (the nucleus
     `screened' by the closed-shell electrons) and the valence electron. The
     dynamics of the valence electron
@@ -333,8 +333,8 @@
     \,.
     \end{equation}
     This simple choice for representing the spin degrees of freedom is possible
-    because throughout this work the interest is in the case where the total
-    spin is $s=1\slash{2}$.
+    because throughout this work the interest is in the case where the spin is
+    $s=1\slash{2}$.
 
     At this point the Hamiltonian which determines the eigenenergies and the
     eigenstates is defined. In the following, the goal is to cast the eigenvalue
@@ -480,12 +480,12 @@
     multiplicities $\mu_j$ of the dimensions $d_j=2j+1$ of the irreducible
     representations $\Gamma_j$ labelled by
     $j=0,1\slash{2},1,3\slash{2},2,\dots$. The multiplicities $\mu_j$ are
-    $\mu_{j}=2$ for $j\neq0$ and $\mu_0=0$. This is because for each $l>0$ there
-    are the two possible orbital angular momentum quantum numbers
-    $l=j-1\slash{2}$ and $l=j+1\slash{2}$ and for $s=1\slash{2}$ a total angular
-    momentum of $j=0$ is not possible. This entails that the Hamiltonian in the
-    basis of the spinors $\bm{\Phi}_{l,s,j,m_j}$ can be decomposed into the
-    following direct sum:
+    $\mu_{j}=2$ for $j\neq0$ and half-integer and $\mu_j=0$ for all integer $j$
+    including $j=0$. This is because for each $l>0$ there are the two possible
+    orbital angular momentum quantum numbers $l=j-1\slash{2}$ and
+    $l=j+1\slash{2}$ and for $s=1\slash{2}$ a total angular momentum of $j=0$ is
+    not possible. This entails that the Hamiltonian in the basis of the spinors
+    $\bm{\Phi}_{l,s,j,m_j}$ can be decomposed into the following direct sum:
     \begin{equation}
         \bigoplus^\infty_{l=0}
         \bigoplus_{j \in \{\abs*{l-s},l+s\}}
@@ -528,7 +528,7 @@
     \begin{equation}
         \rho
         =
-        \bigoplus_{j>0}
+        \bigoplus_{\{j\colon 2j\in\mathbb{N}_{>0}\}}
         2\Gamma_j
     \,.
     \end{equation}
@@ -989,20 +989,20 @@
     points $x_i$ such that the for all polynomials of degree $d\leq2n-1$
     Eq.~\eqref{eq:Quadratures} is exact, i.e., the approximation sign is an
     equal sign. To obtain the weights $w_i$ and the points $x_i$ the software
-    \alkcalc employs the software packet \texttt{GAUSSQ} \cite{golub1969} from
+    \alkcalc employs the software package \texttt{GAUSSQ} \cite{golub1969} from
     \emph{Netlib} \cite{dongarra1987}.  Using such a quadrature rule, the
     components of the matrices $K$, $M$, and $W$ can be computed efficiently. To
     compute the components of the stiffness matrix $K$ one chooses the
-    quadrature order $n=2(d-1)$, because the derivative of a B-spline is a
-    piecewise polynomial of degree $d-1$. Of course, $n=2(d-1)$ is only sensible
-    for $d\geq2$, because otherwise the second derivative vanishes and therefore
-    all components of $K$. In practice, this is not a restriction because
-    typical B-spline orders $(k=d+1)$ are at least $k{\sim}6$ or higher. To
-    compute the components of the matrix $M$ one chooses the quadrature order
-    $n=d+1$. With this choice polynomials of degree $2(d+1)-1=2d+1$ are
-    integrated exactly, which is enough, considering that the relevant integrals
-    are over polynomials of degree $2d$. Finally, the components of the matrix
-    $W$ representing the effective single-electron potential must be calculated.
+    quadrature order $n=d$, because the derivative of a B-spline is a piecewise
+    polynomial of degree $d-1$. Of course, computing the components of $K$ is
+    only sensible for $d\geq2$, because otherwise the second derivative
+    vanishes. In practice, this is not a restriction because typical B-spline
+    orders $(k=d+1)$ are at least $k{\sim}6$ or higher. To compute the
+    components of the matrix $M$ one chooses the quadrature order $n=d+1$. With
+    this choice polynomials of degree $2(d+1)-1=2d+1$ are integrated exactly,
+    which is enough, considering that the relevant integrals are over
+    polynomials of degree $2d$. Finally, the components of the matrix $W$
+    representing the effective single-electron potential must be calculated.
     The polynomial order of the integrand is $2d+d_v$, where $d_v$ is the
     polynomial order of the effective potential \eqref{eq:EffectivePotential}.
     Of course, in general, this potential is not a polynomial. However, when the
@@ -1097,8 +1097,8 @@
     \label{subsec:OscillatorStrengths}
 
     The so-called \emph{oscillator strength} of a transition from an initial
-    state $\bm{\Psi}_\mathrm{i}\equiv\bm{\Psi}_{n',l',s,j',m'_j}$ to a final
-    state $\bm{\Psi}_\mathrm{f}\equiv\bm{\Psi}_{n,l,s,j,m_j}$ is
+    state $\bm{\Psi}_\mathrm{i}\equiv\bm{\Psi}_{n,l,s,j,m_j}$ to a final state
+    $\bm{\Psi}_\mathrm{f}\equiv\bm{\Psi}_{n',l',s',j,m'_j}$ is
     \cite{friedrich2017}
     \begin{equation}
         f_{\mathrm{i}\to\mathrm{f}}
