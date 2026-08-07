@@ -13,3 +13,5 @@ Update code for reading states in alkcalc.h
 Update theory
 
 Stop using "we" in comments, code, and README's
+
+Add references to external software in README's of external software
