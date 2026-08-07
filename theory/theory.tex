@@ -322,22 +322,9 @@
     It describes (relativistic) coupling between the orbital angular momentum
     and the valence electrons' spin. This expression results from relativistic
     perturbation theory \cite{condon1951}. Here, $V_\mathrm{NR}$ is the
-    non-relativistic model potential and $c$ the speed of light. In
-    Ref.~\cite{wilkinson2025} the potential \eqref{eq:LSCoupling} is employed
-    for the treatment of alkaline-earth metal ions. In Ref.~\cite{sibalic2017}
-    the simplified version
-    \begin{equation}\label{eq:SimplifiedLSCoupling}
-        V_\mathrm{R}(r)
-        =
-        \frac{\alpha}{2r^3} \bm{L}\cdot\bm{S}
-    \end{equation}
-    is employed for alkali-metal atoms. Here, $\alpha$ is the fine-structure
-    constant. Throughout \alkcalc relativistically correct version
-    in Eq.~\eqref{eq:LSCoupling}, not the simplified version in
-    Eq.~\ref{eq:SimplifiedLSCoupling}, is employed. Finally, for expressing the
-    spin-operator $\bm{S}$ in Eq.~\eqref{eq:LSCoupling} and
-    Eq.~\eqref{eq:SimplifiedLSCoupling} the representation in Pauli's (spin)
-    matrices is chosen:
+    non-relativistic model potential and $c$ the speed of light. For expressing
+    the spin-operator $\bm{S}$ in Eq.~\eqref{eq:LSCoupling} the representation
+    in Pauli's (spin) matrices is chosen:
     \begin{equation}
         \bm{S} = \frac{\hbar}{2}\mqty[\sigma_x \\ \sigma_y \\ \sigma_z]
     \,.
@@ -558,9 +545,9 @@
         H \bm{\Psi} = E \bm{\Psi}
     \end{equation}
     to the blocks $H_{l,s,j}$ on the Hilbert space associated with the radial
-    degrees of freedom. In particular, solving for the full eigenenergies and
-    eigenstates is reduced to solving the radial eigenvalue problems
-    \begin{equation}\label{eq:radialEigenproblem}
+    degrees of freedom. In particular, solving for the eigenenergies and
+    the eigenstates is reduced to solving the radial eigenvalue problems
+    \begin{equation}\label{eq:RadialEigenproblem}
         H_{l,s,j} R_{n,l,s,j} = E_{n,l,s,j} R_{n,l,s,j}
     \,,
     \end{equation}
@@ -682,7 +669,7 @@
     $I$, the so-called \emph{knots}.\footnote{The family
     $(t_i)_{i=0,\dots,N-1+2d}$ is sometimes called the \emph{knot vector} in the
     literature.} Here, $N\in\mathbb{N}$ is the number of unique knots and
-    $d\geq0$ is the degree of the B-splines: each B-spline is a piecewise
+    $d\geq1$ is the degree of the B-splines: each B-spline is a piecewise
     polynomial function; a degree-$d$ B-spline is a B-spline where all these
     polynomials have (maximally) degree $d$. The knots $t_i$ are defined as
     \begin{equation}
@@ -776,7 +763,7 @@
     dimensionless energy renamed to $\lambda=\bar{E}_{n,l,s,j}$. Further, the
     potential terms in Eq.~\eqref{eq:DimensionlessEigenproblem} are collected
     into the function
-    \begin{equation}
+    \begin{equation}\label{eq:EffectivePotential}
         v(t)
         =
         \frac{l(l+1)}{2t^2}
@@ -908,12 +895,12 @@
     $(N_\mathrm{bs}-2)$-dimensional coefficient vector which defines the full
     coefficient vector $\bm{f}=(0,\bar{\bm{f}}^\mathrm{T},0)^\mathrm{T}$
     including the coefficients $f_1=f_{N_\mathrm{bs}-1}=0$. Therefore, a
-    solution to the (generalised) matrix eigenvalue problem problem posed by
+    solution to the generalised matrix eigenvalue problem problem posed by
     Eq.~\eqref{eq:MatrixEigenvalueProblem} is equivalent to obtaining the full
     coefficient vector $\bm{f}$ and thereby an approximate solution to the
     eigenfunctions of the exact eigenvalue problem posed by
     Eq.~\eqref{eq:DimensionlessEigenproblem}. Note that the conversion formula
-    in Eq.+\eqref{eq:DimensionlessEigenfunctions} finally relates this result
+    in Eq.~\eqref{eq:DimensionlessEigenfunctions} finally relates this result
     directly to the radial eigenstates $R_{n,l,s,j}$. The normalisation of the
     eigenfunctions $f$ is trivially achieved by normalising the coefficient
     vector with respect to the scalar product $B$ represented by the
@@ -941,80 +928,156 @@
         \bar{\bm{f}}^\mathrm{T} M \bar{\bm{f}}
     \,.
     \end{equation}
-    {\color{blue}
-    Finally, to solve the generalised eigenvalue problem posed by
+    Finally, to solve the generalised matrix eigenvalue problem posed by
     Eq.~\eqref{eq:MatrixEigenvalueProblem} \alkcalc employs the routine
-    ??? from the software collection LAPACK \cite{LAPACK}.
+    \texttt{DSBGVX} from the software collection \texttt{LAPACK} \cite{laug1999}
+    taken from \emph{Netlib} \cite{dongarra1987}. This routine is specifically
+    designed to solve real-symmetric banded generalised eigenvalue problems. It
+    further allows to extract eigenvalues selectively. This is useful when the
+    dimension $N_\mathrm{bs}-2$ of the eigenvalue problem is much larger than the
+    number of eigenstates that shall be computed.
 
-    At this point there are two more open questions to answer. \textbf{(i)} The
-    (generalised) matrix eigenvalue problem posed by
+    At this point there are two open questions to be answered. \textbf{(i)} The
+    generalised matrix eigenvalue problem posed by
     Eq.~\eqref{eq:MatrixEigenvalueProblem} is an approximation to the exact
     eigenvalue problem posed by Eq.~\eqref{eq:DimensionlessEigenproblem}. One
     might ask if the numerically computed eigenvalues and eigenvectors indeed
-    approximate the exact result. For instance, on glimpse one might think that
-    it is possible to find eigenvalues which are not physical but solely
+    approximate the exact result. For instance, on a glimpse one might think
+    that it is possible to find eigenvalues which are not physical but sole
     numerical artefacts of the approximate expansion of $f$ in a finite set of
     basis states. \textbf{(ii)} The second question is how the components of the
     matrices $K$, $M$, and $W$ can be calculated numerically in an efficient
     manner, as these are given by integrals that, generally, need to be solved
     numerically.
 
-    \textbf{(i)} Ritz-variational methods for argumentation
+    \bigskip
 
-    \textbf{(ii)} Gaussian quadratures
+    \noindent \textbf{(i)} The first question is readily answered by the
+    Rayleigh-Ritz variational method. For a detailed discussion on this method
+    please see Ref.~\cite{friedrich2017}. In short, the solutions to the
+    eigenvalue problem posed by Eq.~\eqref{eq:RadialEigenproblem} are given by
+    the (normalised) stationary points of the following functional:
+    \begin{equation}\label{eq:RayleighRitzFunctional}
+        \mathcal{R}[R]
+        =
+        \frac{\langle R, H_{l,s,j} R \rangle}{\langle R, R \rangle}
+    \,.
+    \end{equation}
+    The Rayleigh-Ritz variational method is useful in our case because it can be
+    shown that in the finite B-spline basis employed by \alkcalc to approximate
+    the radial eigenfunctions $f$, the variational principle results in upper
+    bounds for the eigenenergies and good approximations of the radial
+    eigenfunctions \cite{friedrich2017}. This is useful because, in the finite
+    B-spline basis, solving $\delta{\mathcal{R}}[R_0]=0$ for the stationary
+    points $R_0$ of the functional \eqref{eq:RayleighRitzFunctional} is
+    equivalent to the generalised matrix eigenvalue problem posed by
+    Eq.~\eqref{eq:MatrixEigenvalueProblem}. In fact, it be shown that each
+    solution of the generalised matrix eigenvalue problem converges to the exact
+    eigenvalue and the exact radial eigenstate as the number of knots, i.e.,
+    $N$, is increased. Therefore, one can be sure that the solutions found by
+    solving the generalised matrix eigenvalue problem indeed approximate the
+    exact radial eigenenergies $E_{n,l,s,j}$ and eigenstates $R_{n,l,s,j}$,
+    without producing solutions that do not converge to solutions of the exact
+    eigenvalue problem for the radial eigenstates $R_{n,l,s,j}$.
 
-    \newpage
+    \bigskip
 
-    % - Talk about approximation and Ritz variational method
-    % - Introduce Gaussian quadratures
+    \noindent \textbf{(ii)} To numerically solve the integrals that define the
+    components of the matrices $K$, $M$, and $V$ \alkcalc employs so-called
+    \emph{Gau\ss-Legendre quadratures} \cite{burden2011}. This method works as
+    follows: the integral of a (sufficiently well-behaved) function $y$ over the
+    interval $[a,b]$ ($a\leq{b}$) can be approximated as follows:
+    \begin{equation}\label{eq:Quadratures}
+        \int^b_a \dd{x} y(x)
+        \approx
+        \sum^n_{i=1}
+        \frac{b-a}{2} w_i
+        y\bigg(\frac{b-a}{2}x_i+\frac{b+a}{2}\bigg)
+    \,.
+    \end{equation}
+    Here $n$ is the so-called \emph{order} of the Gau\ss-Legendre quadrature,
+    $w_i$ are weights, and $x_i$ points in the open interval $(a,b)$.
+    Importantly, for a quadrature of order $n$ there exist weights $w_i$ and
+    points $x_i$ such that the for all polynomials of degree $d\leq2n-1$
+    Eq.~\eqref{eq:Quadratures} is exact, i.e., the approximation sign is an
+    equal sign. To obtain the weights $w_i$ and the points $x_i$ the software
+    \alkcalc employs the software packet \texttt{GAUSSQ} \cite{golub1969} from
+    \emph{Netlib} \cite{dongarra1987}.  Using such a quadrature rule, the
+    components of the matrices $K$, $M$, and $W$ can be computed efficiently. To
+    compute the components of the stiffness matrix $K$ one chooses the
+    quadrature order $n=2(d-1)$, because the derivative of a B-spline is a
+    piecewise polynomial of degree $d-1$. Of course, $n=2(d-1)$ is only sensible
+    for $d\geq2$, because otherwise the second derivative vanishes and therefore
+    all components of $K$. In practice, this is not a restriction because
+    typical B-spline orders $(k=d+1)$ are at least $k{\sim}6$ or higher. To
+    compute the components of the matrix $M$ one chooses the quadrature order
+    $n=d+1$. With this choice polynomials of degree $2(d+1)-1=2d+1$ are
+    integrated exactly, which is enough, considering that the relevant integrals
+    are over polynomials of degree $2d$. Finally, the components of the matrix
+    $W$ representing the effective single-electron potential must be calculated.
+    The polynomial order of the integrand is $2d+d_v$, where $d_v$ is the
+    polynomial order of the effective potential \eqref{eq:EffectivePotential}.
+    Of course, in general, this potential is not a polynomial. However, when the
+    knots $t_i$ are spaced sufficiently close, on each interval $[t_i,t_{i+1})$
+    the potential $v$ is approximately a polynomial. This results from the fact
+    that $v$ is an analytical function on the open interval
+    $(0,t_\mathrm{max})$. However, to obtain a good approximation it is best to
+    choose a high quadrature order. The employed quadrature order is hard-coded
+    to retain simplicity, but of course can be directly viewed or changed in the
+    source code of \alkcalc.
 
     %%% SUBSECTION
     \subsection{Radial matrix elements}
     \label{subsec:RadialMatrixElements}
 
-    To compute radial matrix elements one calculates, for $p\in\mathbb{R}$
-    such that the integral exists,
-    \begin{align}\label{eq:radialMatrixElement}
-        \begin{split}
-            \frac{r^{n,l,s,j;n',l',s',j'}_p}{\aB^p}
-            &\equiv
-            \frac{1}{\aB^p} \langle R_{n,l,s,j},
-            \mathrm{id}^p R_{n',l',s',j'} \rangle
-            =
-            \int^\infty_0 \dd{r} r^2
-            R_{n,l,s,j}(r)
-            \frac{r^p}{\aB^p}
-            R_{n',l',s',j'}(r)
-        \\
-            &=
-            \int^\infty_0 (\dd{t} \aB) (\aB t)^2
-            f_{n,l,s,j}(t)
-            \frac{(\aB t)^p}{\aB^p} \frac{1}{\aB^3}
-            \frac{f_{n',l',s',j'}(t)}{t^2}
-        \\
-            &\approx
-            \int_I (\dd{t} \aB) (\aB t)^2
-            f_{n,l,s,j}(t)
-            \frac{(\aB t)^p}{\aB^p} \frac{1}{\aB^3}
-            \frac{f_{n',l',s',j'}(t)}{t^2}
-            =
-            B(f_{n,l,s,j}, \mathrm{id}^p f_{n',l',s',j'})
-        \,.
-        \end{split}
+    To compute radial matrix elements one calculates for $p\in\mathbb{R}$
+    (such that the integral exists)
+    \begingroup
+    \allowdisplaybreaks
+    \begin{align}\label{eq:RadialMatrixElement}
+        \frac{r^{n,l,s,j;n',l',s',j'}_p}{\aB^p}
+        &\equiv
+        \frac{1}{\aB^p} \langle R_{n,l,s,j},
+        \mathrm{id}^p R_{n',l',s',j'} \rangle
+        =
+        \int^\infty_0 \dd{r} r^2
+        R_{n,l,s,j}(r)
+        \frac{r^p}{\aB^p}
+        R_{n',l',s',j'}(r)
+        \nonumber
+    \\
+        &=
+        \int^\infty_0 (\dd{t} \aB) (\aB t)^2
+        f_{n,l,s,j}(t)
+        \frac{(\aB t)^p}{\aB^p} \frac{1}{\aB^3}
+        \frac{f_{n',l',s',j'}(t)}{t^2}
+        \nonumber
+    \\
+        &\approx
+        \int_I (\dd{t} \aB) (\aB t)^2
+        f_{n,l,s,j}(t)
+        \frac{(\aB t)^p}{\aB^p} \frac{1}{\aB^3}
+        \frac{f_{n',l',s',j'}(t)}{t^2}
+        =
+        B(f_{n,l,s,j}, \mathrm{id}^p f_{n',l',s',j'})
+    \,.
     \end{align}
-    Here, `$\mathrm{id}$' denotes the identity map. The remaining scalar product
-    can be approximated with solutions of the matrix eigenproblem in
-    Eq.~\eqref{eq:MatrixEigenproblem}, i.e., $f_{n,l,s,j}$ and $f_{n',l',s',j'}$
-    are represented by the vectors $\bm{f}_{n,l,s,j}$ and
-    $\bm{f}_{n',l',s',j'}$, respectively [see Eq.~\eqref{eq:ExpansionOfState}].
-    Within this approximations
+    \endgroup
+    Here, `$\mathrm{id}$' denotes the identity map. The remaining integral can
+    be approximated with solutions of the generalised matrix eigenproblem
+    posed by Eq.~\eqref{eq:MatrixEigenvalueProblem}, i.e., $f_{n,l,s,j}$ and
+    $f_{n',l',s',j'}$ are represented by the vectors $\bm{f}_{n,l,s,j}$ and
+    $\bm{f}_{n',l',s',j'}$, respectively [see
+    Eq.~\eqref{eq:ExpansionOfEigenfunctions}]. Within this approximation
     \begin{equation}
         B(f_{n,l,s,j}, \mathrm{id}^p f_{n',l',s',j'})
         =
-        \bm{f}_{n,l,s,j}^\mathrm{T} R_p \bm{f}_{n',l',s',j'}
-    \,,
+        \bar{\bm{f}}_{n,l,s,j}^\mathrm{T} R_p \bar{\bm{f}}_{n',l',s',j'}
+    \,.
     \end{equation}
-    where the components of the real symmetric matrix $R_p$ are defined as
+    Here $\bar{\bm{f}}_{n,l,s,j}$ denotes the coefficient vector
+    $\bm{f}_{n,l,s,j}$ stripped of the first and final component. Further, the
+    components of the real symmetric matrix $R_p$ are defined as
     \begin{equation}
         (R_p)_{k,k'}
         =
@@ -1031,33 +1094,15 @@
         \end{cases}
     \,.
     \end{equation}
-    To numerically compute the remaining integrals we use a two-point
-    Gau\ss{i}an quadrature. This method approximates the integral as
-    \cite{burden2011}:
-    \begin{equation}
-        \int^b_a \dd{t} \alpha(t)
-        \approx
-        \frac{b-a}{2}
-        \bigg[
-            \alpha\bigg(\frac{a+b}{2}-\frac{b-a}{2\sqrt{3}}\bigg)
-            +
-            \alpha\bigg(\frac{a+b}{2}+\frac{b-a}{2\sqrt{3}}\bigg)
-        \bigg]
-    \,,
-    \end{equation}
-    for any sufficiently smooth function $\alpha$ and $a<b$. Note that this
-    result is exact if $\alpha$ is a polynomial of degree three, which is the
-    case for radial dipole matrix elements. This method is straight-forward to
-    implement in a computer program, such that the problem of calculating matrix
-    elements is effectively reduced to computing matrix products. However, note
-    that for too large $p$ there can be numerical overflow or underflow when
-    computing $t^p$. But, for 64-bit floating point arithmetic, $p=\pm10$ is
-    easily possible (if the integral exists), such that, typically, all
-    practical cases are included. Explicitly, we could verify that for Hydrogen
-    the range $p=-2,\dots,10$ yields reasonably good results. Finally, we remark
-    that one can improve on the precision by employing higher-order Gau\ss{i}an
-    quadrature algorithms as described in \cite{burden2011}.
-    }
+    To numerically compute the these components the software \alkcalc again
+    employs Gau\ss-Legendre quadratures defined in Eq.~\eqref{eq:Quadratures}.
+    For integer $p\geq0$ the relevant integrals are over polynomials of order
+    $2d+p$. Therefore, one employs the quadrature of order $n=d+p\slash{2}$ for
+    even $p$ and $n=d+(p-1)\slash{2}$ for odd ones. When $p$ is not an integer,
+    one chooses sufficiently large $n$ such that the integral is well
+    approximated.  The indeed employed quadrature order is hard coded to retain
+    simplicity, but of course can be directly viewed or changed in the source
+    code of \alkcalc.
 
     %%% SUBSECTION
     \subsection{Oscillator strengths}

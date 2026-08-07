@@ -1,10 +1,12 @@
 Fix references
 
-Update README's
+Update READMEs
 
 Fix Licenses of FORTRAN code
 
 Add references for FORTRAN code
+
+Go through references in general and align theory with READMEs
 
 Update code for eigensolver
 
@@ -12,4 +14,10 @@ Update code for reading states in alkcalc.h
 
 Update theory
 
-Stop using "we" in comments, code, and README's
+Fix label names in theory
+
+Order references in theory
+
+Add reference to Amos' code
+
+Stop using "we" in comments, code, and READMEs
