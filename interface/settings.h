@@ -53,25 +53,28 @@
 #define SN_Y 19
 #define SN_Z 20
 
+/* Data type for settings */
+typedef struct alkcalc_settings_s {
+    char *species;
+    int32_t k;
+    int32_t N;
+    int32_t nmax;
+    int32_t l;
+    double j;
+    double rmax;
+} alkcalc_settings;
+
 /* -------------------------------------------------------------------------- *
  * Settings                                                                   *
  *                                                                            *
  * species   : Atom or ion species                                            *
- * N         : Number of discretisation points (N > 2)                        *
+ * k         : Order of B-splines (k > ???)          FIXME !!!                *
+ * N         : Number of discretisation points (N > ?)       FIXME !!!        *
  * nmax      : Maximal principle quantum number                               *
  * l         : Orbital angular momentum quantum number                        *
  * j         : Total angular momentum quantum number                          *
  * rmax      : Maximal radius in units of Bohr's radius, aB                   *
- * offset    : Energy offset to avoid relevant eigenenergies close to zero    *
- * shift     : Shift for shift-invert mode Ref. [3]                           *
  * -------------------------------------------------------------------------- */
-extern const char *species;
-extern const int32_t N;
-extern const int32_t nmax;
-extern const int32_t l;
-extern const double j;
-extern const double rmax;
-extern const double offset;
-extern const double shift;
+extern const alkcalc_settings settings;
 
 #endif

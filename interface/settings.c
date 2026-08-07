@@ -33,14 +33,11 @@
  * l         : Orbital angular momentum quantum number                        *
  * j         : Total angular momentum quantum number                          *
  * rmax      : Maximal radius in units of Bohr's radius, aB                   *
- * offset    : Energy offset to avoid relevant eigenenergies close to zero    *
- * shift     : Shift for shift-invert mode Ref. [3]                           *
  * -------------------------------------------------------------------------- */
-const char      *species     =         "1H"                                    ;
-const int32_t    N           =      1000000                                    ;
-const int32_t    nmax        =            9                                    ;
-const int32_t    l           =            0                                    ;
-const double     j           =             .5                                  ;
-const double     rmax        =        20000.                                   ;
-const double     offset      =            1.3                                  ;
-const double     shift       =            1.                                   ;
+const alkcalc_settings settings;
+settings.species             =                 "1H"                            ;
+settings.N                   =                  100                            ;
+settings.nmax                =                    9                            ;
+settings.l                   =                    0                            ;
+settings.j                   =                     .5                          ;
+settings.rmax                =                20000.                           ;
