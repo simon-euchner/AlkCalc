@@ -1,17 +1,11 @@
-Fix references
+Fix References in READMEs and align them with theory
 
-Update README's
-
-Fix Licenses of FORTRAN code
-
-Add references for FORTRAN code
-
-Update code for eigensolver
+Update READMEs
 
 Update code for reading states in alkcalc.h
 
-Update theory
+Update code for eigensolver
 
-Stop using "we" in comments, code, and README's
+Stop using "we" in comments, code, and READMEs
 
-Add references to external software in README's of external software
+Fix fnlsj-entry in reference manual in theory
