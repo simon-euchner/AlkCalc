@@ -1,0 +1,2 @@
+B-spline routines (SLATEC), based on Carl de Boor's algorithm, modified by D. E.
+Amos (Sandia National Laboratories) -- public domain, no license stated.
