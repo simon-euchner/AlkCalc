@@ -253,7 +253,7 @@ static double VR(double r, const v_data *data, double vc, double vp) {
     aBdVPdr  = -4. / r * vp - 3. * alphaD / pow(rc, 6.) * r * xpnt6;
     aBdVNRdr = aBdVCdr + aBdVPdr;
 
-    result = .25 * alphaM * alphaM * aBdVNRdr / (r*K)
+    result = .25 * alphaM * alphaM * aBdVNRdr / (r * K)
            * (jt * (jt + 1.) - lo * (lo + 1.) - .75);
 
     return result;
