@@ -56,12 +56,8 @@
 /* Data type for settings */
 typedef struct alkcalc_settings_s {
     char *species;
-    int32_t k;
-    int32_t N;
-    int32_t nmax;
-    int32_t l;
-    double j;
-    double rmax;
+    int32_t k, N, nmax, l;
+    double j, rmax;
 } alkcalc_settings;
 
 /* -------------------------------------------------------------------------- *

@@ -35,126 +35,94 @@ int main(int argc, char **argv)
 }
 /* -------------------------------------------------------------------------- */
 
-/* Initialise generalised eeigenvalue problem (result owned by caller)        */
+/* Initialise generalised eigenvalue problem (result owned by caller)         */
 eigensolver_data *eigensolver_data_init() {
 
-    int *info;
-    int32_t dim, *Hrs, *Hcs, *perm_r, *perm_c, *ipar, lo, k, k0;
-    double *vs, *hs, *Mdata, *Hdata, *b, *rpar, C, tk, runtime;
+    int32_t k, N, Nbs, dim, *ipar;
+    double *K, *W, *M, *H, *rpar;
     clock_t tstart, tend;
-    SuperMatrix H, *B;
-    superlu_options_t options;
-    SuperLUStat_t *stat;
     eigensolver_data *data;
 
     /* Allocate memory */
     data = (eigensolver_data *)malloc(sizeof(eigensolver_data));
-    data->dim = dim = N - 2;
-    vs = (double *)malloc(dim * sizeof(double));
-    hs = (double *)malloc((N - 1) * sizeof(double));
-    data->Mdata = Mdata = (double *)malloc((3 * dim - 2) * sizeof(double));
-    Hdata = (double *)malloc((3 * dim - 2) * sizeof(double));
-    Hrs = (int32_t *)malloc((3 * dim - 2) * sizeof(int32_t));
-    Hcs = (int32_t *)malloc((dim + 1) * sizeof(int32_t));
-    b = (double *)calloc(dim, sizeof(double));
-    data->perm_r = perm_r = (int32_t *)malloc(dim * sizeof(int32_t));
-    data->perm_c = perm_c = (int32_t *)malloc(dim * sizeof(int32_t));
+    k = settings.k; N = settings.N;
+    data->Nbs = Nbs = N + k - 2; /* Number of B-splines */
+    data->dim = dim = Nbs - 2; /* Dimension of generalised eigenvalue problem */
+    K = (double *)malloc(k * dim * sizeof(double)); /* Stiffness matrix */
+    W = (double *)malloc(k * dim * sizeof(double)); /* Potential matrix */
+    data->M = M = (double *)malloc(k * dim * sizeof(double)); /* Mass matrix */
+    data->H = H = (double *)malloc(k * dim * sizeof(double)); /* H = K + W */
 
-    /* Initialise potential (see '../interface/settings.c') */
+    /* Start measuremt of execution time */
     tstart = clock();
-    v_initpar(rpar = data->rpar, ipar = data->ipar);
+
+    /* Initialise parametric model potential V */
+    potential_initpar(ipar = data->ipar, rpar = data->rpar);
 
     /* Validate settings */
     validate_settings(ipar[3]);
 
-    /* Compute potential vector and step sizes */
-    lo = ipar[2]; /* Orbital angular momentum */
-    C = rpar[7]; /* Mass correction */
-    tk = 0.; /* t0 = 0 */
-    for (k = 1; k < N - 1; k++) {
-        tk += (hs[k - 1] = step(k));
-        vs[k - 1] = lo * (lo + 1.) / (2. * tk * tk)
-                  + C * v(tk, rpar, ipar) + offset - shift;
-    }
-    hs[N - 2] = step(N - 1);
+    /* Procedure                                                              *
+     *                                                                        *
+     * The goal is to construct the matrices K, M, W, and H defined in        *
+     * theory/theory.pdf. All of these matrices are real-symmetric banded     *
+     * matrices. The number of superdiagonals is given by the degree, d, of   *
+     * the B-splines. Because of these properties, the information carried by *
+     * each of the matrices K, M, W, and H is fully encoded in the d          *
+     * superdiagonals and the one diagonal. Therefore, each of the matrices   *
+     * can be represented by arrays of dimension (d + 1) * dim = k * dim,     *
+     * where k = d + 1 is the order of the B-splines and dim is the dimension *
+     * of the generalised eigenvalue problem                                  *
+     *                                                                        *
+     *     H fbar = lambda M f                                                *
+     *                                                                        *
+     * derived in theory/theory.pdf.                                          *
+     *                                                                        *
+     * To construct the matrices Gauss-Legendre quadratures are employed (see *
+     * theory/theory.pdf). For the mass matrix M, a quadrature rule of order  *
+     * n = d + 1 yields the exact result (to machine precision) for the       *
+     * components. In constrast, the stiffness matrix only requires a         *
+     * quadrature rule of order d. However, here, both cases are treated with *
+     * order d + 1. This is numerically more efficient, because this way,     *
+     * both matrices K and M can be constructed with one loop over quadrature *
+     * points. This reduced the number of calls to de Boor's algorithm.       *
+     *                                                                        *
+     * Finally, the matrix W, which represents the effective potential, is    *
+     * constructed. This is done separately, because the computation of its   *
+     * components requires high quadrature orders n, as the potential is only *
+     * approximately a polynomial.                                            *
+     *                                                                        *
+     * In the final step, the matrix H = K + W is constructed. With this, all *
+     * matrices to formulate the generalised eigenvalue problem are           *
+     * constructed. The next step is then to numerically solve the            *
+     * generalised eigenvalue problem.                                        */
 
-    /* Mass matrix (scalar product for generalised eigenproblem [row-major])  */
-    Mdata[0] = (hs[0] + hs[1]) / 3.;
-    Mdata[1] = hs[1] / 6.;
-    for (k = 1; k < dim - 1; k++) {
-        k0 = 2 + 3 * (k - 1);
-        Mdata[k0] = hs[k] / 6.;
-        Mdata[k0 + 1] = (hs[k] + hs[k + 1]) / 3.;
-        Mdata[k0 + 2] = hs[k + 1] / 6.;
-    }
-    k0 = 2 + 3 * (dim - 2);
-    Mdata[k0] = hs[dim - 1] / 6.;
-    Mdata[k0 + 1] = (hs[dim - 1] + hs[dim]) / 3.;
+    /* Compute Gauss-Legendre quadrature rule of degree k = d + 1             */
 
-    /* Hamiltonian in CSC format */
-    Hcs[0] = 0;
-    Hdata[0] = .5 / hs[0] + .5 / hs[1] + vs[0] * Mdata[0];
-    Hdata[1] = -.5 / hs[1] + .5 * (vs[0] + vs[1]) * Mdata[1];
-    Hrs[0] = 0; Hrs[1] = 1;
-    Hcs[1] = 2;
-    for (k = 1; k < dim - 1; k++) {
-        k0 = 2 + 3 * (k - 1);
-        Hdata[k0] = -.5 / hs[k] + .5 * (vs[k - 1] + vs[k]) * Mdata[k0];
-        Hdata[k0 + 1] = .5 / hs[k] + .5 / hs[k + 1] + vs[k] * Mdata[k0 + 1];
-        Hdata[k0 + 2] = -.5 / hs[k + 1]
-                      + .5 * (vs[k] + vs[k + 1]) * Mdata[k0 + 2];
-        Hrs[k0] = k - 1; Hrs[k0 + 1] = k; Hrs[k0 + 2] = k + 1;
-        Hcs[k + 1] = Hcs[k] + 3;
-    }
-    k0 = 2 + 3 * (dim - 2);
-    Hdata[k0] = -.5 / hs[N - 3] + .5 * (vs[N - 4] + vs[N - 3]) * Mdata[k0];
-    Hdata[k0 + 1] = .5 / hs[N - 3] + .5 / hs[N - 2] + vs[N - 3] * Mdata[k0 + 1];
-    Hrs[k0] = dim - 2; Hrs[k0 + 1] = dim - 1;
-    Hcs[dim] = Hcs[dim - 1] + 2;
-    dCreate_CompCol_Matrix(&H, dim, dim, 3 * dim - 2, Hdata, Hrs, Hcs, SLU_NC,
-                           SLU_D, SLU_GE);
 
-    /* Initialise solver */
-    set_default_options(&options); options.ColPerm = NATURAL;
-    StatInit(stat = &data->stat);
 
-    /* Dummy right-hand side (b is already initialised to hold zeros) */
-    dCreate_Dense_Matrix(B = &data->B, dim, 1, b, dim, SLU_DN, SLU_D, SLU_GE);
 
-    /* Perform LU decomposition */
-    tend = clock();
-    runtime = (tend - tstart)/(double)CLOCKS_PER_SEC; data->runtime = runtime;
-    tstart = clock(); info = &data->info;
-    dgssv(&options, &H, perm_c, perm_r, &data->L, &data->U, B, stat, info);
-    tend = clock(); runtime = (tend - tstart)/(double)CLOCKS_PER_SEC;
-    if (*info) {
-        ERROR("LU DECOMPOSITION FAILED WITH 'INFO = %d'", *info);
-    } else {
-        printf("LU DECOMPOSITION SUCCESSFUL (RUNTIME: %1.3f S)\n\n", runtime);
-    }
-    data->runtime += runtime;
+
+
 
     /* Clean up */
-    free(vs); vs = NULL;
-    free(hs); hs = NULL;
-    free(b); b = NULL;
-    ((DNformat *)(data->B.Store))->nzval = NULL;
-    Destroy_CompCol_Matrix(&H);
+    free(K); K = NULL;
+    free(W); W = NULL;
+
+    /* Save partial execution time */
+    tend = clock(); data->runtime = (tend - tstart)/(double)CLOCKS_PER_SEC;
 
     return data;
 }
 
-//      /* Free data of type 'eigensolver_data'                                       */
-//      void eigensolver_data_free(eigensolver_data *data) {
-//          SUPERLU_FREE(data->perm_r); data->perm_r = NULL;
-//          SUPERLU_FREE(data->perm_c); data->perm_c = NULL;
-//          free(data->Mdata); data->Mdata = NULL;
-//          Destroy_Dense_Matrix(&data->B);
-//          Destroy_SuperNode_Matrix(&data->L);
-//          Destroy_CompCol_Matrix(&data->U);
-//          StatFree(&data->stat);
-//          free(data); data = NULL;
-//      }
+/* Free data of type eigensolver_data                                         */
+void eigensolver_data_free(eigensolver_data *data) {
+    free(data->M); data->M = NULL;
+    free(data->H); data->H = NULL;
+    free(data); data = NULL;
+}
+
+
 //      
 //      /* Solve eigenproblem                                                         */
 //      void solve(eigensolver_data *data) {

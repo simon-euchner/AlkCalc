@@ -53,7 +53,7 @@ solve: ${TMP}/e${TMSTMP}
 ${TMP}/e${TMSTMP}: ${OBJ}/${F0}.o ${OBJ}/${F1}.o ${OBJ}/${F2}.o ${OBJ}/${F3}.o
 	@${LD} -o ${TMP}/solve${TMSTMP} -L${GAQ}/ -L${BSP}/ -L${ELA}/ \
 	${OBJ}/${F0}.o ${OBJ}/${F1}.o ${OBJ}/${F2}.o ${OBJ}/${F3}.o -lm -lblas \
-	-lgaussq -lbsplines -leiglapack -Wl,-rpath,{${LUF}/,${LCZ}/}
+	-lgaussq -lbsplines -leiglapack -Wl,-rpath,{${GAQ}/,${BSP}/,${ELA}/}
 
 
 ### Compile
