@@ -8,6 +8,8 @@ int main(int argc, char **argv)
 
     potential_initpar(ipar, rpar);
 
+    validate_settings(ipar[3]);
+
     double r;
     for (int i = 0; i < 100; i++) {
         r = 1e-6 + 1e-4 * i * i;

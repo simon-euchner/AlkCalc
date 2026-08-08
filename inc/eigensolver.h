@@ -43,6 +43,7 @@ typedef struct eigensolver_data_s {
 
 void potential_initpar(int32_t *, double *);
 double V(double, int32_t *, double *);
+void validate_settings(int32_t);
 eigensolver_data *eigensolver_data_init();
 void eigensolver_data_free(eigensolver_data *);
 void solve(eigensolver_data *);

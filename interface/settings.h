@@ -68,8 +68,8 @@ typedef struct alkcalc_settings_s {
  * Settings                                                                   *
  *                                                                            *
  * species   : Atom or ion species                                            *
- * k         : Order of B-splines (k > ???)          FIXME !!!                *
- * N         : Number of discretisation points (N > ?)       FIXME !!!        *
+ * k         : Order of B-splines (k >= 3)                                    *
+ * N         : Number of discretisation points (N >= 2)                       *
  * nmax      : Maximal principle quantum number                               *
  * l         : Orbital angular momentum quantum number                        *
  * j         : Total angular momentum quantum number                          *

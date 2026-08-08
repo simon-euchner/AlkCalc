@@ -28,8 +28,8 @@
  * Settings                                                                   *
  *                                                                            *
  * species   : Atom or ion species                                            *
- * k         : Order of B-splines (k > ???)          FIXME !!!                *
- * N         : Number of discretisation points (N > ?)       FIXME !!!        *
+ * k         : Order of B-splines (k >= 3)                                    *
+ * N         : Number of discretisation points (N >= 2)                       *
  * nmax      : Maximal principal quantum number                               *
  * l         : Orbital angular momentum quantum number                        *
  * j         : Total angular momentum quantum number                          *
@@ -37,10 +37,10 @@
  * -------------------------------------------------------------------------- */
 const alkcalc_settings settings = {
     .species =                                                       "1H"      ,
-    .k       =                                                          8      ,
-    .N       =                                                        100      ,
-    .nmax    =                                                          9      ,
+    .k       =                                                          3      ,
+    .N       =                                                          2      ,
+    .nmax    =                                                          3      ,
     .l       =                                                          0      ,
     .j       =                                                           .5    ,
-    .rmax    =                                                      20000.
+    .rmax    =                                                       20000.
 };
