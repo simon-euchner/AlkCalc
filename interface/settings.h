@@ -7,12 +7,12 @@
  * The purpose of this file is to provide an interface for the user to        *
  * specify settings for computing eigenenergies and radial eigenstates.       *
  *                                                                            *
- * Note that by running the main 'Makefile' with the argument 'solve', i.e.,  *
+ * Note that by running the main Makefile with the argument solve, i.e.,      *
  * running the command 'make solve', this file is read, the settings applied, *
  * all specified eigenenergies and radial eigenstates computed, and the       *
  * results saved.                                                             *
  *                                                                            *
- * Note further that this file has no effect on the functions in 'alkcalc.h'. *
+ * Note further that this file has no effect on the functions in alkcalc.h.   *
  * These merely use the already generated data.                               *
  * -------------------------------------------------------------------------- */
 

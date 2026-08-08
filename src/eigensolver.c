@@ -4,9 +4,7 @@
  * Author of this file: Simon Euchner                                         *
  * -------------------------------------------------------------------------- *
  *                                                                            *
- * All eigenenergies are in units of Hartree and the radial eigenstates are   *
- * represented by a vector in the basis of the finite elements; see           *
- * 'theory/theory.pdf'.                                                       *
+ * For more information please see theory/theory.pdf.                         *
  * -------------------------------------------------------------------------- */
 
 #include "../inc/eigensolver.h"

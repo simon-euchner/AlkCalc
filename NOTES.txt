@@ -2,6 +2,10 @@ Fix References in READMEs and align them with theory
 
 Update READMEs
 
+Stop marking variable with '...' and file name with '...'
+
+Remove checks for validity of settings from potentila file. Do it seprately!
+
 Update code for reading states in alkcalc.h
 
 Update code for eigensolver

@@ -4,9 +4,7 @@
  * Author of this file: Simon Euchner                                         *
  * -------------------------------------------------------------------------- *
  *                                                                            *
- * All eigenenergies are in units of Hartree and the radial eigenstates are   *
- * represented by a vector in the basis of the finite elements; see           *
- * 'theory/theory.pdf'.                                                       *
+ * For more information please see theory/theory.pdf.                         *
  * -------------------------------------------------------------------------- */
 
 #ifndef EIGENSOLVER_H
@@ -16,15 +14,18 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <string.h>
+#include <math.h>
 #include <time.h>
 #include "../interface/settings.h"
-#include "../LUFac/inc/slu_ddefs.h"
-#include "../LANCZOS/inc/lanczos.h"
+#include "../GAUSSQ/inc/gaussq.h"
+#include "../BSPLINES/inc/bsplines.h"
+#include "../EIGLAPACK/inc/eiglapack.h"
 
-#define FC 0.0072973525643 /* Fine-structure, 0.0072973525643(11) Ref. [5] */
+#define FC 0.0072973525643 /* Fine-strct. cnst., 0.0072973525643(11) Ref. [5] */
 #define ME 0.0005485799090441 /* me, 0.0005485799090441(97) u Ref. [5] */
 
-#define SPECIES_DATA "./interface/species.dat"
+//#define SPECIES_DATA "./interface/species.dat"
+#define SPECIES_DATA "../interface/species.dat" // DELTEME, FOR TESTING
 
 /* Macro for error handling */
 #define ERROR(...) do { \
@@ -36,14 +37,12 @@
 
 /* Data type to store data for eigensolver */
 typedef struct eigensolver_data_s {
-    int32_t dim, *perm_r, *perm_c, ipar[4], info;
+    int32_t dim, ipar[4], info;
     double *Mdata, rpar[10], runtime;
-    SuperMatrix B, L, U;
-    SuperLUStat_t stat;
 } eigensolver_data;
 
-void v_initpar(double *, int32_t *);
-double v(double, double *, int32_t *);
+void potential_initpar(int32_t *, double *);
+double V(double, int32_t *, double *);
 eigensolver_data *eigensolver_data_init();
 void eigensolver_data_free(eigensolver_data *);
 void solve(eigensolver_data *);
