@@ -41,6 +41,6 @@ const alkcalc_settings settings = {
     .N       =                                                          2      ,
     .nmax    =                                                          3      ,
     .l       =                                                          1      ,
-    .j       =                                                           0.    ,
+    .j       =                                                            .5   ,
     .rmax    =                                                       20000.
 };

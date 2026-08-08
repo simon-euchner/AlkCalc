@@ -31,12 +31,12 @@ void validate_settings(int32_t nl) {
      *                                                                        *
      * Constraint(s) : k >= 3                                                 *
      * Information   : This makes sure that the second derivatives of         *
-     *                 B-splines are still polynomials with degree larger or  *
-     *                 equal to zero. As a result, the components of the      *
-     *                 stiffness matrix K in theory/theory.pdf are            *
+     *                 B-splines are still polynomials with degree larger     *
+     *                 than or equal to zero. As a result, the components of  *
+     *                 the stiffness matrix K in theory/theory.pdf are        *
      *                 well-defined.                                          */
     if (k < 3) {
-        ERROR("B-SPLINE ORDER K = %" PRId32 " IS TO SMALL", k);
+        ERROR("B-SPLINE ORDER K = %" PRId32 " IS TOO SMALL", k);
     }
 
     /* Number of unique knots (N)                                             *
@@ -47,7 +47,7 @@ void validate_settings(int32_t nl) {
      *                 ensures that there is a first and a final knot. This   *
      *                 ensures that the dimension of the generalised          *
      *                 eigenvalue problem in theory/theory.pdf is larger than *
-     *                 or equal to 1.                                         */
+     *                 or equal to one.                                       */
     if (N < 2) {
         ERROR("TOO FEW KNOTS, N MUST SATISFY: N(%" PRId32 ") >= 2", N);
     }
@@ -57,7 +57,7 @@ void validate_settings(int32_t nl) {
      * Constraint(s) : nmax >= nl, where nl is the minimal possible principal *
      *                 quantum number for fixed l                             *
      * Information   : For fixed l, a physical constraint on n is that        *
-     *                 l <= n - 1. Therefore, nl = l - 1 is the minimal       *
+     *                 l <= n - 1. Therefore, nl = l + 1 is the minimal       *
      *                 principal quantum number that can host l. When         *
      *                 nmax < nl there does not exist an eigenstate.          */
     if (nmax < nl) {
@@ -67,8 +67,8 @@ void validate_settings(int32_t nl) {
     /* Orbital angular momentum quantum number (l)                            *
      *                                                                        *
      * Constraint(s) : 0 <= l < nmax                                          *
-     * Information   : For fixed n a physical constraint is l > n. Therefore, *
-     *                 l must be less than nmax.                              */
+     * Information   : For fixed n, a physical constraint is l < n.           *
+     *                 Therefore, l must be less than nmax.                   */
     if (l < 0 || l >= nmax) {
         ERROR("INVALID L: 0 <= L(%" PRId32 ") < NMAX(%" PRId32 ")", l, nmax);
     }
@@ -76,7 +76,7 @@ void validate_settings(int32_t nl) {
     /* Total angular momentum quantum number (j)                              *
      *                                                                        *
      * Constraint(s) : j = |l - 1 / 2|, l + 1 / 2                             *
-     * Information   : By coupling l with s = 1 / 2 the only possible total   *
+     * Information   : By coupling l with s = 1 / 2, the only possible total  *
      *                 angular momentum quantum numbers are j = |l - s| and   *
      *                 j = l + s.                                             */
     J = (int32_t)floor(2. * j + .5);
@@ -91,7 +91,7 @@ void validate_settings(int32_t nl) {
      * Constraint(s) : rmax > 0                                               *
      * Information   : In theory/theory.pdf it is assumed that rmax > 0. This *
      *                 is a technical constraint which is applied to simplify *
-     *                 the theory. Of course, it also does not make senss to  *
+     *                 the theory. Of course, it also does not make sense to  *
      *                 choose rmax <= 0.                                      */
     if (!(rmax > 0)) {
         ERROR("MAXIMAL RADIUS RMAX MUST BE LARGER THAN ZERO");
