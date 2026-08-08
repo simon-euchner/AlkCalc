@@ -80,32 +80,24 @@ void potential_initpar(int32_t *ipar, double *rpar) {
 
     /* Open data file */
     if (!(fd = fopen(SPECIES_DATA, "r"))) {
-        ERROR("COULD NOT OPEN 'SPECIES.DAT' FOR READING");
+        ERROR("COULD NOT OPEN INTERFACE/SPECIES.DAT FOR READING");
     }
 
-    /* Get species from settings */
-    species = settings.species;
-
     /* Search for identifier corresponding to species */
-    id[0] = '*';
+    species = settings.species; id[0] = '*';
     while (strcmp(species, id)) {
         move(fd, id);
         if (!id[0]) {
-            ERROR("REQUESTED SPECIES '%s' IS NOT KNOWN", species);
+            ERROR("REQUESTED SPECIES %s IS NOT KNOWN", species);
         }
     }
 
     /* Get orbital and total angular momentum quantum numbers from settings */
     l = settings.l; j = settings.j;
 
-    /* Check validity of orbital angular momentum quantum number */
-    if (l < 0) {
-        ERROR("INVALID ORBITAL ANGULAR MOMENTUM 'L = %" PRId32 "'", l);
-    }
-
     /* Read data for atom/ion species */
     if ((c = fgetc(fd)) == '=') {
-        ERROR("THERE MUST BE DATA FOR AT LEAST ONE ANGULAR MOMENTUM 'L'");
+        ERROR("THERE MUST BE DATA FOR AT LEAST ONE ANGULAR MOMENTUM L");
     }
     do {
         (void)fscanf(fd, "%d %lf %lf %lf %lf %lf %" SCNd32 " ", &lread, rpar,
@@ -113,7 +105,7 @@ void potential_initpar(int32_t *ipar, double *rpar) {
 
     } while ((c = fgetc(fd)) != '=' && lread != l);
     if (l < lread) { /* Case where it is unclear which parameters to use */
-        ERROR("NO DATA FOUND FOR ANGULAR MOMENTUM 'L = %" PRId32 "'", l);
+        ERROR("NO DATA FOUND FOR ANGULAR MOMENTUM L = %" PRId32, l);
     }
     if (l > lread) { /* Case where parameters for largest supplied l are used */
         ipar[3] = l + 1;
