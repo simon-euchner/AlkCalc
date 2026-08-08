@@ -1,15 +1,14 @@
+
 Fix References in READMEs and align them with theory
 
-Update READMEs
+Update READMEs (j behaviour was unified with library functions)
 
 Stop marking variable with '...' and file name with '...'
-
-Remove checks for validity of settings from potentila file. Do it seprately!
 
 Update code for reading states in alkcalc.h
 
 Update code for eigensolver
 
-Stop using "we" in comments, code, and READMEs
+Stop using "we" in code, and READMEs
 
 Fix fnlsj-entry in reference manual in theory

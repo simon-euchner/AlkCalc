@@ -129,7 +129,7 @@ void potential_initpar(int32_t *ipar, double *rpar) {
     /* rpar[7] = 1. / (1. + ME / rpar[6]); */
     rpar[7] = 1.;
     ipar[2] = l;
-    rpar[8] = .5 * (2 * (int32_t)j + 1);
+    rpar[8] = .5 * CONVERT(j);
     (void)fscanf(fd, "EGS %lf ", rpar + 9);
 
     /* Close file */

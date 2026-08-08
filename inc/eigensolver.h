@@ -35,6 +35,9 @@
     exit(EXIT_FAILURE); \
 } while (0)
 
+/* Macro for cleaning up half-integer quantum numbers */
+#define CONVERT(X) (int32_t)floor(2. * (X) + .5)
+
 /* Data type to store data for eigensolver */
 typedef struct eigensolver_data_s {
     int32_t dim, ipar[4], info;
