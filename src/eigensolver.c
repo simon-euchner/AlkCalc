@@ -10,12 +10,10 @@
 #include "../inc/eigensolver.h"
 
 static double step(int32_t);
-static void mass_matrix_f(const eigensolver_data *, const double *, double *);
-static void shift_invert_f(eigensolver_data *, double *);
-static void save_energies(eigensolver_data *, const double *);
-static void save_states(eigensolver_data *, const double *);
-static void save_discretisation();
-static void fmt_2d_exp(char *, int32_t, double);
+//static void save_energies(eigensolver_data *, const double *);
+//static void save_states(eigensolver_data *, const double *);
+//static void save_discretisation();
+//static void fmt_2d_exp(char *, int32_t, double);
 
 /* --- MAIN ----------------------------------------------------------------- */
 int main(int argc, char **argv)
@@ -38,22 +36,35 @@ int main(int argc, char **argv)
 /* Initialise generalised eigenvalue problem (result owned by caller)         */
 eigensolver_data *eigensolver_data_init() {
 
-    int32_t k, N, Nbs, dim, *ipar;
-    double *K, *W, *M, *H, *rpar;
+    int32_t nW, k, N, Nbs, dim, *ipar, nKM;
+    double *K, *W, *M, *H, *wKM, *xKM, *wW, *xW, *rpar;
     clock_t tstart, tend;
     eigensolver_data *data;
+
+    /* Set order nW of Gauss-Legendre quadrature for the potential matrix W   *
+     *                                                                        *
+     * The effective potential in theory/theory.pdf which determines the      *
+     * components of the potential matrix W is not a polynomial. Therefore,   *
+     * to compute the integral it is best to choose a high quadrature order   *
+     * nW. This is the point in the code where this order is hard-coded. It   *
+     * be adjusted by the user, if necessary.                                 */
+    nW = 1000;
 
     /* Allocate memory */
     data = (eigensolver_data *)malloc(sizeof(eigensolver_data));
     k = settings.k; N = settings.N;
     data->Nbs = Nbs = N + k - 2; /* Number of B-splines */
     data->dim = dim = Nbs - 2; /* Dimension of generalised eigenvalue problem */
-    K = (double *)malloc(k * dim * sizeof(double)); /* Stiffness matrix */
-    W = (double *)malloc(k * dim * sizeof(double)); /* Potential matrix */
-    data->M = M = (double *)malloc(k * dim * sizeof(double)); /* Mass matrix */
-    data->H = H = (double *)malloc(k * dim * sizeof(double)); /* H = K + W */
+    K = (double *)calloc(k * dim, sizeof(double)); /* Stiffness matrix */
+    W = (double *)calloc(k * dim, sizeof(double)); /* Potential matrix */
+    data->M = M = (double *)calloc(k * dim, sizeof(double)); /* Mass matrix */
+    data->H = H = (double *)calloc(k * dim, sizeof(double)); /* H = K + W */
+    wKM = (double *)malloc(k * sizeof(double)); /* Weights for K, M integrals */
+    xKM = (double *)malloc(k * sizeof(double)); /* Points for K, M integrals */
+    wW = (double *)malloc(nW * sizeof(double)); /* Weights for W integrals */
+    xW = (double *)malloc(nW * sizeof(double)); /* Points for W integrals */
 
-    /* Start measuremt of execution time */
+    /* Start measuremet of execution time */
     tstart = clock();
 
     /* Initialise parametric model potential V */
@@ -97,7 +108,29 @@ eigensolver_data *eigensolver_data_init() {
      * constructed. The next step is then to numerically solve the            *
      * generalised eigenvalue problem.                                        */
 
-    /* Compute Gauss-Legendre quadrature rule of degree k = d + 1             */
+    /* Compute weights and points for Gauss-Legendre quadrature rule          *
+     *                                                                        *
+     * The weights, wKM, and the points, xKM, are computed. Both are arrays   *
+     * of length k. The weights and points are computed for integrals over    *
+     * the interval [-1, 1]. For more information, see theory/theory.pdf.     */
+    nKM = k;
+    gaussq_c(&nKM, xKM, wKM); /* Call to GAUSSQ */
+
+
+
+
+
+    /* Compute weights and points for Gauss-Legendre quadrature rule          *
+     *                                                                        *
+     * The weights, wW, and the points, xW, are computed. Both are arrays of  *
+     * length nW. The weights and points are computed for integrals over the  *
+     * interval [-1, 1]. For more information, see theory/theory.pdf.         */
+    gaussq_c(&nW, xW, wW); /* Call to GAUSSQ */
+
+
+
+
+
 
 
 
@@ -106,10 +139,14 @@ eigensolver_data *eigensolver_data_init() {
 
 
     /* Clean up */
+    free(wKM); wKM = NULL;
+    free(xKM); xKM = NULL;
+    free(wW); wW = NULL;
+    free(xW); xW = NULL;
     free(K); K = NULL;
     free(W); W = NULL;
 
-    /* Save partial execution time */
+    /* Compute and save partial execution time */
     tend = clock(); data->runtime = (tend - tstart)/(double)CLOCKS_PER_SEC;
 
     return data;
@@ -227,30 +264,37 @@ void eigensolver_data_free(eigensolver_data *data) {
 //          /* Save discretisation points and step sizes to file */
 //          save_discretisation();
 //      }
-//      
-//      /* -------------------------------------------------------------------------- *
-//       * Helper functions                                                           *
-//       * -------------------------------------------------------------------------- */
-//      
-//      /* Function returning the k-th (k = 1, ..., N - 1) step size                  */
-//      static double step(int32_t k) {
-//      
-//          /* Here the step sizes hk = tk - tkm1 (km1 means 'k - 1') are defined.    *
-//           * The step sizes must be such that their sum is rmax (see                *
-//           * 'interface/settings.c'). Note here the step sizes are set rather than  *
-//           * the discretisation mesh itself. This is to avoid so-called             *
-//           * 'catastrophic cancellation' when computing the step sizes, which       *
-//           * ensures numerical stability.                                           *
-//           *                                                                        *
-//           * Note: One must be careful with overflow in integer multiplication and  *
-//           * addition here, if N is very large.                                     */
-//      
-//          double hk;
-//      
-//          hk = rmax * (2 * k - 1)/((double)(N - 1) * (N - 1));
-//      
-//          return hk;
-//      }
+
+/* -------------------------------------------------------------------------- *
+ * Helper functions                                                           *
+ * -------------------------------------------------------------------------- */
+
+// FIXME !!!
+/* Function returning the i-th (i = 1, ..., N - 1) step size                  */
+static double step(int32_t i) {
+
+    /* Here the step sizes hk = tk - tkm1 (km1 means 'k - 1') are defined.    *
+     * The step sizes must be such that their sum is rmax (see                *
+     * 'interface/settings.c'). Note here the step sizes are set rather than  *
+     * the discretisation mesh itself. This is to avoid so-called             *
+     * 'catastrophic cancellation' when computing the step sizes, which       *
+     * ensures numerical stability.                                           *
+     *                                                                        *
+     * Note: One must be careful with overflow in integer multiplication and  *
+     * addition here, if N is very large.                                     */
+
+    int32_t N;
+    double rmax, hi;
+
+    /* Extract N and rmax from settings */
+    N = settings.N; rmax = settings.rmax;
+
+    /* Definition of step sizes */
+    hi = rmax * (2 * i - 1)/((double)(N - 1) * (N - 1));
+
+    return hi;
+}
+
 //      
 //      /* Compute action of mass matrix (result stored in y)                         */
 //      static void mass_matrix_f(const eigensolver_data *data, const double *x,
