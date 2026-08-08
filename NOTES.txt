@@ -1,14 +1,13 @@
-
-Fix References in READMEs and align them with theory
-
-Update READMEs (j behaviour was unified with library functions)
-
-Stop marking variable with '...' and file name with '...'
+Update code for eigensolver
 
 Update code for reading states in alkcalc.h
 
-Update code for eigensolver
-
-Stop using "we" in code, and READMEs
+Stop marking variable with '...' and file names with '...'
 
 Fix fnlsj-entry in reference manual in theory
+
+Stop using "we" in code (including FORTRAN package READMEs), and READMEs
+
+Fix References in READMEs + code and align them with theory
+
+Update READMEs (j behaviour was unified with library functions)
