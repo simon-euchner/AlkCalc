@@ -35,7 +35,7 @@
     exit(EXIT_FAILURE); \
 } while (0)
 
-/* Macro for cleaning up half-integer quantum numbers */
+/* Macro for converting a half-integer quantum number X to the integer 2 * X */
 #define CONVERT(X) (int32_t)floor(2. * (X) + .5)
 
 /* Data type to store data for eigensolver */
@@ -45,8 +45,8 @@ typedef struct eigensolver_data_s {
 } eigensolver_data;
 
 void potential_initpar(int32_t *, double *);
-double V(double, int32_t *, double *);
 void validate_settings(int32_t);
+double V(double, int32_t *, double *);
 eigensolver_data *eigensolver_data_init();
 void eigensolver_data_free(eigensolver_data *);
 void solve(eigensolver_data *);

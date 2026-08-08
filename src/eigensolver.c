@@ -22,20 +22,20 @@ int main(int argc, char **argv)
 {
     (void)argc; (void)argv;
 
-    /* Initialise eigenproblem */
+    /* Initialise generalised eigenvalue problem */
     eigensolver_data *data = eigensolver_data_init();
 
     /* Solve eigenproblem and save result */
-    solve(data);
+    //solve(data);
 
     /* Clean up */
-    eigensolver_data_free(data);
+    //eigensolver_data_free(data);
 
     return 0;
 }
 /* -------------------------------------------------------------------------- */
 
-/* Initialise eigenproblem (result owned by caller)                           */
+/* Initialise generalised eeigenvalue problem (result owned by caller)        */
 eigensolver_data *eigensolver_data_init() {
 
     int *info;
@@ -144,341 +144,341 @@ eigensolver_data *eigensolver_data_init() {
     return data;
 }
 
-/* Free data of type 'eigensolver_data'                                       */
-void eigensolver_data_free(eigensolver_data *data) {
-    SUPERLU_FREE(data->perm_r); data->perm_r = NULL;
-    SUPERLU_FREE(data->perm_c); data->perm_c = NULL;
-    free(data->Mdata); data->Mdata = NULL;
-    Destroy_Dense_Matrix(&data->B);
-    Destroy_SuperNode_Matrix(&data->L);
-    Destroy_CompCol_Matrix(&data->U);
-    StatFree(&data->stat);
-    free(data); data = NULL;
-}
-
-/* Solve eigenproblem                                                         */
-void solve(eigensolver_data *data) {
-
-    int ido, nerr, info;
-    int32_t dim, n, nl, nev, ncv, ldv, ldz, lworkl, *iparam, *ipntr, k;
-    double tol, *resid, *v, *workd, *workl, *select, *d, *z, sigma, runtime,
-           *dummy, iC;
-    clock_t tstart, tend;
-
-    /* Initialise variables for Lanczos algorithm */
-    dim = data->dim;
-    ido = 0; n = dim; nl = data->ipar[3]; nev = nmax - nl + 1;
-    if ((ncv = 2 * nev + 1) < 20) { ncv = 20; }
-    if (ncv > dim) { ncv = dim; }
-    ldv = dim; ldz = dim; lworkl = ncv * (8 + ncv); info = 0; tol = 1e-12;
-    iparam = (int32_t *)calloc(11, sizeof(int32_t));
-    ipntr = (int32_t *)calloc(11, sizeof(int32_t));
-    resid = (double *)malloc(dim * sizeof(double));
-    v = (double *)malloc(dim * ncv * sizeof(double));
-    workd = (double *)malloc(3 * dim * sizeof(double));
-    workl = (double *)malloc(lworkl * sizeof(double));
-    select = (double *)calloc(ncv, sizeof(double)); /* Ritz value ordering */
-    d = (double *)malloc(nev * sizeof(double));
-    z = (double *)malloc(nev * dim * sizeof(double));
-    sigma = shift;
-    iparam[0] = 1;
-    iparam[2] = 1000000000; /* Large enough to avoid becoming a problem */
-    iparam[3] = 1;
-    iparam[6] = 3; /* Shift-invert mode */
-
-    /* Iterative calls to 'DSAUPD' */
-    tstart = clock(); nerr = 0;
-    do {
-
-        /* Call 'DSAUPD' */
-        dsaupd_c(&ido, &n, &nev, &tol, resid, &ncv, v, &ldv, iparam, ipntr,
-                 workd, workl, &lworkl, &info); data->info = info;
-
-        /* Check if call was successful */
-        if (ido != 1 && ido != -1 && ido != 2 && ido != 99) {
-            ERROR("ERROR DURING ITERATION: IDO = %d", ido);
-            nerr++;
-        }
-        if (info != 0 && info != 1) {
-            ERROR("ERROR DURING ITERATION: INFO = %d", info);
-            nerr++;
-        }
-        if (info == 1) {
-            ERROR("REACHED MAXIMAL NUMBER OF ITERATIONS");
-            nerr++;
-        }
-        if (nerr) { ERROR("DSAUPD ENDED WITH NERR = %d", nerr); }
-
-        /* React to instructions from 'DSAUPD' */
-        if (ido == 1) { /* Compute action of shift-inverted Hamiltonian */
-            for (k = 0; k < dim; k++) {
-                workd[ipntr[1] - 1 + k] = workd[ipntr[2] - 1 + k];
-            }
-            shift_invert_f(data, &workd[ipntr[1] - 1]); /* Result in argument */
-        } else
-        if (ido == 2) { /* Compute action of mass matrix */
-            mass_matrix_f(data, &workd[ipntr[0] - 1], &workd[ipntr[1] - 1]);
-        } else { /* Initialisation step */
-            mass_matrix_f(data, &workd[ipntr[0] - 1], &workd[ipntr[1] - 1]);
-            shift_invert_f(data, &workd[ipntr[1] - 1]); /* Result in argument */
-        }
-
-    } while (ido == 1 || ido == 2 || ido == -1);
-
-    /* Call 'DSEUPD' to extract results */
-    dseupd_c(select, d, z, &ldz, &n, &nev, &tol, resid, &ncv, v, &ldv, &sigma,
-             iparam, ipntr, workd, workl, &lworkl, &info);
-    tend = clock();
-    runtime = (tend - tstart) / (double)CLOCKS_PER_SEC;
-    data->runtime += runtime;
-    printf("ALGORITHM FINISHED SUCCESSFULLY (RUNTIME: %.3f S)\n\n", runtime);
-
-    /* Dummy data to give 'Destroy_Dense_Matrix' something to free */
-    dummy = (double *)calloc(1, sizeof(double));
-    ((DNformat *)(data->B.Store))->nzval = dummy;
-
-    /* Prepare and save eigenenergies */
-    iC = 1. / data->rpar[7];
-    for (k = 0; k < nev; k++) { d[k] = iC * (d[k] - offset); }
-    save_energies(data, d);
-
-    /* Save radial eigenstates */
-    save_states(data, z);
-
-    /* Clean up */
-    free(iparam); iparam = NULL;
-    free(ipntr); ipntr = NULL;
-    free(resid); resid = NULL;
-    free(v); v = NULL;
-    free(workd); workd = NULL;
-    free(workl); workl = NULL;
-    free(select); select = NULL;
-    free(d); d = NULL;
-    free(z); z = NULL;
-
-    /* Save discretisation points and step sizes to file */
-    save_discretisation();
-}
-
-/* -------------------------------------------------------------------------- *
- * Helper functions                                                           *
- * -------------------------------------------------------------------------- */
-
-/* Function returning the k-th (k = 1, ..., N - 1) step size                  */
-static double step(int32_t k) {
-
-    /* Here the step sizes hk = tk - tkm1 (km1 means 'k - 1') are defined.    *
-     * The step sizes must be such that their sum is rmax (see                *
-     * 'interface/settings.c'). Note here the step sizes are set rather than  *
-     * the discretisation mesh itself. This is to avoid so-called             *
-     * 'catastrophic cancellation' when computing the step sizes, which       *
-     * ensures numerical stability.                                           *
-     *                                                                        *
-     * Note: One must be careful with overflow in integer multiplication and  *
-     * addition here, if N is very large.                                     */
-
-    double hk;
-
-    hk = rmax * (2 * k - 1)/((double)(N - 1) * (N - 1));
-
-    return hk;
-}
-
-/* Compute action of mass matrix (result stored in y)                         */
-static void mass_matrix_f(const eigensolver_data *data, const double *x,
-                          double *y) {
-
-    int32_t k, k0, dim = data->dim;
-    double *Mdata = data->Mdata;
-
-    y[0] = Mdata[0] * x[0] + Mdata[1] * x[1];
-    for (k = 1; k < dim - 1; k++) {
-        k0 = 2 + 3 * (k - 1);
-        y[k] = Mdata[k0] * x[k - 1]
-             + Mdata[k0 + 1] * x[k]
-             + Mdata[k0 + 2] * x[k + 1];
-    }
-    k0 = 2 + 3 * (dim - 2);
-    y[dim - 1] = Mdata[k0] * x[dim - 2] + Mdata[k0 + 1] * x[dim - 1];
-}
-
-/* Compute action of shift-inverted Hamiltonian (result stored in x)          */
-static void shift_invert_f(eigensolver_data *data, double *x) {
-
-    /* Prepare input */
-    ((DNformat *)(data->B.Store))->nzval = x;
-
-    /* Solve the system (H-sigma*M) * vout = vin */
-    dgstrs(NOTRANS, &data->L, &data->U, data->perm_c, data->perm_r, &data->B,
-           &data->stat, &data->info);
-}
-
-/* Save computed eigenenergies to file                                        */
-static void save_energies(eigensolver_data *data, const double *energies) {
-
-    char file[71], filename[51], buffer[101];
-    int32_t *ipar, nl, lo, jj, runtime, n;
-    double EGS, dti, dtf;
-    FILE *fd;
-
-    /* Open file for writing */
-    nl = (ipar = data->ipar)[3]; lo = ipar[2]; jj = 2 * (int32_t)j + 1;
-    EGS = data->rpar[9]; runtime = (int32_t)data->runtime;
-    dti = step(1); dtf = step(N - 1);
-    (void)sprintf(filename, "energies-%s-%03" PRId32 "-%03" PRId32 ".dat",
-                  species, lo, jj);
-    (void)strcpy(file, "./data/");
-    (void)strcat(file, filename);
-    if (!(fd = fopen(file, "w"))) {
-        ERROR("COULD NOT OPEN FILE '%s' FOR WRITING", filename);
-    }
-
-    /* Save metadata */
-    (void)fprintf(fd,
-                  "EIGENENERGIES FOR '%s' [HARTREE]\n\n"
-                  "CPU TIME TO GENERATE DATA SET [S]: %" PRId32 "\n"
-                  "GROUND STATE ENERGY [HARTREE]: %1.8lf\n"
-                  "ORBITAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "\n"
-                  "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "/2\n"
-                  "RMAX [BOHR'S RADIUS]: %1.3E\n"
-                  "NUMBER OF DISCRETISATION POINTS: %" PRId32 "\n"
-                  "FIRST, FINAL STEP SIZE: %1.3E, %1.3E\n"
-                  "MINIMAL PRINCIPAL QUANTUM NUMBER: %" PRId32 "\n"
-                  "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" PRId32 "\n\n\n\n"
-                  "N   ENERGY\n\n",
-                  species, runtime, EGS, lo, jj, rmax, N, dti, dtf, nl, nmax);
-
-    /* Save eigenenergies */
-    n = 0;
-    while (++n < nl) { (void)fprintf(fd, "%03" PRId32 "\n", n); }
-    while (n++ < nmax + 1) {
-        fmt_2d_exp(buffer, 9, energies[n - (nl - 1) - 2]);
-        (void)fprintf(fd, "%03" PRId32 " %s\n", n - 1, buffer);
-    }
-
-    /* Close file */
-    fclose(fd); fd = NULL;
-}
-
-/* Save computed radial eigenstates to file                                   */
-static void save_states(eigensolver_data *data, const double *z) {
-
-    char file[LEN_PATH_TO_STATES + 101], filename[101], buffer[101];
-    int32_t *ipar, nl, lo, jj, dim, n, k;
-    FILE *fd;
-
-    /* Open file for writing */
-    nl = (ipar = data->ipar)[3]; lo = ipar[2]; jj = 2 * (int32_t)j + 1;
-    dim = data->dim;
-    for (n = nl; n < nmax + 1; n++) {
-
-        /* Open file for writing */
-        file[0] = filename[0] = '\0';
-        (void)sprintf(filename,
-                      "state-%s-%03" PRId32 "-%03" PRId32 "-%03" PRId32 ".dat",
-                      species, n, lo, jj);
-        (void)strcpy(file, PATH_TO_STATES);
-        (void)strcat(file, filename);
-
-        /* Save metadata */
-        if (!(fd = fopen(file, "w"))) {
-            ERROR("COULD NOT OPEN FILE '%s' FOR WRITING", filename);
-        }
-        (void)fprintf(fd,
-                      "RADIAL EIGENSTATE FOR '%s' [DIMENSIONLESS]\n\n"
-                      "COEFFICIENTS 'FK' (K = 1, ..., N-2)\n"
-                      "PRINCIPAL QUANTUM NUMBER (N): %" PRId32 "\n"
-                      "ORBITAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "\n"
-                      "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "/2\n"
-                      "RMAX [BOHR'S RADIUS]: %1.3E\n"
-                      "NUMBER OF DISCRETISATION POINTS: %" PRId32 "\n\n\n\n"
-                      "FK\n\n",
-                      species, n, lo, jj, rmax, N);
-
-        /* Save radial eigenstate */
-        for (k = 0; k < dim; k++) {
-            fmt_2d_exp(buffer, 15, z[dim * (n - nl) + k]);
-            (void)fprintf(fd, "%s\n", buffer);
-        }
-
-        /* Close file */
-        fclose(fd); fd = NULL;
-    }
-}
-
-/* Save discretisation points and step sizes to file                          */
-static void save_discretisation() {
-
-    char file[71], filename[51], buffer_tk[101], buffer_hk[101];
-    int32_t k;
-    double tk, hk;
-    FILE *fd;
-
-    /* Check if file already exists */
-    (void)sprintf(filename, "discretisation-%s.dat", species);
-    (void)strcpy(file, "./data/");
-    (void)strcat(file, filename);
-    if ((fd = fopen(file, "r"))) { fclose(fd); fd = NULL; return; }
-
-    /* Save metadata */
-    if (!(fd = fopen(file, "w"))) {
-        ERROR("COULD NOT WRITE DICRETISATION DATA");
-    }
-    (void)fprintf(fd,
-                  "DISCRETISATION DATA FOR SPECIES '%s'\n\n"
-                  "NUMBER OF DISCRETISATION POINTS: %" PRId32 "\n\n\n\n"
-                  "K        T                     H\n\n",
-                  species, N);
-
-    /* Save discretisation data */
-    fmt_2d_exp(buffer_tk, 15, 0.);
-    fprintf(fd, "%08" PRId32 " %s\n", 0, buffer_tk); tk = 0.;
-    for (k = 1; k < N; k++) {
-        tk += (hk = step(k));
-        fmt_2d_exp(buffer_tk, 15, tk); fmt_2d_exp(buffer_hk, 15, hk);
-        fprintf(fd, "%08" PRId32 " %s %s\n", k, buffer_tk, buffer_hk);
-    }
-
-    /* Close file */
-    fclose(fd); fd = NULL;
-}
-
-/* Formatter to ensure two-digit exponent (Number of digits: 1.234 -> nd = 4) */
-static void fmt_2d_exp(char *buffer, int32_t nd, double x) {
-
-    char *d;
-    int32_t len;
-    double y;
-
-    /* IMPORTANT: The C99 standard specifies (Sec. 7.19.6.1 and               *
-     * Sec. 7.19.6.6 in Ref. [11]):                                           *
-     *                                                                        *
-     *     The sprintf function is equivalent to fprintf, ...                 *
-     *                                                                        *
-     *     ... The exponent always contains at least two digits, and only as  *
-     *     many more digits as necessary to represent the exponent.           *
-     *                                                                        *
-     * Because of this, the checks below allow one to assume that the         *
-     * exponent is printed with exactly two digits on systems that strictly   *
-     * follow the C99 standard. However, Windows does not always do this,     *
-     * which is the reason for the shift logic below. It trims a three-digit  *
-     * exponent, typically employed by Windows, to a two-digit one. Strictly  *
-     * speaking, this is not necessary; it is a nicety offered to Windows     *
-     * users.                                                                 */
-
-    /* Check if a two-digit exponent is able to capture the number */
-    y = (x < 0) ? -x: x;
-    if (y > 1e98) {
-        ERROR("IMPOSSIBLE NUMBER DETECTED: EXPONENT OUT OF BOUNDS");
-    }
-    if ( y < 1e-98) { x = 0.; }
-
-    /* Get the total length of the string representing x */
-    len = (int32_t)sprintf(buffer, "%+1.*E", nd - 1, x);
-
-    /* Trim leading zero in a three-digit exponent */
-    if (len > nd + 6) {
-        d = buffer + nd + 4;
-        d[0] = d[1]; d[1] = d[2]; d[2] = '\0';
-    }
-}
+//      /* Free data of type 'eigensolver_data'                                       */
+//      void eigensolver_data_free(eigensolver_data *data) {
+//          SUPERLU_FREE(data->perm_r); data->perm_r = NULL;
+//          SUPERLU_FREE(data->perm_c); data->perm_c = NULL;
+//          free(data->Mdata); data->Mdata = NULL;
+//          Destroy_Dense_Matrix(&data->B);
+//          Destroy_SuperNode_Matrix(&data->L);
+//          Destroy_CompCol_Matrix(&data->U);
+//          StatFree(&data->stat);
+//          free(data); data = NULL;
+//      }
+//      
+//      /* Solve eigenproblem                                                         */
+//      void solve(eigensolver_data *data) {
+//      
+//          int ido, nerr, info;
+//          int32_t dim, n, nl, nev, ncv, ldv, ldz, lworkl, *iparam, *ipntr, k;
+//          double tol, *resid, *v, *workd, *workl, *select, *d, *z, sigma, runtime,
+//                 *dummy, iC;
+//          clock_t tstart, tend;
+//      
+//          /* Initialise variables for Lanczos algorithm */
+//          dim = data->dim;
+//          ido = 0; n = dim; nl = data->ipar[3]; nev = nmax - nl + 1;
+//          if ((ncv = 2 * nev + 1) < 20) { ncv = 20; }
+//          if (ncv > dim) { ncv = dim; }
+//          ldv = dim; ldz = dim; lworkl = ncv * (8 + ncv); info = 0; tol = 1e-12;
+//          iparam = (int32_t *)calloc(11, sizeof(int32_t));
+//          ipntr = (int32_t *)calloc(11, sizeof(int32_t));
+//          resid = (double *)malloc(dim * sizeof(double));
+//          v = (double *)malloc(dim * ncv * sizeof(double));
+//          workd = (double *)malloc(3 * dim * sizeof(double));
+//          workl = (double *)malloc(lworkl * sizeof(double));
+//          select = (double *)calloc(ncv, sizeof(double)); /* Ritz value ordering */
+//          d = (double *)malloc(nev * sizeof(double));
+//          z = (double *)malloc(nev * dim * sizeof(double));
+//          sigma = shift;
+//          iparam[0] = 1;
+//          iparam[2] = 1000000000; /* Large enough to avoid becoming a problem */
+//          iparam[3] = 1;
+//          iparam[6] = 3; /* Shift-invert mode */
+//      
+//          /* Iterative calls to 'DSAUPD' */
+//          tstart = clock(); nerr = 0;
+//          do {
+//      
+//              /* Call 'DSAUPD' */
+//              dsaupd_c(&ido, &n, &nev, &tol, resid, &ncv, v, &ldv, iparam, ipntr,
+//                       workd, workl, &lworkl, &info); data->info = info;
+//      
+//              /* Check if call was successful */
+//              if (ido != 1 && ido != -1 && ido != 2 && ido != 99) {
+//                  ERROR("ERROR DURING ITERATION: IDO = %d", ido);
+//                  nerr++;
+//              }
+//              if (info != 0 && info != 1) {
+//                  ERROR("ERROR DURING ITERATION: INFO = %d", info);
+//                  nerr++;
+//              }
+//              if (info == 1) {
+//                  ERROR("REACHED MAXIMAL NUMBER OF ITERATIONS");
+//                  nerr++;
+//              }
+//              if (nerr) { ERROR("DSAUPD ENDED WITH NERR = %d", nerr); }
+//      
+//              /* React to instructions from 'DSAUPD' */
+//              if (ido == 1) { /* Compute action of shift-inverted Hamiltonian */
+//                  for (k = 0; k < dim; k++) {
+//                      workd[ipntr[1] - 1 + k] = workd[ipntr[2] - 1 + k];
+//                  }
+//                  shift_invert_f(data, &workd[ipntr[1] - 1]); /* Result in argument */
+//              } else
+//              if (ido == 2) { /* Compute action of mass matrix */
+//                  mass_matrix_f(data, &workd[ipntr[0] - 1], &workd[ipntr[1] - 1]);
+//              } else { /* Initialisation step */
+//                  mass_matrix_f(data, &workd[ipntr[0] - 1], &workd[ipntr[1] - 1]);
+//                  shift_invert_f(data, &workd[ipntr[1] - 1]); /* Result in argument */
+//              }
+//      
+//          } while (ido == 1 || ido == 2 || ido == -1);
+//      
+//          /* Call 'DSEUPD' to extract results */
+//          dseupd_c(select, d, z, &ldz, &n, &nev, &tol, resid, &ncv, v, &ldv, &sigma,
+//                   iparam, ipntr, workd, workl, &lworkl, &info);
+//          tend = clock();
+//          runtime = (tend - tstart) / (double)CLOCKS_PER_SEC;
+//          data->runtime += runtime;
+//          printf("ALGORITHM FINISHED SUCCESSFULLY (RUNTIME: %.3f S)\n\n", runtime);
+//      
+//          /* Dummy data to give 'Destroy_Dense_Matrix' something to free */
+//          dummy = (double *)calloc(1, sizeof(double));
+//          ((DNformat *)(data->B.Store))->nzval = dummy;
+//      
+//          /* Prepare and save eigenenergies */
+//          iC = 1. / data->rpar[7];
+//          for (k = 0; k < nev; k++) { d[k] = iC * (d[k] - offset); }
+//          save_energies(data, d);
+//      
+//          /* Save radial eigenstates */
+//          save_states(data, z);
+//      
+//          /* Clean up */
+//          free(iparam); iparam = NULL;
+//          free(ipntr); ipntr = NULL;
+//          free(resid); resid = NULL;
+//          free(v); v = NULL;
+//          free(workd); workd = NULL;
+//          free(workl); workl = NULL;
+//          free(select); select = NULL;
+//          free(d); d = NULL;
+//          free(z); z = NULL;
+//      
+//          /* Save discretisation points and step sizes to file */
+//          save_discretisation();
+//      }
+//      
+//      /* -------------------------------------------------------------------------- *
+//       * Helper functions                                                           *
+//       * -------------------------------------------------------------------------- */
+//      
+//      /* Function returning the k-th (k = 1, ..., N - 1) step size                  */
+//      static double step(int32_t k) {
+//      
+//          /* Here the step sizes hk = tk - tkm1 (km1 means 'k - 1') are defined.    *
+//           * The step sizes must be such that their sum is rmax (see                *
+//           * 'interface/settings.c'). Note here the step sizes are set rather than  *
+//           * the discretisation mesh itself. This is to avoid so-called             *
+//           * 'catastrophic cancellation' when computing the step sizes, which       *
+//           * ensures numerical stability.                                           *
+//           *                                                                        *
+//           * Note: One must be careful with overflow in integer multiplication and  *
+//           * addition here, if N is very large.                                     */
+//      
+//          double hk;
+//      
+//          hk = rmax * (2 * k - 1)/((double)(N - 1) * (N - 1));
+//      
+//          return hk;
+//      }
+//      
+//      /* Compute action of mass matrix (result stored in y)                         */
+//      static void mass_matrix_f(const eigensolver_data *data, const double *x,
+//                                double *y) {
+//      
+//          int32_t k, k0, dim = data->dim;
+//          double *Mdata = data->Mdata;
+//      
+//          y[0] = Mdata[0] * x[0] + Mdata[1] * x[1];
+//          for (k = 1; k < dim - 1; k++) {
+//              k0 = 2 + 3 * (k - 1);
+//              y[k] = Mdata[k0] * x[k - 1]
+//                   + Mdata[k0 + 1] * x[k]
+//                   + Mdata[k0 + 2] * x[k + 1];
+//          }
+//          k0 = 2 + 3 * (dim - 2);
+//          y[dim - 1] = Mdata[k0] * x[dim - 2] + Mdata[k0 + 1] * x[dim - 1];
+//      }
+//      
+//      /* Compute action of shift-inverted Hamiltonian (result stored in x)          */
+//      static void shift_invert_f(eigensolver_data *data, double *x) {
+//      
+//          /* Prepare input */
+//          ((DNformat *)(data->B.Store))->nzval = x;
+//      
+//          /* Solve the system (H-sigma*M) * vout = vin */
+//          dgstrs(NOTRANS, &data->L, &data->U, data->perm_c, data->perm_r, &data->B,
+//                 &data->stat, &data->info);
+//      }
+//      
+//      /* Save computed eigenenergies to file                                        */
+//      static void save_energies(eigensolver_data *data, const double *energies) {
+//      
+//          char file[71], filename[51], buffer[101];
+//          int32_t *ipar, nl, lo, jj, runtime, n;
+//          double EGS, dti, dtf;
+//          FILE *fd;
+//      
+//          /* Open file for writing */
+//          nl = (ipar = data->ipar)[3]; lo = ipar[2]; jj = 2 * (int32_t)j + 1;
+//          EGS = data->rpar[9]; runtime = (int32_t)data->runtime;
+//          dti = step(1); dtf = step(N - 1);
+//          (void)sprintf(filename, "energies-%s-%03" PRId32 "-%03" PRId32 ".dat",
+//                        species, lo, jj);
+//          (void)strcpy(file, "./data/");
+//          (void)strcat(file, filename);
+//          if (!(fd = fopen(file, "w"))) {
+//              ERROR("COULD NOT OPEN FILE '%s' FOR WRITING", filename);
+//          }
+//      
+//          /* Save metadata */
+//          (void)fprintf(fd,
+//                        "EIGENENERGIES FOR '%s' [HARTREE]\n\n"
+//                        "CPU TIME TO GENERATE DATA SET [S]: %" PRId32 "\n"
+//                        "GROUND STATE ENERGY [HARTREE]: %1.8lf\n"
+//                        "ORBITAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "\n"
+//                        "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "/2\n"
+//                        "RMAX [BOHR'S RADIUS]: %1.3E\n"
+//                        "NUMBER OF DISCRETISATION POINTS: %" PRId32 "\n"
+//                        "FIRST, FINAL STEP SIZE: %1.3E, %1.3E\n"
+//                        "MINIMAL PRINCIPAL QUANTUM NUMBER: %" PRId32 "\n"
+//                        "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" PRId32 "\n\n\n\n"
+//                        "N   ENERGY\n\n",
+//                        species, runtime, EGS, lo, jj, rmax, N, dti, dtf, nl, nmax);
+//      
+//          /* Save eigenenergies */
+//          n = 0;
+//          while (++n < nl) { (void)fprintf(fd, "%03" PRId32 "\n", n); }
+//          while (n++ < nmax + 1) {
+//              fmt_2d_exp(buffer, 9, energies[n - (nl - 1) - 2]);
+//              (void)fprintf(fd, "%03" PRId32 " %s\n", n - 1, buffer);
+//          }
+//      
+//          /* Close file */
+//          fclose(fd); fd = NULL;
+//      }
+//      
+//      /* Save computed radial eigenstates to file                                   */
+//      static void save_states(eigensolver_data *data, const double *z) {
+//      
+//          char file[LEN_PATH_TO_STATES + 101], filename[101], buffer[101];
+//          int32_t *ipar, nl, lo, jj, dim, n, k;
+//          FILE *fd;
+//      
+//          /* Open file for writing */
+//          nl = (ipar = data->ipar)[3]; lo = ipar[2]; jj = 2 * (int32_t)j + 1;
+//          dim = data->dim;
+//          for (n = nl; n < nmax + 1; n++) {
+//      
+//              /* Open file for writing */
+//              file[0] = filename[0] = '\0';
+//              (void)sprintf(filename,
+//                            "state-%s-%03" PRId32 "-%03" PRId32 "-%03" PRId32 ".dat",
+//                            species, n, lo, jj);
+//              (void)strcpy(file, PATH_TO_STATES);
+//              (void)strcat(file, filename);
+//      
+//              /* Save metadata */
+//              if (!(fd = fopen(file, "w"))) {
+//                  ERROR("COULD NOT OPEN FILE '%s' FOR WRITING", filename);
+//              }
+//              (void)fprintf(fd,
+//                            "RADIAL EIGENSTATE FOR '%s' [DIMENSIONLESS]\n\n"
+//                            "COEFFICIENTS 'FK' (K = 1, ..., N-2)\n"
+//                            "PRINCIPAL QUANTUM NUMBER (N): %" PRId32 "\n"
+//                            "ORBITAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "\n"
+//                            "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "/2\n"
+//                            "RMAX [BOHR'S RADIUS]: %1.3E\n"
+//                            "NUMBER OF DISCRETISATION POINTS: %" PRId32 "\n\n\n\n"
+//                            "FK\n\n",
+//                            species, n, lo, jj, rmax, N);
+//      
+//              /* Save radial eigenstate */
+//              for (k = 0; k < dim; k++) {
+//                  fmt_2d_exp(buffer, 15, z[dim * (n - nl) + k]);
+//                  (void)fprintf(fd, "%s\n", buffer);
+//              }
+//      
+//              /* Close file */
+//              fclose(fd); fd = NULL;
+//          }
+//      }
+//      
+//      /* Save discretisation points and step sizes to file                          */
+//      static void save_discretisation() {
+//      
+//          char file[71], filename[51], buffer_tk[101], buffer_hk[101];
+//          int32_t k;
+//          double tk, hk;
+//          FILE *fd;
+//      
+//          /* Check if file already exists */
+//          (void)sprintf(filename, "discretisation-%s.dat", species);
+//          (void)strcpy(file, "./data/");
+//          (void)strcat(file, filename);
+//          if ((fd = fopen(file, "r"))) { fclose(fd); fd = NULL; return; }
+//      
+//          /* Save metadata */
+//          if (!(fd = fopen(file, "w"))) {
+//              ERROR("COULD NOT WRITE DICRETISATION DATA");
+//          }
+//          (void)fprintf(fd,
+//                        "DISCRETISATION DATA FOR SPECIES '%s'\n\n"
+//                        "NUMBER OF DISCRETISATION POINTS: %" PRId32 "\n\n\n\n"
+//                        "K        T                     H\n\n",
+//                        species, N);
+//      
+//          /* Save discretisation data */
+//          fmt_2d_exp(buffer_tk, 15, 0.);
+//          fprintf(fd, "%08" PRId32 " %s\n", 0, buffer_tk); tk = 0.;
+//          for (k = 1; k < N; k++) {
+//              tk += (hk = step(k));
+//              fmt_2d_exp(buffer_tk, 15, tk); fmt_2d_exp(buffer_hk, 15, hk);
+//              fprintf(fd, "%08" PRId32 " %s %s\n", k, buffer_tk, buffer_hk);
+//          }
+//      
+//          /* Close file */
+//          fclose(fd); fd = NULL;
+//      }
+//      
+//      /* Formatter to ensure two-digit exponent (Number of digits: 1.234 -> nd = 4) */
+//      static void fmt_2d_exp(char *buffer, int32_t nd, double x) {
+//      
+//          char *d;
+//          int32_t len;
+//          double y;
+//      
+//          /* IMPORTANT: The C99 standard specifies (Sec. 7.19.6.1 and               *
+//           * Sec. 7.19.6.6 in Ref. [11]):                                           *
+//           *                                                                        *
+//           *     The sprintf function is equivalent to fprintf, ...                 *
+//           *                                                                        *
+//           *     ... The exponent always contains at least two digits, and only as  *
+//           *     many more digits as necessary to represent the exponent.           *
+//           *                                                                        *
+//           * Because of this, the checks below allow one to assume that the         *
+//           * exponent is printed with exactly two digits on systems that strictly   *
+//           * follow the C99 standard. However, Windows does not always do this,     *
+//           * which is the reason for the shift logic below. It trims a three-digit  *
+//           * exponent, typically employed by Windows, to a two-digit one. Strictly  *
+//           * speaking, this is not necessary; it is a nicety offered to Windows     *
+//           * users.                                                                 */
+//      
+//          /* Check if a two-digit exponent is able to capture the number */
+//          y = (x < 0) ? -x: x;
+//          if (y > 1e98) {
+//              ERROR("IMPOSSIBLE NUMBER DETECTED: EXPONENT OUT OF BOUNDS");
+//          }
+//          if ( y < 1e-98) { x = 0.; }
+//      
+//          /* Get the total length of the string representing x */
+//          len = (int32_t)sprintf(buffer, "%+1.*E", nd - 1, x);
+//      
+//          /* Trim leading zero in a three-digit exponent */
+//          if (len > nd + 6) {
+//              d = buffer + nd + 4;
+//              d[0] = d[1]; d[1] = d[2]; d[2] = '\0';
+//          }
+//      }

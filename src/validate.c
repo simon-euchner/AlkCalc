@@ -41,15 +41,21 @@ void validate_settings(int32_t nl) {
 
     /* Number of unique knots (N)                                             *
      *                                                                        *
-     * Constraint(s) : N >= 2                                                 *
-     * Information   : The number N specifies how many knots there are,       *
-     *                 without counting multiplicities. The constraint        *
-     *                 ensures that there is a first and a final knot. This   *
-     *                 ensures that the dimension of the generalised          *
-     *                 eigenvalue problem in theory/theory.pdf is larger than *
-     *                 or equal to one.                                       */
-    if (N < 2) {
-        ERROR("TOO FEW KNOTS, N MUST SATISFY: N(%" PRId32 ") >= 2", N);
+     * Constraint(s) : N >= k + 1                                             *
+     * Information   : The parameter N specifies the number of knots, not     *
+     *                 counting multiplicities. The constraint ensures that   *
+     *                 Gram-type matrices, such as the stiffness matrix or    *
+     *                 the mass matrix, host all d off-diagonal bands. In     *
+     *                 principle, the constraint is not strictly required and *
+     *                 is therefore not explicitly mentioned in               *
+     *                 theory/theory.pdf. However, it is applied here because *
+     *                 it simplifies the implementation. In practice, the     *
+     *                 condition is easily met, as values of N (within        *
+     *                 reason) are much larger than d in order to ensure      *
+     *                 sufficient accuracy for approximating the radial       *
+     *                 eigenstates.                                           */
+    if (N < k + 1) {
+        ERROR("TOO FEW KNOTS, N: N(%" PRId32 ") >= K(%" PRId32 ") + 1", N, k);
     }
 
     /* Maximal principal quantum number (nmax)                                *

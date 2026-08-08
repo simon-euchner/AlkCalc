@@ -21,8 +21,9 @@ OBJ = ./obj
 LIB = ./lib
 INF = ./interface
 TMP = ./tmp
-LUF = ./LUFac/lib
-LCZ = ./LANCZOS/lib
+GAQ = ./GAUSSQ/lib
+BSP = ./BSPLINES/lib
+ELA = ./EIGLAPACK/lib
 
 # File names
 F0 = settings
@@ -50,20 +51,20 @@ solve: ${TMP}/e${TMSTMP}
 	- @${TMP}/solve${TMSTMP}
 	@rm -f ${TMP}/solve${TMSTMP}
 ${TMP}/e${TMSTMP}: ${OBJ}/${F0}.o ${OBJ}/${F1}.o ${OBJ}/${F2}.o ${OBJ}/${F3}.o
-	@${LD} -o ${TMP}/solve${TMSTMP} -L${LUF}/ -L${LCZ}/ ${OBJ}/${F0}.o \
-	${OBJ}/${F1}.o ${OBJ}/${F2}.o ${OBJ}/${F3}.o -lm -lblas -llapack -llufac \
-	-llanczos -Wl,-rpath,{${LUF}/,${LCZ}/}
+	@${LD} -o ${TMP}/solve${TMSTMP} -L${GAQ}/ -L${BSP}/ -L${ELA}/ \
+	${OBJ}/${F0}.o ${OBJ}/${F1}.o ${OBJ}/${F2}.o ${OBJ}/${F3}.o -lm -lblas \
+	-lgaussq -lbsplines -leiglapack -Wl,-rpath,{${LUF}/,${LCZ}/}
 
 
 ### Compile
 
 # settings.c
-${OBJ}/${F0}.o: ${SRC}/${F0}.c
-	${CC} ${FLAGS} -o ${OBJ}/${F0}.o -c ${SRC}/${F0}.c
+${OBJ}/${F0}.o: ${INF}/${F0}.c
+	${CC} ${FLAGS} -o ${OBJ}/${F0}.o -c ${INF}/${F0}.c
 
 # potential.c
-${OBJ}/${F1}.o: ${INF}/${F1}.c
-	${CC} ${FLAGS} -o ${OBJ}/${F1}.o -c ${INF}/${F1}.c
+${OBJ}/${F1}.o: ${SRC}/${F1}.c
+	${CC} ${FLAGS} -o ${OBJ}/${F1}.o -c ${SRC}/${F1}.c
 
 # validate.c
 ${OBJ}/${F2}.o: ${SRC}/${F2}.c
