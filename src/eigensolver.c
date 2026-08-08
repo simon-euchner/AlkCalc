@@ -64,15 +64,8 @@ eigensolver_data *eigensolver_data_init() {
     tstart = clock();
     v_initpar(rpar = data->rpar, ipar = data->ipar);
 
-    /* Sanity check for specified maximal principal quantum number */
-    if (nmax < ipar[3]) {
-        ERROR("TOO SMALL MAXIMAL PRINCIPAL QUANTUM NUMBER");
-    }
-
-    /* Sanity check for number of discretisation points */
-    if (N < 4) {
-        ERROR("TOO FEW DISCRETISATION POINTS");
-    }
+    /* Validate settings */
+    validate_settings(ipar[3]);
 
     /* Compute potential vector and step sizes */
     lo = ipar[2]; /* Orbital angular momentum */
