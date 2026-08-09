@@ -55,7 +55,7 @@ void validate_settings(int32_t nl) {
      *                 sufficient accuracy for approximating the radial       *
      *                 eigenstates.                                           */
     if (N < k + 1) {
-        ERROR("TOO FEW KNOTS, N: N(%" PRId32 ") >= K(%" PRId32 ") + 1", N, k);
+        ERROR("TOO FEW KNOTS, N: N(%" PRId32 ") >= K(%" PRId32 ")", N, k + 1);
     }
 
     /* Maximal principal quantum number (nmax)                                *

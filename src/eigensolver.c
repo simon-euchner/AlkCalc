@@ -36,11 +36,26 @@ int main(int argc, char **argv)
 /* Initialise generalised eigenvalue problem (result owned by caller)         */
 eigensolver_data *eigensolver_data_init() {
 
-    int32_t nW, i, im1, k, N, Nkns, Nbs, dim, nderiv, nKM, *ipar, j, ileft;
+    int32_t nW, i, im1, k, N, Nkns, Nbs, dim, nderiv, nKM, *ipar, j, ileft, a,
+            b, imin, aa, bb;
     double *ts, *tkns, *hs, *vnikx, *work, *K, *W, *M, *H, *wKM, *xKM, *wW, *xW,
            *rpar, w, t;
     clock_t tstart, tend;
     eigensolver_data *data;
+
+    /* Start measuremet of execution time */
+    tstart = clock();
+
+    /* Allocate memeory for result */
+    data = (eigensolver_data *)malloc(sizeof(eigensolver_data));
+
+    /* Constants */
+    k = settings.k; N = settings.N;
+    nderiv = 1 + 1; /* Compute only first derivative of B-splines */
+    nKM = k; /*Quadrature order for stiffness and mass matrix */
+    data->Nkns = Nkns = N - 2 + 2 * k; /* Number of knots with multiplicities */
+    data->Nbs = Nbs = N + k - 2; /* Number of B-splines */
+    data->dim = dim = Nbs - 2; /* Dimension of generalised eigenvalue problem */
 
     /* Set order nW of Gauss-Legendre quadrature for the potential matrix W   *
      *                                                                        *
@@ -52,13 +67,6 @@ eigensolver_data *eigensolver_data_init() {
     nW = 1000;
 
     /* Allocate memory */
-    data = (eigensolver_data *)malloc(sizeof(eigensolver_data));
-    k = settings.k; N = settings.N;
-    data->Nkns = Nkns = N - 2 + 2 * k; /* Number of knots with multiplicities */
-    data->Nbs = Nbs = N + k - 2; /* Number of B-splines */
-    data->dim = dim = Nbs - 2; /* Dimension of generalised eigenvalue problem */
-    nderiv = 1 + 1; /* Compute only first derivative of B-splines */
-    nKM = k; /*Quadrature order for stiffness and mass matrix */
     ts = (double *)malloc(N * sizeof(double)); /* Knots, no multipl. */
     tkns = (double *)calloc(Nkns, sizeof(double)); /* Full knot vector */
     hs = (double *)malloc((N  - 1) * sizeof(double)); /* Steps, no multipl. */
@@ -72,9 +80,6 @@ eigensolver_data *eigensolver_data_init() {
     xKM = (double *)malloc(nKM * sizeof(double)); /* Points K, M integrals */
     wW = (double *)malloc(nW * sizeof(double)); /* Weights W integrals */
     xW = (double *)malloc(nW * sizeof(double)); /* Points W integrals */
-
-    /* Start measuremet of execution time */
-    tstart = clock();
 
     /* Initialise parametric model potential V */
     potential_initpar(ipar = data->ipar, rpar = data->rpar);
@@ -134,8 +139,20 @@ eigensolver_data *eigensolver_data_init() {
      * the interval [-1, 1]. For more information, see theory/theory.pdf.     */
     gaussq_c(&nKM, xKM, wKM); /* Call to GAUSSQ (Quadrature order n = k) */
 
-    /* Construct stiffness matrix K and mass matrix M */
-    for (i = 1; i < N; i++) { /* Loop over intervals [tim1, ti] */
+    /* Construct stiffness matrix K and mass matrix M                         *
+     *                                                                        *
+     * Let Mij be the component (i, j) of the matrix M (analogously for K).   *
+     * The array M of size (k, dim) is constructed as follows:                *
+     *                                                                        *
+     * M11     M22     M33                                                    *
+     *                                                                        *
+     *         M12     M23 ,   Mij is an integral over B-splines i and j .    *
+     *                                                                        *
+     *                 M13                                                    *
+     *                                                                        *
+     * To align with FORTRAN convention, the entries in the arrays K and M    *
+     * are stored in column-major order.                                      */
+    for (i = 1; i < N; i++) { /* Loop over intervals [ts[i - 1], ts[i]] */
         for (j = 0; j < nKM; j++) { /* Loop over quadrature points */
 
             /* Compute to interval adjusted weight and point */
@@ -143,14 +160,33 @@ eigensolver_data *eigensolver_data_init() {
             t = .5 * (hs[i - 1] * xKM[j] + ts[i] + ts[i - 1]);
 
             /* Largest integer satisfying tkns[ileft] <= t */
-            ileft = k - 1 + i - 1; /* tkns[ileft] = tim1 (see function step) */
+            ileft = k - 1 + i - 1; /* tkns[ileft] = ts[i - 1] */
 
             /* Evaluate B-splines and derivatives at quadrature point t */
             ileft += 1; /* Add one, because in FORTRAN counting starts at ONE */
             dbspvd_c(tkns, &k, &nderiv, &t, &ileft, vnikx, work);
 
-            //printf("%1.3E\n", vnikx[0]);
+            /* Accumulate matrix components of K and M (order: column-major)  *
+             *                                                                *
+             * The interval [ts[i - 1], ts[i]] correpsonds to the interval    *
+             * [tkns[i + k - 2], tkns[i + k - 1]] in the absolute index       *
+             * associted with the knots tkns, in which multiplicities are     *
+             * included. On this interval only the B-splines with indices     *
+             * i - 1, ..., i + k - 2 are non-zero.                            */
+            imin = i - 1;
+            for (a = 0; a < k; a++) {
+                if ((aa = imin + a) == 0 || aa == Nbs - 1) { continue; }
+                for (b = 0; b <= a; b++) {
+                    if ((bb = imin + b) == 0 || bb == Nbs - 1) { continue; }
+                    M[(aa - 1) * k + k - (a - b) - 1] += w * vnikx[a] * vnikx[b];
+                    K[(aa - 1) * k + k - (a - b) - 1] += w * vnikx[k + a] * vnikx[k + b];
+                }
+            }
         }
+    }
+
+    for (i = 0; i < k * dim; i++) {
+        printf("%1.3f\n", M[i]);
     }
 
     /* Compute weights and points for Gauss-Legendre quadrature rule          *
@@ -323,7 +359,7 @@ static double step(int32_t i) {
      * i - 1) are defined, where ti is the i-th knot WITHOUT considering      *
      * multiplicities. Note that the index i for labelling was shifted here   *
      * compared to theory/theory.pdf, e.g., ti here, in theory/theory.pdf     *
-     * would be tj with j = d + i = k + (i - 1), where k is the order of the  *
+     * would be tj with j = d + i = k + i - 1, where k is the order of the    *
      * B-splines and d their degree.                                          *
      *                                                                        *
      * Visualisation.                                                         *
@@ -360,36 +396,6 @@ static double step(int32_t i) {
     return hi;
 }
 
-//      
-//      /* Compute action of mass matrix (result stored in y)                         */
-//      static void mass_matrix_f(const eigensolver_data *data, const double *x,
-//                                double *y) {
-//      
-//          int32_t k, k0, dim = data->dim;
-//          double *Mdata = data->Mdata;
-//      
-//          y[0] = Mdata[0] * x[0] + Mdata[1] * x[1];
-//          for (k = 1; k < dim - 1; k++) {
-//              k0 = 2 + 3 * (k - 1);
-//              y[k] = Mdata[k0] * x[k - 1]
-//                   + Mdata[k0 + 1] * x[k]
-//                   + Mdata[k0 + 2] * x[k + 1];
-//          }
-//          k0 = 2 + 3 * (dim - 2);
-//          y[dim - 1] = Mdata[k0] * x[dim - 2] + Mdata[k0 + 1] * x[dim - 1];
-//      }
-//      
-//      /* Compute action of shift-inverted Hamiltonian (result stored in x)          */
-//      static void shift_invert_f(eigensolver_data *data, double *x) {
-//      
-//          /* Prepare input */
-//          ((DNformat *)(data->B.Store))->nzval = x;
-//      
-//          /* Solve the system (H-sigma*M) * vout = vin */
-//          dgstrs(NOTRANS, &data->L, &data->U, data->perm_c, data->perm_r, &data->B,
-//                 &data->stat, &data->info);
-//      }
-//      
 //      /* Save computed eigenenergies to file                                        */
 //      static void save_energies(eigensolver_data *data, const double *energies) {
 //      
@@ -412,7 +418,7 @@ static double step(int32_t i) {
 //      
 //          /* Save metadata */
 //          (void)fprintf(fd,
-//                        "EIGENENERGIES FOR '%s' [HARTREE]\n\n"
+//                        "EIGENENERGIES FOR %s [HARTREE]\n\n"
 //                        "CPU TIME TO GENERATE DATA SET [S]: %" PRId32 "\n"
 //                        "GROUND STATE ENERGY [HARTREE]: %1.8lf\n"
 //                        "ORBITAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "\n"
@@ -463,7 +469,7 @@ static double step(int32_t i) {
 //              }
 //              (void)fprintf(fd,
 //                            "RADIAL EIGENSTATE FOR '%s' [DIMENSIONLESS]\n\n"
-//                            "COEFFICIENTS 'FK' (K = 1, ..., N-2)\n"
+//                            "COEFFICIENTS FK (K = 1, ..., N-2)\n"
 //                            "PRINCIPAL QUANTUM NUMBER (N): %" PRId32 "\n"
 //                            "ORBITAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "\n"
 //                            "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "/2\n"
@@ -502,7 +508,7 @@ static double step(int32_t i) {
 //              ERROR("COULD NOT WRITE DICRETISATION DATA");
 //          }
 //          (void)fprintf(fd,
-//                        "DISCRETISATION DATA FOR SPECIES '%s'\n\n"
+//                        "DISCRETISATION DATA FOR SPECIES %s\n\n"
 //                        "NUMBER OF DISCRETISATION POINTS: %" PRId32 "\n\n\n\n"
 //                        "K        T                     H\n\n",
 //                        species, N);
