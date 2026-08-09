@@ -36,8 +36,8 @@ int main(int argc, char **argv)
 /* Initialise generalised eigenvalue problem (result owned by caller)         */
 eigensolver_data *eigensolver_data_init() {
 
-    int32_t nW, k, N, Nbs, dim, *ipar, nKM;
-    double *K, *W, *M, *H, *wKM, *xKM, *wW, *xW, *rpar;
+    int32_t nW, i, im1, k, N, Nbs, dim, *ipar, nKM;
+    double *hs, *ts, *K, *W, *M, *H, *wKM, *xKM, *wW, *xW, *rpar;
     clock_t tstart, tend;
     eigensolver_data *data;
 
@@ -55,6 +55,8 @@ eigensolver_data *eigensolver_data_init() {
     k = settings.k; N = settings.N;
     data->Nbs = Nbs = N + k - 2; /* Number of B-splines */
     data->dim = dim = Nbs - 2; /* Dimension of generalised eigenvalue problem */
+    hs = (double *)malloc((N  - 1) * sizeof(double)); /* Steps, no multipl. */
+    ts = (double *)malloc(N * sizeof(double)); /* Knots, no multipl. */
     K = (double *)calloc(k * dim, sizeof(double)); /* Stiffness matrix */
     W = (double *)calloc(k * dim, sizeof(double)); /* Potential matrix */
     data->M = M = (double *)calloc(k * dim, sizeof(double)); /* Mass matrix */
@@ -108,6 +110,14 @@ eigensolver_data *eigensolver_data_init() {
      * constructed. The next step is then to numerically solve the            *
      * generalised eigenvalue problem.                                        */
 
+    /* Knots and step sizes, both without mutliplicities */
+    ts[0] = 0.; /* First knot is zero */
+    for (i = 1; i < N - 1; i++) {
+        im1 = i - 1;
+        hs[im1] = step(i);
+        ts[i] = ts[im1] + hs[im1];
+    }
+
     /* Compute weights and points for Gauss-Legendre quadrature rule          *
      *                                                                        *
      * The weights, wKM, and the points, xKM, are computed. Both are arrays   *
@@ -115,6 +125,18 @@ eigensolver_data *eigensolver_data_init() {
      * the interval [-1, 1]. For more information, see theory/theory.pdf.     */
     nKM = k;
     gaussq_c(&nKM, xKM, wKM); /* Call to GAUSSQ */
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -138,7 +160,14 @@ eigensolver_data *eigensolver_data_init() {
 
 
 
+
+
+
+
+
     /* Clean up */
+    free(hs); hs = NULL;
+    free(ts); ts = NULL;
     free(wKM); wKM = NULL;
     free(xKM); xKM = NULL;
     free(wW); wW = NULL;
@@ -269,19 +298,39 @@ void eigensolver_data_free(eigensolver_data *data) {
  * Helper functions                                                           *
  * -------------------------------------------------------------------------- */
 
-// FIXME !!!
-/* Function returning the i-th (i = 1, ..., N - 1) step size                  */
+/* Function returning step sizes (i = 1, ..., N - 1)                          */
 static double step(int32_t i) {
 
-    /* Here the step sizes hk = tk - tkm1 (km1 means 'k - 1') are defined.    *
-     * The step sizes must be such that their sum is rmax (see                *
-     * 'interface/settings.c'). Note here the step sizes are set rather than  *
-     * the discretisation mesh itself. This is to avoid so-called             *
-     * 'catastrophic cancellation' when computing the step sizes, which       *
-     * ensures numerical stability.                                           *
+    /* Information                                                            *
      *                                                                        *
-     * Note: One must be careful with overflow in integer multiplication and  *
-     * addition here, if N is very large.                                     */
+     * Here, the step sizes hi = ti - tim1, i = 1, ..., N - 1 (im1 means      *
+     * i - 1) are defined, where ti is the i-th knot WITHOUT considering      *
+     * multiplicities. Note that the index i for labelling was shifted here   *
+     * compared to theory/theory.pdf, e.g., ti here, in theory/theory.pdf     *
+     * would be tj with j = d + i = k + (i - 1), where k is the order of the  *
+     * B-splines and d their degree.                                          *
+     *                                                                        *
+     * Visualisation.                                                         *
+     *                                                                        *
+     * In theory/theory.pdf:                                                  *
+     *     t[0], ..., t[d], t[k], ..., t[k + N - 3], tmax, ..., tmax          *
+     *     --------------                            ---------------          *
+     *        k knots                                   k knots               *
+     *                                                                        *
+     * Here:                                                                  *
+     *                t[0], t[1], ..., t[N - 2]    , t[N - 1] = tmax          *
+     *                                                                        *
+     * The step sizes hi must be chosen such that their sum is equal to the   *
+     * maximal radius rmax (see interface/settings.c). The reason the step    *
+     * sizes are set, rather than the actual knots ti, is that                *
+     * algorithmically the step sizes are needed. However, computing them     *
+     * from the knots ti can be numerically unstable due to catastrophic      *
+     * cancellation in computing the differences ti - tim1. Therefore, it is  *
+     * numerically more stable to define the step sizes instead of the knots. *
+     *                                                                        *
+     * Note: All multiplication and addition should be done in double         *
+     * precision rather than 32-bit signed integer. This is to avoid integer  *
+     * overflow for large N.                                                  */
 
     int32_t N;
     double rmax, hi;
@@ -290,7 +339,7 @@ static double step(int32_t i) {
     N = settings.N; rmax = settings.rmax;
 
     /* Definition of step sizes */
-    hi = rmax * (2 * i - 1)/((double)(N - 1) * (N - 1));
+    hi = rmax * (2. * i - 1.) / ((double)(N - 1) * (N - 1));
 
     return hi;
 }
