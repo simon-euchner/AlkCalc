@@ -36,8 +36,8 @@ int main(int argc, char **argv)
 /* Initialise generalised eigenvalue problem (result owned by caller)         */
 eigensolver_data *eigensolver_data_init() {
 
-    int32_t nW, i, im1, k, N, Nbs, dim, *ipar, nKM;
-    double *hs, *ts, *K, *W, *M, *H, *wKM, *xKM, *wW, *xW, *rpar;
+    int32_t nW, i, im1, k, N, Nkns, Nbs, dim, *ipar, nKM;
+    double *ts, *tkns, *hs, *K, *W, *M, *H, *wKM, *xKM, *wW, *xW, *rpar;
     clock_t tstart, tend;
     eigensolver_data *data;
 
@@ -53,10 +53,12 @@ eigensolver_data *eigensolver_data_init() {
     /* Allocate memory */
     data = (eigensolver_data *)malloc(sizeof(eigensolver_data));
     k = settings.k; N = settings.N;
+    data->Nkns = Nkns = N - 2 + 2 * k; /* Number of knots with multiplicities */
     data->Nbs = Nbs = N + k - 2; /* Number of B-splines */
     data->dim = dim = Nbs - 2; /* Dimension of generalised eigenvalue problem */
-    hs = (double *)malloc((N  - 1) * sizeof(double)); /* Steps, no multipl. */
     ts = (double *)malloc(N * sizeof(double)); /* Knots, no multipl. */
+    tkns = (double *)calloc(Nkns, sizeof(double)); /* Full knot vector */
+    hs = (double *)malloc((N  - 1) * sizeof(double)); /* Steps, no multipl. */
     K = (double *)calloc(k * dim, sizeof(double)); /* Stiffness matrix */
     W = (double *)calloc(k * dim, sizeof(double)); /* Potential matrix */
     data->M = M = (double *)calloc(k * dim, sizeof(double)); /* Mass matrix */
@@ -110,13 +112,20 @@ eigensolver_data *eigensolver_data_init() {
      * constructed. The next step is then to numerically solve the            *
      * generalised eigenvalue problem.                                        */
 
-    /* Knots and step sizes, both without mutliplicities */
+    /* Knots and step sizes */
     ts[0] = 0.; /* First knot is zero */
-    for (i = 1; i < N - 1; i++) {
+    for (i = 1; i < N; i++) {
         im1 = i - 1;
         hs[im1] = step(i);
         ts[i] = ts[im1] + hs[im1];
+        tkns[k - 1 + i] = ts[i];
     }
+    for (i = N - 2 + k; i < Nkns; tkns[i++] = settings.rmax); /* Multiplicity */
+
+    for (i = 0; i < Nkns; i++) {
+        printf("%1.3E\n", tkns[i]);
+    }
+
 
     /* Compute weights and points for Gauss-Legendre quadrature rule          *
      *                                                                        *
