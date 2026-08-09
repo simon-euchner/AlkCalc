@@ -36,8 +36,9 @@ int main(int argc, char **argv)
 /* Initialise generalised eigenvalue problem (result owned by caller)         */
 eigensolver_data *eigensolver_data_init() {
 
-    int32_t nW, i, im1, k, N, Nkns, Nbs, dim, *ipar, nKM;
-    double *ts, *tkns, *hs, *K, *W, *M, *H, *wKM, *xKM, *wW, *xW, *rpar;
+    int32_t nW, i, im1, k, N, Nkns, Nbs, dim, nderiv, nKM, *ipar, j, ileft;
+    double *ts, *tkns, *hs, *vnikx, *work, *K, *W, *M, *H, *wKM, *xKM, *wW, *xW,
+           *rpar, w, t;
     clock_t tstart, tend;
     eigensolver_data *data;
 
@@ -56,17 +57,21 @@ eigensolver_data *eigensolver_data_init() {
     data->Nkns = Nkns = N - 2 + 2 * k; /* Number of knots with multiplicities */
     data->Nbs = Nbs = N + k - 2; /* Number of B-splines */
     data->dim = dim = Nbs - 2; /* Dimension of generalised eigenvalue problem */
+    nderiv = 1 + 1; /* Compute only first derivative of B-splines */
+    nKM = k; /*Quadrature order for stiffness and mass matrix */
     ts = (double *)malloc(N * sizeof(double)); /* Knots, no multipl. */
     tkns = (double *)calloc(Nkns, sizeof(double)); /* Full knot vector */
     hs = (double *)malloc((N  - 1) * sizeof(double)); /* Steps, no multipl. */
+    vnikx = (double *)malloc(k * nderiv * sizeof(double));
+    work = (double *)malloc(((k + 1) * (k + 2)) / 2 * sizeof(double));
     K = (double *)calloc(k * dim, sizeof(double)); /* Stiffness matrix */
     W = (double *)calloc(k * dim, sizeof(double)); /* Potential matrix */
     data->M = M = (double *)calloc(k * dim, sizeof(double)); /* Mass matrix */
     data->H = H = (double *)calloc(k * dim, sizeof(double)); /* H = K + W */
-    wKM = (double *)malloc(k * sizeof(double)); /* Weights for K, M integrals */
-    xKM = (double *)malloc(k * sizeof(double)); /* Points for K, M integrals */
-    wW = (double *)malloc(nW * sizeof(double)); /* Weights for W integrals */
-    xW = (double *)malloc(nW * sizeof(double)); /* Points for W integrals */
+    wKM = (double *)malloc(nKM * sizeof(double)); /* Weights K, M integrals */
+    xKM = (double *)malloc(nKM * sizeof(double)); /* Points K, M integrals */
+    wW = (double *)malloc(nW * sizeof(double)); /* Weights W integrals */
+    xW = (double *)malloc(nW * sizeof(double)); /* Points W integrals */
 
     /* Start measuremet of execution time */
     tstart = clock();
@@ -122,57 +127,57 @@ eigensolver_data *eigensolver_data_init() {
     }
     for (i = N - 2 + k; i < Nkns; tkns[i++] = settings.rmax); /* Multiplicity */
 
-    for (i = 0; i < Nkns; i++) {
-        printf("%1.3E\n", tkns[i]);
-    }
-
-
     /* Compute weights and points for Gauss-Legendre quadrature rule          *
      *                                                                        *
      * The weights, wKM, and the points, xKM, are computed. Both are arrays   *
-     * of length k. The weights and points are computed for integrals over    *
+     * of length nKM. The weights and points are computed for integrals over  *
      * the interval [-1, 1]. For more information, see theory/theory.pdf.     */
-    nKM = k;
-    gaussq_c(&nKM, xKM, wKM); /* Call to GAUSSQ */
+    gaussq_c(&nKM, xKM, wKM); /* Call to GAUSSQ (Quadrature order n = k) */
 
+    /* Construct stiffness matrix K and mass matrix M */
+    for (i = 1; i < N; i++) { /* Loop over intervals [tim1, ti] */
+        for (j = 0; j < nKM; j++) { /* Loop over quadrature points */
 
+            /* Compute to interval adjusted weight and point */
+            w = .5 * hs[i - 1] * wKM[j];
+            t = .5 * (hs[i - 1] * xKM[j] + ts[i] + ts[i - 1]);
 
+            /* Largest integer satisfying tkns[ileft] <= t */
+            ileft = k - 1 + i - 1; /* tkns[ileft] = tim1 (see function step) */
 
+            /* Evaluate B-splines and derivatives at quadrature point t */
+            ileft += 1; /* Add one, because in FORTRAN counting starts at ONE */
+            dbspvd_c(tkns, &k, &nderiv, &t, &ileft, vnikx, work);
 
-
-
-
-
-
-
-
-
-
-
-
+            //printf("%1.3E\n", vnikx[0]);
+        }
+    }
 
     /* Compute weights and points for Gauss-Legendre quadrature rule          *
      *                                                                        *
      * The weights, wW, and the points, xW, are computed. Both are arrays of  *
      * length nW. The weights and points are computed for integrals over the  *
      * interval [-1, 1]. For more information, see theory/theory.pdf.         */
-    gaussq_c(&nW, xW, wW); /* Call to GAUSSQ */
+    gaussq_c(&nW, xW, wW); /* Call to GAUSSQ (Quadrature order n = nW) */
 
+    /* Construct potential matrix W */
+    for (i = 1; i < N; i++) { /* Loop over intervals [tim1, ti] */
+        for (j = 0; j < nW; j++) { /* Loop over quadrature points */
 
+            /* Compute to interval adjusted weight and point */
+            w = .5 * hs[i - 1] * wW[j];
+            t = .5 * (hs[i - 1] * xW[j] + ts[i] + ts[i - 1]);
 
+            /* Largest integer satisfying tkns[ileft] <= t */
+            ileft = k - 1 + i - 1; /* tkns[ileft] = tim1 (see function step) */
 
+            /* Evaluate B-splines and derivatives at quadrature point t */
+            ileft += 1; /* Add one, because in FORTRAN counting starts at ONE */
+            dbspvd_c(tkns, &k, &nderiv, &t, &ileft, vnikx, work);
 
-
-
-
-
-
-
-
-
-
-
-
+            //printf("%1.3E\n", vnikx[0]);
+        }
+    }
 
     /* Clean up */
     free(hs); hs = NULL;
@@ -181,6 +186,8 @@ eigensolver_data *eigensolver_data_init() {
     free(xKM); xKM = NULL;
     free(wW); wW = NULL;
     free(xW); xW = NULL;
+    free(vnikx); vnikx = NULL;
+    free(work); work = NULL;
     free(K); K = NULL;
     free(W); W = NULL;
 

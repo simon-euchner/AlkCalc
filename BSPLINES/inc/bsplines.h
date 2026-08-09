@@ -16,7 +16,7 @@
 void dintrv_c(double *, int32_t *, double *, int32_t *, int32_t *, int32_t *);
 
 /* DBSPVD */
-void dbspvd_c(double *, int32_t *, int32_t *, double *, int32_t *, int32_t *,
-              double *, double *);
+void dbspvd_c(double *, int32_t *, int32_t *, double *, int32_t *, double *,
+              double *);
 
 #endif
