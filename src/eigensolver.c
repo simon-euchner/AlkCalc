@@ -24,7 +24,7 @@ int main(int argc, char **argv)
     eigensolver_data *data = eigensolver_data_init();
 
     /* Solve eigenproblem and save result */
-    //solve(data);
+    solve(data);
 
     /* Clean up */
     //eigensolver_data_free(data);
@@ -36,10 +36,10 @@ int main(int argc, char **argv)
 /* Initialise generalised eigenvalue problem (result owned by caller)         */
 eigensolver_data *eigensolver_data_init() {
 
-    int32_t nW, i, im1, k, N, Nkns, Nbs, dim, nderiv, nKM, *ipar, j, ileft, a,
-            b, imin, aa, bb;
-    double *ts, *tkns, *hs, *vnikx, *work, *K, *W, *M, *H, *wKM, *xKM, *wW, *xW,
-           *rpar, w, t;
+    int32_t k, N, Nks, Nbs, dim, nderivKM, nderivW, nderivm, nKM, nW, *ipar, i,
+            im1, imin, j, ileft, a, ia, b, ib, iarr, l;
+    double rmax, *ts, *trs, *hs, *vnikx, *work, *K, *M, *W, *H, *wKM, *xKM, *wW,
+           *xW, *rpar, w, t, C, vt;
     clock_t tstart, tend;
     eigensolver_data *data;
 
@@ -51,22 +51,26 @@ eigensolver_data *eigensolver_data_init() {
 
     /* Constants                                                              *
      *                                                                        *
-     * k      : Order of B-splines                                            *
-     * N      : Number of knots without counting multiplicities               *
-     * rmax   : Maximal radius in units of Bohr's radius                      *
-     * nW     : See code below.                                               *
-     * Nks    : Number of knots including mutiplicities                       *
-     * Nbs    : Number of B-splines                                           *
-     * dim    : Dimension of generalised eigenvalue problem                   *
-     * nderiv : Control parameter for derivatives computed by DBSPVD          *
-     * nKM    : Quadrature order for computing components of K and M          */
+     * k        : Order of B-splines                                          *
+     * N        : Number of knots without counting multiplicities             *
+     * rmax     : Maximal radius in units of Bohr's radius                    *
+     * nW       : See code below.                                             *
+     * Nks      : Number of knots including mutiplicities                     *
+     * Nbs      : Number of B-splines                                         *
+     * dim      : Dimension of generalised eigenvalue problem                 *
+     * nderivKM : Control parameter for derivatives (see DBSPVD) for K, and M *
+     * nderivW  : Control parameter for derivatives (see DBSPVD) for W        *
+     * nderivm  : Maximum of nderivm = max(nderivKM, nderivW)                 *
+     * nKM      : Quadrature order for computing components of K and M        */
     k = settings.k;
     N = settings.N;
     rmax = settings.rmax;
     data->Nks = Nks = N - 2 + 2 * k;
     data->Nbs = Nbs = N + k - 2;
     data->dim = dim = Nbs - 2;
-    nderiv = 1 + 1;
+    nderivKM = 1 + 1;
+    nderivW = 1;
+    nderivm = (nderivKM > nderivW) ? nderivKM: nderivW;
     nKM = k;
 
     /* Order nW of Gauss-Legendre quadrature for the potential matrix W       *
@@ -80,8 +84,8 @@ eigensolver_data *eigensolver_data_init() {
 
     /* Allocate memory                                                        *
      *                                                                        *
-     * trs   : Knots excluding mutliplicities (r: reduced knot vector)        *
      * ts    : Knots including multiplicities (k: knot vector)                *
+     * trs   : Knots excluding mutliplicities (r: reduced knot vector)        *
      * hs    : Steps h[i] = trs[i] - trs[i - 1], excluding mutliplicities     *
      * vnikx : Array to store values of B-splines and their derivatives       *
      * work  : Working space for DBSPVD                                       *
@@ -93,14 +97,14 @@ eigensolver_data *eigensolver_data_init() {
      * xKM   : Quadrature points for computing components of K and M          *
      * wW    : Quadrature weights for computing components of W               *
      * xW    : Quadrature points for computing components of W                */
-    trs = (double *)malloc(N * sizeof(double));
     ts = (double *)calloc(Nks, sizeof(double));
+    trs = (double *)malloc(N * sizeof(double));
     hs = (double *)malloc((N  - 1) * sizeof(double));
-    vnikx = (double *)malloc(k * nderiv * sizeof(double));
+    vnikx = (double *)malloc(k * nderivm * sizeof(double));
     work = (double *)malloc(((k + 1) * (k + 2)) / 2 * sizeof(double));
     K = (double *)calloc(k * dim, sizeof(double));
-    W = (double *)calloc(k * dim, sizeof(double));
     data->M = M = (double *)calloc(k * dim, sizeof(double));
+    W = (double *)calloc(k * dim, sizeof(double));
     data->H = H = (double *)calloc(k * dim, sizeof(double));
     wKM = (double *)malloc(nKM * sizeof(double));
     xKM = (double *)malloc(nKM * sizeof(double));
@@ -156,7 +160,7 @@ eigensolver_data *eigensolver_data_init() {
         trs[i] = trs[im1] + hs[im1];
         ts[k - 1 + i] = trs[i];
     }
-    for (i = N - 2 + k; i < Nks, ts[i++] = rmax); /* Add multiplicity */
+    for (i = N - 2 + k; i < Nks; ts[i++] = rmax); /* Add multiplicity */
 
     /* Compute weights and points for Gauss-Legendre quadrature rule          *
      *                                                                        *
@@ -165,23 +169,18 @@ eigensolver_data *eigensolver_data_init() {
      * the interval [-1, 1]. For more information, see theory/theory.pdf.     */
     gaussq_c(&nKM, xKM, wKM); /* Call to GAUSSQ (Quadrature order n = k) */
 
-    /* Construct stiffness matrix K and mass matrix M                         *
-     *                                                                        *
-     * Let Mij be the component (i, j) of the matrix M (analogously for K).   *
-     * The array M of size (k, dim) is constructed as follows:                *
-     *                                                                        *
-     * M11     M22     M33                                                    *
-     *                                                                        *
-     *         M12     M23 ,   Mij is an integral over B-splines i and j .    *
-     *                                                                        *
-     *                 M13                                                    *
-     *                                                                        *
-     * To align with FORTRAN convention, the entries in the arrays K and M    *
-     * are stored in column-major order.                                      */
+    /* Construct stiffness matrix K and mass matrix M */
     for (i = 1; i < N; i++) { /* Loop over intervals [ts[i - 1], ts[i]] */
+
+        /* The interval [trs[i - 1], trs[i]] correpsonds to the interval      *
+         * [ts[i + k - 2], ts[i + k - 1]] in terms of the full knot           *
+         * vector ts. On this interval only the B-splines with indices        *
+         * imin = i - 1, ..., i + k - 2 are non-zero.                         */
+        imin = i - 1;
+
         for (j = 0; j < nKM; j++) { /* Loop over quadrature points */
 
-            /* Compute to interval adjusted weight and point */
+            /* Compute to interval adjusted weight, w, and point, t */
             w = .5 * hs[i - 1] * wKM[j];
             t = .5 * (hs[i - 1] * xKM[j] + trs[i] + trs[i - 1]);
 
@@ -190,67 +189,84 @@ eigensolver_data *eigensolver_data_init() {
 
             /* Evaluate B-splines and derivatives at quadrature point t */
             ileft += 1; /* Add one, because in FORTRAN counting starts at ONE */
-            dbspvd_c(tkns, &k, &nderiv, &t, &ileft, vnikx, work);
+            dbspvd_c(ts, &k, &nderivKM, &t, &ileft, vnikx, work);
 
-            /* Accumulate matrix components of K and M (order: column-major)  *
-             *                                                                *
-             * The interval [trs[i - 1], trs[i]] correpsonds to the interval  *
-             * [ts[i + k - 2], ts[i + k - 1]] in terms of the full knot       *
-             * vector (i.e., with multiplicities). On this interval only the  *
-             * B-splines with indices i - 1, ..., i + k - 2 are non-zero.     */
-            imin = i - 1;
+            /* Accumulate matrix components of K and M (order: column-major) */
             for (a = 0; a < k; a++) {
-                if ((aa = imin + a) == 0 || aa == Nbs - 1) { continue; }
+                ia = imin + a; /* Index of relevant B-spline */
+                if (ia == 0 || ia == Nbs - 1) { continue; }
                 for (b = 0; b <= a; b++) {
-                    if ((bb = imin + b) == 0 || bb == Nbs - 1) { continue; }
-                    M[(aa - 1) * k + k - (a - b) - 1] += w * vnikx[a] * vnikx[b];
-                    K[(aa - 1) * k + k - (a - b) - 1] += w * vnikx[k + a] * vnikx[k + b];
+                    ib = imin + b; /* Index of relevant B-spline */
+                    if (ib == 0 || ib == Nbs - 1) { continue; }
+
+                    /* Array index for column-major upper (U) (see EIGLAPACK) */
+                    iarr = (ia - 1) * k + k - (a - b) - 1;
+
+                    /* Accumulate matrix components */
+                    M[iarr] += w * vnikx[a] * vnikx[b];
+                    K[iarr] += .5 * w * vnikx[k + a] * vnikx[k + b];
                 }
             }
         }
     }
 
-    for (i = 0; i < k * dim; i++) {
-        printf("%1.3f\n", M[i]);
-    }
-
-    /* Compute weights and points for Gauss-Legendre quadrature rule          *
-     *                                                                        *
-     * The weights, wW, and the points, xW, are computed. Both are arrays of  *
-     * length nW. The weights and points are computed for integrals over the  *
-     * interval [-1, 1]. For more information, see theory/theory.pdf.         */
+    /* Compute weights and points for Gauss-Legendre quadrature rule          */
     gaussq_c(&nW, xW, wW); /* Call to GAUSSQ (Quadrature order n = nW) */
 
     /* Construct potential matrix W */
-    for (i = 1; i < N; i++) { /* Loop over intervals [tim1, ti] */
+    C = rpar[7]; l = settings.l;
+    for (i = 1; i < N; i++) { /* Loop over intervals [ts[i - 1], ts[i]] */
+
+        imin = i - 1;
+
         for (j = 0; j < nW; j++) { /* Loop over quadrature points */
 
-            /* Compute to interval adjusted weight and point */
+            /* Compute to interval adjusted weight, w, and point, t */
             w = .5 * hs[i - 1] * wW[j];
             t = .5 * (hs[i - 1] * xW[j] + trs[i] + trs[i - 1]);
 
-            /* Largest integer satisfying tkns[ileft] <= t */
-            ileft = k - 1 + i - 1; /* ts[ileft] = tim1 (see function step) */
+            /* Largest integer satisfying ts[ileft] <= t */
+            ileft = k - 1 + i - 1; /* ts[ileft] = trs[i - 1] */
 
             /* Evaluate B-splines and derivatives at quadrature point t */
             ileft += 1; /* Add one, because in FORTRAN counting starts at ONE */
-            dbspvd_c(tkns, &k, &nderiv, &t, &ileft, vnikx, work);
+            dbspvd_c(ts, &k, &nderivW, &t, &ileft, vnikx, work);
 
-            //printf("%1.3E\n", vnikx[0]);
+            /* Evaluate the effective potential (see theory/theory.pdf) at t */
+            vt = C * V(t, ipar, rpar) + (l * (l + 1)) / (2. * t * t);
+
+            /* Accumulate matrix components of K and M (order: column-major) */
+            for (a = 0; a < k; a++) {
+                ia = imin + a; /* Index of relevant B-spline */
+                if (ia == 0 || ia == Nbs - 1) { continue; }
+                for (b = 0; b <= a; b++) {
+                    ib = imin + b; /* Index of relevant B-spline */
+                    if (ib == 0 || ib == Nbs - 1) { continue; }
+
+                    /* Array index for column-major upper (U) (see EIGLAPACK) */
+                    iarr = (ia - 1) * k + k - (a - b) - 1;
+
+                    /* Accumulate matrix components */
+                    W[iarr] += w * vnikx[a] * vt * vnikx[b];
+                }
+            }
         }
     }
 
+    /* Construct matrix H = K + M */
+    for (i = 0; i < k * dim; i++) { H[i] = K[i] + W[i]; }
+
     /* Clean up */
-    free(hs); hs = NULL;
-    free(ts); ts = NULL;
+    free(trs); trs = NULL;
+    free(vnikx); vnikx = NULL;
+    free(work); work = NULL;
+    free(xKM); xKM = NULL;
+    free(K); K = NULL;
+    free(W); W = NULL;
     free(wKM); wKM = NULL;
     free(xKM); xKM = NULL;
     free(wW); wW = NULL;
     free(xW); xW = NULL;
-    free(vnikx); vnikx = NULL;
-    free(work); work = NULL;
-    free(K); K = NULL;
-    free(W); W = NULL;
 
     /* Compute and save partial execution time */
     tend = clock(); data->runtime = (tend - tstart)/(double)CLOCKS_PER_SEC;
@@ -260,116 +276,45 @@ eigensolver_data *eigensolver_data_init() {
 
 /* Free data of type eigensolver_data                                         */
 void eigensolver_data_free(eigensolver_data *data) {
+    free(data->ts); data->ts = NULL;
+    free(data->hs); data->hs = NULL;
     free(data->M); data->M = NULL;
     free(data->H); data->H = NULL;
     free(data); data = NULL;
 }
 
+/* Solve generalised eigenvalue problem (result owned by caller)              */
+void solve(eigensolver_data *data) {
 
-//      
-//      /* Solve eigenproblem                                                         */
-//      void solve(eigensolver_data *data) {
-//      
-//          int ido, nerr, info;
-//          int32_t dim, n, nl, nev, ncv, ldv, ldz, lworkl, *iparam, *ipntr, k;
-//          double tol, *resid, *v, *workd, *workl, *select, *d, *z, sigma, runtime,
-//                 *dummy, iC;
-//          clock_t tstart, tend;
-//      
-//          /* Initialise variables for Lanczos algorithm */
-//          dim = data->dim;
-//          ido = 0; n = dim; nl = data->ipar[3]; nev = nmax - nl + 1;
-//          if ((ncv = 2 * nev + 1) < 20) { ncv = 20; }
-//          if (ncv > dim) { ncv = dim; }
-//          ldv = dim; ldz = dim; lworkl = ncv * (8 + ncv); info = 0; tol = 1e-12;
-//          iparam = (int32_t *)calloc(11, sizeof(int32_t));
-//          ipntr = (int32_t *)calloc(11, sizeof(int32_t));
-//          resid = (double *)malloc(dim * sizeof(double));
-//          v = (double *)malloc(dim * ncv * sizeof(double));
-//          workd = (double *)malloc(3 * dim * sizeof(double));
-//          workl = (double *)malloc(lworkl * sizeof(double));
-//          select = (double *)calloc(ncv, sizeof(double)); /* Ritz value ordering */
-//          d = (double *)malloc(nev * sizeof(double));
-//          z = (double *)malloc(nev * dim * sizeof(double));
-//          sigma = shift;
-//          iparam[0] = 1;
-//          iparam[2] = 1000000000; /* Large enough to avoid becoming a problem */
-//          iparam[3] = 1;
-//          iparam[6] = 3; /* Shift-invert mode */
-//      
-//          /* Iterative calls to 'DSAUPD' */
-//          tstart = clock(); nerr = 0;
-//          do {
-//      
-//              /* Call 'DSAUPD' */
-//              dsaupd_c(&ido, &n, &nev, &tol, resid, &ncv, v, &ldv, iparam, ipntr,
-//                       workd, workl, &lworkl, &info); data->info = info;
-//      
-//              /* Check if call was successful */
-//              if (ido != 1 && ido != -1 && ido != 2 && ido != 99) {
-//                  ERROR("ERROR DURING ITERATION: IDO = %d", ido);
-//                  nerr++;
-//              }
-//              if (info != 0 && info != 1) {
-//                  ERROR("ERROR DURING ITERATION: INFO = %d", info);
-//                  nerr++;
-//              }
-//              if (info == 1) {
-//                  ERROR("REACHED MAXIMAL NUMBER OF ITERATIONS");
-//                  nerr++;
-//              }
-//              if (nerr) { ERROR("DSAUPD ENDED WITH NERR = %d", nerr); }
-//      
-//              /* React to instructions from 'DSAUPD' */
-//              if (ido == 1) { /* Compute action of shift-inverted Hamiltonian */
-//                  for (k = 0; k < dim; k++) {
-//                      workd[ipntr[1] - 1 + k] = workd[ipntr[2] - 1 + k];
-//                  }
-//                  shift_invert_f(data, &workd[ipntr[1] - 1]); /* Result in argument */
-//              } else
-//              if (ido == 2) { /* Compute action of mass matrix */
-//                  mass_matrix_f(data, &workd[ipntr[0] - 1], &workd[ipntr[1] - 1]);
-//              } else { /* Initialisation step */
-//                  mass_matrix_f(data, &workd[ipntr[0] - 1], &workd[ipntr[1] - 1]);
-//                  shift_invert_f(data, &workd[ipntr[1] - 1]); /* Result in argument */
-//              }
-//      
-//          } while (ido == 1 || ido == 2 || ido == -1);
-//      
-//          /* Call 'DSEUPD' to extract results */
-//          dseupd_c(select, d, z, &ldz, &n, &nev, &tol, resid, &ncv, v, &ldv, &sigma,
-//                   iparam, ipntr, workd, workl, &lworkl, &info);
-//          tend = clock();
-//          runtime = (tend - tstart) / (double)CLOCKS_PER_SEC;
-//          data->runtime += runtime;
-//          printf("ALGORITHM FINISHED SUCCESSFULLY (RUNTIME: %.3f S)\n\n", runtime);
-//      
-//          /* Dummy data to give 'Destroy_Dense_Matrix' something to free */
-//          dummy = (double *)calloc(1, sizeof(double));
-//          ((DNformat *)(data->B.Store))->nzval = dummy;
-//      
-//          /* Prepare and save eigenenergies */
-//          iC = 1. / data->rpar[7];
-//          for (k = 0; k < nev; k++) { d[k] = iC * (d[k] - offset); }
-//          save_energies(data, d);
-//      
-//          /* Save radial eigenstates */
-//          save_states(data, z);
-//      
-//          /* Clean up */
-//          free(iparam); iparam = NULL;
-//          free(ipntr); ipntr = NULL;
-//          free(resid); resid = NULL;
-//          free(v); v = NULL;
-//          free(workd); workd = NULL;
-//          free(workl); workl = NULL;
-//          free(select); select = NULL;
-//          free(d); d = NULL;
-//          free(z); z = NULL;
-//      
-//          /* Save discretisation points and step sizes to file */
-//          save_discretisation();
-//      }
+    clock_t tstart, tend;
+
+    /* Start measuremet of execution time */
+    tstart = clock();
+
+    /* Compute and save total execution time */
+    tend = clock(); data->runtime = (tend - tstart) / (double)CLOCKS_PER_SEC;
+
+    /* Print information */
+    printf("ALGORITHM FINISHED SUCCESSFULLY (RUNTIME: %.3f S)\n\n"
+           "SAVING DATA\n\n", data->runtime);
+
+    /* Prepare and save eigenenergies */
+    //iC = 1. / data->rpar[7];
+    //for (k = 0; k < nev; k++) { d[k] = iC * (d[k] - offset); }
+    //save_energies(data, d);
+
+    /* Save radial eigenstates */
+    //save_states(data, z);
+
+    /* Clean up */
+
+    /* Save discretisation points and step sizes to file */
+    //save_discretisation();
+
+    /* Print information */
+    printf("DATA SAVED SUCCESSFULLY\n\n"
+           "EXITING\n\n");
+}
 
 /* -------------------------------------------------------------------------- *
  * Helper functions                                                           *
@@ -395,7 +340,7 @@ static double step(int32_t i) {
      *        k knots                                   k knots               *
      *                                                                        *
      * Here:                                                                  *
-     *                t[0], t[1], ..., t[N - 2]    , t[N - 1] = tmax          *
+     *            0 = t[0], t[1], ..., t[N - 2]    , t[N - 1] = tmax          *
      *                                                                        *
      * The step sizes hi must be chosen such that their sum is equal to the   *
      * maximal radius rmax (see interface/settings.c). The reason the step    *
