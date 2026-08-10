@@ -12,7 +12,7 @@
 static double step(int32_t);
 static void save_energies(eigensolver_data *, const double *);
 static void save_states(eigensolver_data *, const double *);
-//static void save_knotdata();
+static void save_knotdata(eigensolver_data *data);
 static void fmt_2d_exp(char *, int32_t, double);
 
 /* --- MAIN ----------------------------------------------------------------- */
@@ -257,7 +257,9 @@ eigensolver_data *eigensolver_data_init() {
     for (i = 0; i < k * dim; i++) { H[i] = K[i] + W[i]; }
 
     /* Clean up */
+    free(ts); ts = NULL;
     free(trs); trs = NULL;
+    free(hs); hs = NULL;
     free(vnikx); vnikx = NULL;
     free(work); work = NULL;
     free(xKM); xKM = NULL;
@@ -276,8 +278,6 @@ eigensolver_data *eigensolver_data_init() {
 
 /* Free data of type eigensolver_data                                         */
 void eigensolver_data_free(eigensolver_data *data) {
-    free(data->ts); data->ts = NULL;
-    free(data->hs); data->hs = NULL;
     free(data->M); data->M = NULL;
     free(data->H); data->H = NULL;
     free(data); data = NULL;
@@ -347,7 +347,7 @@ void solve(eigensolver_data *data) {
     free(work); work = NULL;
 
     /* Save knotdata: information on B-splines, knots, and step sizes */
-    //save_knotdata();
+    save_knotdata(data);
 
     /* Print information */
     printf("DATA SAVED SUCCESSFULLY\n\n"
@@ -440,19 +440,19 @@ static void save_energies(eigensolver_data *data, const double *energies) {
     (void)fprintf(fd,
                   "EIGENENERGIES FOR %s [HARTREE]\n\n"
                   "CPU TIME TO GENERATE DATA SET [S]: %" PRId32 "\n"
-                  "GROUND STATE ENERGY [HARTREE]: %1.8lf\n"
+                  "MINIMAL PRINCIPAL QUANTUM NUMBER: %" PRId32 "\n"
+                  "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" PRId32 "\n"
                   "ORBITAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "\n"
                   "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 " / 2\n"
-                  "RMAX [BOHR'S RADIUS]: %1.3E\n"
+                  "GROUND STATE ENERGY [HARTREE]: %1.8lf\n"
                   "ORDER OF B-SPLINES: %" PRId32 "\n"
                   "TOTAL NUMBER OF KNOTS: %" PRId32 "\n"
                   "NUMBER OF KNOTS (NO MULTIPLICITIES): %" PRId32 "\n"
-                  "FIRST, FINAL NON-ZERO STEP SIZE: %1.3E, %1.3E\n"
-                  "MINIMAL PRINCIPAL QUANTUM NUMBER: %" PRId32 "\n"
-                  "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" PRId32 "\n\n\n\n"
+                  "RMAX [BOHR'S RADIUS]: %1.3E\n"
+                  "FIRST, FINAL NON-ZERO STEP SIZE: %1.3E, %1.3E\n\n\n\n"
                   "N   ENERGY\n\n",
-                  species, runtime, EGS, l, J, rmax, k, Nks, N, dti, dtf, nl,
-                  nmax);
+                  species, runtime, nl, nmax, l, J, EGS, k, Nks, N, rmax, dti,
+                  dtf);
 
     /* Save eigenenergies */
     n = 0;
@@ -470,7 +470,7 @@ static void save_energies(eigensolver_data *data, const double *energies) {
 static void save_states(eigensolver_data *data, const double *z) {
 
     char *species, file[LEN_PATH_TO_STATES + 101], filename[101], buffer[101];
-    int32_t l, J, nl, nmax, dim, n, i;
+    int32_t l, J, nl, nmax, Nbs, dim, n, i;
     FILE *fd;
 
     /* Constants */
@@ -479,6 +479,7 @@ static void save_states(eigensolver_data *data, const double *z) {
     J = CONVERT(settings.j);
     nl = data->ipar[3];
     nmax = settings.nmax;
+    Nbs = data->Nbs;
     dim = data->dim;
 
     /* Open file for writing */
@@ -502,57 +503,81 @@ static void save_states(eigensolver_data *data, const double *z) {
                       "ORBITAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "\n"
                       "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 " / 2\n"
                       "NUMBER OF B-SPLINES (NBS): %" PRId32 "\n"
-                      "COEFFICIENTS FI (I = 0, ..., NBS - 1)\n\n\n\n"
-                      "FI\n\n",
-                      species, n, l, J, dim);
+                      "COEFFICIENTS F(I) (I = 0, ..., NBS - 1)\n\n\n\n"
+                      "F(I)\n\n",
+                      species, n, l, J, Nbs);
 
         /* Save radial eigenstate */
+        fmt_2d_exp(buffer, 15, 0.); /* f[0] = 0 (see theory/theory.pdf) */
+        (void)fprintf(fd, "%s\n", buffer);
         for (i = 0; i < dim; i++) {
             fmt_2d_exp(buffer, 15, z[dim * (n - nl) + i]);
             (void)fprintf(fd, "%s\n", buffer);
         }
+        fmt_2d_exp(buffer, 15, 0.); /* f[Nbs - 1] = 0 (see theory/theory.pdf) */
+        (void)fprintf(fd, "%s\n", buffer);
 
         /* Close file */
         fclose(fd); fd = NULL;
     }
 }
 
-// /* Save knot data to file                                                     */
-//  static void save_discretisation() {
-//  
-//      char file[71], filename[51], buffer_tk[101], buffer_hk[101];
-//      int32_t k;
-//      double tk, hk;
-//      FILE *fd;
-//  
-//      /* Check if file already exists */
-//      (void)sprintf(filename, "discretisation-%s.dat", species);
-//      (void)strcpy(file, "./data/");
-//      (void)strcat(file, filename);
-//      if ((fd = fopen(file, "r"))) { fclose(fd); fd = NULL; return; }
-//  
-//      /* Save metadata */
-//      if (!(fd = fopen(file, "w"))) {
-//          ERROR("COULD NOT WRITE DICRETISATION DATA");
-//      }
-//      (void)fprintf(fd,
-//                    "DISCRETISATION DATA FOR SPECIES %s\n\n"
-//                    "NUMBER OF DISCRETISATION POINTS: %" PRId32 "\n\n\n\n"
-//                    "K        T                     H\n\n",
-//                    species, N);
-//  
-//      /* Save discretisation data */
-//      fmt_2d_exp(buffer_tk, 15, 0.);
-//      fprintf(fd, "%08" PRId32 " %s\n", 0, buffer_tk); tk = 0.;
-//      for (k = 1; k < N; k++) {
-//          tk += (hk = step(k));
-//          fmt_2d_exp(buffer_tk, 15, tk); fmt_2d_exp(buffer_hk, 15, hk);
-//          fprintf(fd, "%08" PRId32 " %s %s\n", k, buffer_tk, buffer_hk);
-//      }
-//  
-//      /* Close file */
-//      fclose(fd); fd = NULL;
-//  }
+/* Save knotdata to file                                                      */
+static void save_knotdata(eigensolver_data *data) {
+
+    char *species, file[71], filename[51], buffer_ti[101], buffer_hi[101];
+    int32_t k, Nks, N, i;
+    double rmax, dti, dtf, ti, hi;
+    FILE *fd;
+
+    /* Constants */
+    species = settings.species;
+    k = settings.k;
+    Nks = data->Nks;
+    N = settings.N;
+    rmax = settings.rmax;
+    dti = step(1);
+    dtf = step(settings.N - 1);
+
+    /* Check if file already exists; if so, open it; if not, create it */
+    (void)sprintf(filename, "knotdata-%s.dat", species);
+    (void)strcpy(file, "./data/");
+    (void)strcat(file, filename);
+    if ((fd = fopen(file, "r"))) { fclose(fd); fd = NULL; return; }
+
+    /* Save metadata */
+    if (!(fd = fopen(file, "w"))) {
+        ERROR("COULD NOT WRITE KNOTDATA");
+    }
+    (void)fprintf(fd,
+                  "KNOTDATA FOR SPECIES %s\n\n"
+                  "ORDER OF B-SPLINES: %" PRId32 "\n"
+                  "TOTAL NUMBER OF KNOTS: %" PRId32 "\n"
+                  "NUMBER OF KNOTS (NO MULTIPLICITIES): %" PRId32 "\n"
+                  "RMAX [BOHR'S RADIUS]: %1.3E\n"
+                  "FIRST, FINAL NON-ZERO STEP SIZE: %1.3E, %1.3E\n\n\n\n"
+                  "I        T(I)                  H(I - K)\n\n",
+                  species, k, Nks, N, rmax, dti, dtf);
+
+    /* Save knotdata */
+    fmt_2d_exp(buffer_ti, 15, 0.);
+    for (i = 0; i < k; i++) {
+        fprintf(fd, "%08" PRId32 " %s\n", i, buffer_ti);
+    }
+    ti = 0.;
+    for (i = 1; i < N; i++) {
+        ti += (hi = step(i));
+        fmt_2d_exp(buffer_ti, 15, ti); fmt_2d_exp(buffer_hi, 15, hi);
+        fprintf(fd, "%08" PRId32 " %s %s\n", k - 1 + i, buffer_ti, buffer_hi);
+    }
+    fmt_2d_exp(buffer_ti, 15, rmax);
+    for (i = 0; i < k - 1; i++) {
+        fprintf(fd, "%08" PRId32 " %s\n", k + N - 1 + i, buffer_ti);
+    }
+
+    /* Close file */
+    fclose(fd); fd = NULL;
+}
 
 /* Formatter to ensure two-digit exponent (Number of digits: 1.234 -> nd = 4) */
 static void fmt_2d_exp(char *buffer, int32_t nd, double x) {

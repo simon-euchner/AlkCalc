@@ -24,7 +24,7 @@
 **.bcf-SAVE-ERROR
 
 # Data
-/data/discretisation-*
+/data/knotdata-*
 /data/energies-*
 /data/state-*
 

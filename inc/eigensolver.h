@@ -40,7 +40,7 @@
 /* Data type to store data for eigensolver */
 typedef struct eigensolver_data_s {
     int32_t Nks, Nbs, dim, ipar[4];
-    double *ts, *hs, *M, *H, rpar[10], runtime;
+    double *M, *H, rpar[10], runtime;
 } eigensolver_data;
 
 void potential_initpar(int32_t *, double *);
