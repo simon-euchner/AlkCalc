@@ -10,10 +10,10 @@
 #include "../inc/eigensolver.h"
 
 static double step(int32_t);
-//static void save_energies(eigensolver_data *, const double *);
-//static void save_states(eigensolver_data *, const double *);
-//static void save_discretisation();
-//static void fmt_2d_exp(char *, int32_t, double);
+static void save_energies(eigensolver_data *, const double *);
+static void save_states(eigensolver_data *, const double *);
+//static void save_knotdata();
+static void fmt_2d_exp(char *, int32_t, double);
 
 /* --- MAIN ----------------------------------------------------------------- */
 int main(int argc, char **argv)
@@ -286,10 +286,40 @@ void eigensolver_data_free(eigensolver_data *data) {
 /* Solve generalised eigenvalue problem (result owned by caller)              */
 void solve(eigensolver_data *data) {
 
+    int32_t n, ka, kb, ldab, ldbb, ldq, il, iu, ldz, m, *iwork, *ifail, info, i;
+    double *ab, *bb, *q, *w, *z, *work, iC;
     clock_t tstart, tend;
 
     /* Start measuremet of execution time */
     tstart = clock();
+
+    /* Prepare arguments for the DSBGVX solver from LAPACK */
+    n = data->dim;
+    ka = settings.k - 1;
+    kb = settings.k - 1;
+    ab = data->H;
+    ldab = settings.k;
+    bb = data->M;
+    ldbb = settings.k;
+    ldq = n;
+    il = 2;
+    iu = settings.nmax - data->ipar[3];
+    ldz = n;
+
+    /* Number of requested eigenvalues */
+    m = iu - il + 1;
+
+    /* Allocate memory */
+    q = (double *)malloc(ldq * n * sizeof(double));
+    w = (double *)malloc(n * sizeof(double));
+    z = (double *)malloc(n * m * sizeof(double));
+    work = (double *)malloc(7 * n * sizeof(double));
+    iwork = (int32_t *)malloc(5 * n * sizeof(int32_t));
+    ifail = (int32_t *)malloc(n * sizeof(int32_t));
+
+    /* Solve generalised eigenvalue problem using DSBGVX from LAPACK */
+    dsbgvx_c(&n, &ka, &kb, ab, &ldab, bb, &ldbb, q, &ldq, &il, &iu, &m, w, z,
+             &ldz, work, iwork, ifail, &info);
 
     /* Compute and save total execution time */
     tend = clock(); data->runtime = (tend - tstart) / (double)CLOCKS_PER_SEC;
@@ -299,17 +329,25 @@ void solve(eigensolver_data *data) {
            "SAVING DATA\n\n", data->runtime);
 
     /* Prepare and save eigenenergies */
-    //iC = 1. / data->rpar[7];
-    //for (k = 0; k < nev; k++) { d[k] = iC * (d[k] - offset); }
-    //save_energies(data, d);
+    iC = 1. / data->rpar[7];
+    for (i = 0; i < m; i++) { w[i] = iC * w[i]; }
+    save_energies(data, w);
 
     /* Save radial eigenstates */
-    //save_states(data, z);
+    save_states(data, z);
 
     /* Clean up */
+    free(iwork); iwork = NULL;
+    free(ifail); ifail = NULL;
+    free(ab); ab = NULL;
+    free(bb); bb = NULL;
+    free(q); q = NULL;
+    free(w); w = NULL;
+    free(z); z = NULL;
+    free(work); work = NULL;
 
-    /* Save discretisation points and step sizes to file */
-    //save_discretisation();
+    /* Save knotdata: information on B-splines, knots, and step sizes */
+    //save_knotdata();
 
     /* Print information */
     printf("DATA SAVED SUCCESSFULLY\n\n"
@@ -366,172 +404,192 @@ static double step(int32_t i) {
     return hi;
 }
 
-//      /* Save computed eigenenergies to file                                        */
-//      static void save_energies(eigensolver_data *data, const double *energies) {
-//      
-//          char file[71], filename[51], buffer[101];
-//          int32_t *ipar, nl, lo, jj, runtime, n;
-//          double EGS, dti, dtf;
-//          FILE *fd;
-//      
-//          /* Open file for writing */
-//          nl = (ipar = data->ipar)[3]; lo = ipar[2]; jj = 2 * (int32_t)j + 1;
-//          EGS = data->rpar[9]; runtime = (int32_t)data->runtime;
-//          dti = step(1); dtf = step(N - 1);
-//          (void)sprintf(filename, "energies-%s-%03" PRId32 "-%03" PRId32 ".dat",
-//                        species, lo, jj);
-//          (void)strcpy(file, "./data/");
-//          (void)strcat(file, filename);
-//          if (!(fd = fopen(file, "w"))) {
-//              ERROR("COULD NOT OPEN FILE '%s' FOR WRITING", filename);
-//          }
-//      
-//          /* Save metadata */
-//          (void)fprintf(fd,
-//                        "EIGENENERGIES FOR %s [HARTREE]\n\n"
-//                        "CPU TIME TO GENERATE DATA SET [S]: %" PRId32 "\n"
-//                        "GROUND STATE ENERGY [HARTREE]: %1.8lf\n"
-//                        "ORBITAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "\n"
-//                        "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "/2\n"
-//                        "RMAX [BOHR'S RADIUS]: %1.3E\n"
-//                        "NUMBER OF DISCRETISATION POINTS: %" PRId32 "\n"
-//                        "FIRST, FINAL STEP SIZE: %1.3E, %1.3E\n"
-//                        "MINIMAL PRINCIPAL QUANTUM NUMBER: %" PRId32 "\n"
-//                        "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" PRId32 "\n\n\n\n"
-//                        "N   ENERGY\n\n",
-//                        species, runtime, EGS, lo, jj, rmax, N, dti, dtf, nl, nmax);
-//      
-//          /* Save eigenenergies */
-//          n = 0;
-//          while (++n < nl) { (void)fprintf(fd, "%03" PRId32 "\n", n); }
-//          while (n++ < nmax + 1) {
-//              fmt_2d_exp(buffer, 9, energies[n - (nl - 1) - 2]);
-//              (void)fprintf(fd, "%03" PRId32 " %s\n", n - 1, buffer);
-//          }
-//      
-//          /* Close file */
-//          fclose(fd); fd = NULL;
+/* Save computed eigenenergies to file                                        */
+static void save_energies(eigensolver_data *data, const double *energies) {
+
+    char *species, file[71], filename[51], buffer[101];
+    int32_t k, N, Nks, l, J, nl, nmax, runtime, n;
+    double rmax, dti, dtf, EGS;
+    FILE *fd;
+
+    /* Constants */
+    species = settings.species;
+    k = settings.k;
+    N = settings.N;
+    Nks = data->Nks;
+    rmax = settings.rmax;
+    dti = step(1);
+    dtf = step(settings.N - 1);
+    l = settings.l;
+    J = CONVERT(settings.j);
+    nl = data->ipar[3];
+    nmax = settings.nmax;
+    EGS = data->rpar[9];
+    runtime = (int32_t)(data->runtime + 1);
+
+    /* Open file for writing */
+    (void)sprintf(filename, "energies-%s-%03" PRId32 "-%03" PRId32 ".dat",
+                  species, l, J);
+    (void)strcpy(file, "./data/");
+    (void)strcat(file, filename);
+    if (!(fd = fopen(file, "w"))) {
+        ERROR("COULD NOT OPEN FILE %s FOR WRITING", filename);
+    }
+
+    /* Save metadata */
+    (void)fprintf(fd,
+                  "EIGENENERGIES FOR %s [HARTREE]\n\n"
+                  "CPU TIME TO GENERATE DATA SET [S]: %" PRId32 "\n"
+                  "GROUND STATE ENERGY [HARTREE]: %1.8lf\n"
+                  "ORBITAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "\n"
+                  "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 " / 2\n"
+                  "RMAX [BOHR'S RADIUS]: %1.3E\n"
+                  "ORDER OF B-SPLINES: %" PRId32 "\n"
+                  "TOTAL NUMBER OF KNOTS: %" PRId32 "\n"
+                  "NUMBER OF KNOTS (NO MULTIPLICITIES): %" PRId32 "\n"
+                  "FIRST, FINAL NON-ZERO STEP SIZE: %1.3E, %1.3E\n"
+                  "MINIMAL PRINCIPAL QUANTUM NUMBER: %" PRId32 "\n"
+                  "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" PRId32 "\n\n\n\n"
+                  "N   ENERGY\n\n",
+                  species, runtime, EGS, l, J, rmax, k, Nks, N, dti, dtf, nl,
+                  nmax);
+
+    /* Save eigenenergies */
+    n = 0;
+    while (++n < nl) { (void)fprintf(fd, "%03" PRId32 "\n", n); }
+    while (n++ < nmax + 1) {
+        fmt_2d_exp(buffer, 9, energies[n - (nl - 1) - 2]);
+        (void)fprintf(fd, "%03" PRId32 " %s\n", n - 1, buffer);
+    }
+
+    /* Close file */
+    fclose(fd); fd = NULL;
+}
+
+/* Save computed radial eigenstates to file                                   */
+static void save_states(eigensolver_data *data, const double *z) {
+
+    char *species, file[LEN_PATH_TO_STATES + 101], filename[101], buffer[101];
+    int32_t l, J, nl, nmax, dim, n, i;
+    FILE *fd;
+
+    /* Constants */
+    species = settings.species;
+    l = settings.l;
+    J = CONVERT(settings.j);
+    nl = data->ipar[3];
+    nmax = settings.nmax;
+    dim = data->dim;
+
+    /* Open file for writing */
+    for (n = nl; n < nmax + 1; n++) {
+
+        /* Open file for writing */
+        file[0] = filename[0] = '\0';
+        (void)sprintf(filename,
+                      "state-%s-%03" PRId32 "-%03" PRId32 "-%03" PRId32 ".dat",
+                      species, n, l, J);
+        (void)strcpy(file, PATH_TO_STATES);
+        (void)strcat(file, filename);
+
+        /* Save metadata */
+        if (!(fd = fopen(file, "w"))) {
+            ERROR("COULD NOT OPEN FILE %s FOR WRITING", filename);
+        }
+        (void)fprintf(fd,
+                      "RADIAL EIGENSTATE FOR %s [DIMENSIONLESS]\n\n"
+                      "PRINCIPAL QUANTUM NUMBER (N): %" PRId32 "\n"
+                      "ORBITAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "\n"
+                      "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 " / 2\n"
+                      "NUMBER OF B-SPLINES (NBS): %" PRId32 "\n"
+                      "COEFFICIENTS FI (I = 0, ..., NBS - 1)\n\n\n\n"
+                      "FI\n\n",
+                      species, n, l, J, dim);
+
+        /* Save radial eigenstate */
+        for (i = 0; i < dim; i++) {
+            fmt_2d_exp(buffer, 15, z[dim * (n - nl) + i]);
+            (void)fprintf(fd, "%s\n", buffer);
+        }
+
+        /* Close file */
+        fclose(fd); fd = NULL;
+    }
+}
+
+// /* Save knot data to file                                                     */
+//  static void save_discretisation() {
+//  
+//      char file[71], filename[51], buffer_tk[101], buffer_hk[101];
+//      int32_t k;
+//      double tk, hk;
+//      FILE *fd;
+//  
+//      /* Check if file already exists */
+//      (void)sprintf(filename, "discretisation-%s.dat", species);
+//      (void)strcpy(file, "./data/");
+//      (void)strcat(file, filename);
+//      if ((fd = fopen(file, "r"))) { fclose(fd); fd = NULL; return; }
+//  
+//      /* Save metadata */
+//      if (!(fd = fopen(file, "w"))) {
+//          ERROR("COULD NOT WRITE DICRETISATION DATA");
 //      }
-//      
-//      /* Save computed radial eigenstates to file                                   */
-//      static void save_states(eigensolver_data *data, const double *z) {
-//      
-//          char file[LEN_PATH_TO_STATES + 101], filename[101], buffer[101];
-//          int32_t *ipar, nl, lo, jj, dim, n, k;
-//          FILE *fd;
-//      
-//          /* Open file for writing */
-//          nl = (ipar = data->ipar)[3]; lo = ipar[2]; jj = 2 * (int32_t)j + 1;
-//          dim = data->dim;
-//          for (n = nl; n < nmax + 1; n++) {
-//      
-//              /* Open file for writing */
-//              file[0] = filename[0] = '\0';
-//              (void)sprintf(filename,
-//                            "state-%s-%03" PRId32 "-%03" PRId32 "-%03" PRId32 ".dat",
-//                            species, n, lo, jj);
-//              (void)strcpy(file, PATH_TO_STATES);
-//              (void)strcat(file, filename);
-//      
-//              /* Save metadata */
-//              if (!(fd = fopen(file, "w"))) {
-//                  ERROR("COULD NOT OPEN FILE '%s' FOR WRITING", filename);
-//              }
-//              (void)fprintf(fd,
-//                            "RADIAL EIGENSTATE FOR '%s' [DIMENSIONLESS]\n\n"
-//                            "COEFFICIENTS FK (K = 1, ..., N-2)\n"
-//                            "PRINCIPAL QUANTUM NUMBER (N): %" PRId32 "\n"
-//                            "ORBITAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "\n"
-//                            "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "/2\n"
-//                            "RMAX [BOHR'S RADIUS]: %1.3E\n"
-//                            "NUMBER OF DISCRETISATION POINTS: %" PRId32 "\n\n\n\n"
-//                            "FK\n\n",
-//                            species, n, lo, jj, rmax, N);
-//      
-//              /* Save radial eigenstate */
-//              for (k = 0; k < dim; k++) {
-//                  fmt_2d_exp(buffer, 15, z[dim * (n - nl) + k]);
-//                  (void)fprintf(fd, "%s\n", buffer);
-//              }
-//      
-//              /* Close file */
-//              fclose(fd); fd = NULL;
-//          }
+//      (void)fprintf(fd,
+//                    "DISCRETISATION DATA FOR SPECIES %s\n\n"
+//                    "NUMBER OF DISCRETISATION POINTS: %" PRId32 "\n\n\n\n"
+//                    "K        T                     H\n\n",
+//                    species, N);
+//  
+//      /* Save discretisation data */
+//      fmt_2d_exp(buffer_tk, 15, 0.);
+//      fprintf(fd, "%08" PRId32 " %s\n", 0, buffer_tk); tk = 0.;
+//      for (k = 1; k < N; k++) {
+//          tk += (hk = step(k));
+//          fmt_2d_exp(buffer_tk, 15, tk); fmt_2d_exp(buffer_hk, 15, hk);
+//          fprintf(fd, "%08" PRId32 " %s %s\n", k, buffer_tk, buffer_hk);
 //      }
-//      
-//      /* Save discretisation points and step sizes to file                          */
-//      static void save_discretisation() {
-//      
-//          char file[71], filename[51], buffer_tk[101], buffer_hk[101];
-//          int32_t k;
-//          double tk, hk;
-//          FILE *fd;
-//      
-//          /* Check if file already exists */
-//          (void)sprintf(filename, "discretisation-%s.dat", species);
-//          (void)strcpy(file, "./data/");
-//          (void)strcat(file, filename);
-//          if ((fd = fopen(file, "r"))) { fclose(fd); fd = NULL; return; }
-//      
-//          /* Save metadata */
-//          if (!(fd = fopen(file, "w"))) {
-//              ERROR("COULD NOT WRITE DICRETISATION DATA");
-//          }
-//          (void)fprintf(fd,
-//                        "DISCRETISATION DATA FOR SPECIES %s\n\n"
-//                        "NUMBER OF DISCRETISATION POINTS: %" PRId32 "\n\n\n\n"
-//                        "K        T                     H\n\n",
-//                        species, N);
-//      
-//          /* Save discretisation data */
-//          fmt_2d_exp(buffer_tk, 15, 0.);
-//          fprintf(fd, "%08" PRId32 " %s\n", 0, buffer_tk); tk = 0.;
-//          for (k = 1; k < N; k++) {
-//              tk += (hk = step(k));
-//              fmt_2d_exp(buffer_tk, 15, tk); fmt_2d_exp(buffer_hk, 15, hk);
-//              fprintf(fd, "%08" PRId32 " %s %s\n", k, buffer_tk, buffer_hk);
-//          }
-//      
-//          /* Close file */
-//          fclose(fd); fd = NULL;
-//      }
-//      
-//      /* Formatter to ensure two-digit exponent (Number of digits: 1.234 -> nd = 4) */
-//      static void fmt_2d_exp(char *buffer, int32_t nd, double x) {
-//      
-//          char *d;
-//          int32_t len;
-//          double y;
-//      
-//          /* IMPORTANT: The C99 standard specifies (Sec. 7.19.6.1 and               *
-//           * Sec. 7.19.6.6 in Ref. [11]):                                           *
-//           *                                                                        *
-//           *     The sprintf function is equivalent to fprintf, ...                 *
-//           *                                                                        *
-//           *     ... The exponent always contains at least two digits, and only as  *
-//           *     many more digits as necessary to represent the exponent.           *
-//           *                                                                        *
-//           * Because of this, the checks below allow one to assume that the         *
-//           * exponent is printed with exactly two digits on systems that strictly   *
-//           * follow the C99 standard. However, Windows does not always do this,     *
-//           * which is the reason for the shift logic below. It trims a three-digit  *
-//           * exponent, typically employed by Windows, to a two-digit one. Strictly  *
-//           * speaking, this is not necessary; it is a nicety offered to Windows     *
-//           * users.                                                                 */
-//      
-//          /* Check if a two-digit exponent is able to capture the number */
-//          y = (x < 0) ? -x: x;
-//          if (y > 1e98) {
-//              ERROR("IMPOSSIBLE NUMBER DETECTED: EXPONENT OUT OF BOUNDS");
-//          }
-//          if ( y < 1e-98) { x = 0.; }
-//      
-//          /* Get the total length of the string representing x */
-//          len = (int32_t)sprintf(buffer, "%+1.*E", nd - 1, x);
-//      
-//          /* Trim leading zero in a three-digit exponent */
-//          if (len > nd + 6) {
-//              d = buffer + nd + 4;
-//              d[0] = d[1]; d[1] = d[2]; d[2] = '\0';
-//          }
-//      }
+//  
+//      /* Close file */
+//      fclose(fd); fd = NULL;
+//  }
+
+/* Formatter to ensure two-digit exponent (Number of digits: 1.234 -> nd = 4) */
+static void fmt_2d_exp(char *buffer, int32_t nd, double x) {
+
+    char *d;
+    int32_t len;
+    double y;
+
+    /* IMPORTANT: The C99 standard specifies (Sec. 7.19.6.1 and               *
+     * Sec. 7.19.6.6 in Ref. [11]):                                           *
+     *                                                                        *
+     *     The sprintf function is equivalent to fprintf, ...                 *
+     *                                                                        *
+     *     ... The exponent always contains at least two digits, and only as  *
+     *     many more digits as necessary to represent the exponent.           *
+     *                                                                        *
+     * Because of this, the checks below allow one to assume that the         *
+     * exponent is printed with exactly two digits on systems that strictly   *
+     * follow the C99 standard. However, Windows does not always do this,     *
+     * which is the reason for the shift logic below. It trims a three-digit  *
+     * exponent, typically employed by Windows, to a two-digit one. Strictly  *
+     * speaking, this is not necessary; it is a nicety offered to Windows     *
+     * users.                                                                 */
+
+    /* Check if a two-digit exponent is able to capture the number */
+    y = (x < 0) ? -x: x;
+    if (y > 1e98) {
+        ERROR("IMPOSSIBLE NUMBER DETECTED: EXPONENT OUT OF BOUNDS");
+    }
+    if ( y < 1e-98) { x = 0.; }
+
+    /* Get the total length of the string representing x */
+    len = (int32_t)sprintf(buffer, "%+1.*E", nd - 1, x);
+
+    /* Trim leading zero in a three-digit exponent */
+    if (len > nd + 6) {
+        d = buffer + nd + 4;
+        d[0] = d[1]; d[1] = d[2]; d[2] = '\0';
+    }
+}

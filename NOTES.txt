@@ -15,3 +15,16 @@ Stop using "we" in code (including FORTRAN package READMEs), and READMEs
 Fix References in READMEs + code and align them with theory
 
 Update READMEs (j behaviour was unified with library functions)
+
+Check if dim > 0 always, if not, add a constraint
+
+Add constraint that nmax <= dim
+
+Add constraint that the iu - il + 1 >= 1
+
+Add constraint nl > 0
+
+Check if it is a problem to hand to FOURTRAN routine int32_t?
+
+Check why there can be unhysical increadibly negative eigenvalues. Also, think
+of a way to treat them consistently.
