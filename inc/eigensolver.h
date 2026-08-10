@@ -39,7 +39,7 @@
 
 /* Data type to store data for eigensolver */
 typedef struct eigensolver_data_s {
-    int32_t Nkns, Nbs, dim, ipar[4];
+    int32_t Nks, Nbs, dim, ipar[4];
     double *ts, *tkns, *hs, *M, *H, rpar[10], runtime;
 } eigensolver_data;
 

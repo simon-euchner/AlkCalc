@@ -49,15 +49,27 @@ eigensolver_data *eigensolver_data_init() {
     /* Allocate memeory for result */
     data = (eigensolver_data *)malloc(sizeof(eigensolver_data));
 
-    /* Constants */
-    k = settings.k; N = settings.N;
-    nderiv = 1 + 1; /* Compute only first derivative of B-splines */
-    nKM = k; /*Quadrature order for stiffness and mass matrix */
-    data->Nkns = Nkns = N - 2 + 2 * k; /* Number of knots with multiplicities */
-    data->Nbs = Nbs = N + k - 2; /* Number of B-splines */
-    data->dim = dim = Nbs - 2; /* Dimension of generalised eigenvalue problem */
+    /* Constants                                                              *
+     *                                                                        *
+     * k      : Order of B-splines                                            *
+     * N      : Number of knots without counting multiplicities               *
+     * rmax   : Maximal radius in units of Bohr's radius                      *
+     * nW     : See code below.                                               *
+     * Nks    : Number of knots including mutiplicities                       *
+     * Nbs    : Number of B-splines                                           *
+     * dim    : Dimension of generalised eigenvalue problem                   *
+     * nderiv : Control parameter for derivatives computed by DBSPVD          *
+     * nKM    : Quadrature order for computing components of K and M          */
+    k = settings.k;
+    N = settings.N;
+    rmax = settings.rmax;
+    data->Nks = Nks = N - 2 + 2 * k;
+    data->Nbs = Nbs = N + k - 2;
+    data->dim = dim = Nbs - 2;
+    nderiv = 1 + 1;
+    nKM = k;
 
-    /* Set order nW of Gauss-Legendre quadrature for the potential matrix W   *
+    /* Order nW of Gauss-Legendre quadrature for the potential matrix W       *
      *                                                                        *
      * The effective potential in theory/theory.pdf which determines the      *
      * components of the potential matrix W is not a polynomial. Therefore,   *
@@ -66,25 +78,39 @@ eigensolver_data *eigensolver_data_init() {
      * be adjusted by the user, if necessary.                                 */
     nW = 1000;
 
-    /* Allocate memory */
-    ts = (double *)malloc(N * sizeof(double)); /* Knots, no multipl. */
-    tkns = (double *)calloc(Nkns, sizeof(double)); /* Full knot vector */
-    hs = (double *)malloc((N  - 1) * sizeof(double)); /* Steps, no multipl. */
+    /* Allocate memory                                                        *
+     *                                                                        *
+     * trs   : Knots excluding mutliplicities (r: reduced knot vector)        *
+     * ts    : Knots including multiplicities (k: knot vector)                *
+     * hs    : Steps h[i] = trs[i] - trs[i - 1], excluding mutliplicities     *
+     * vnikx : Array to store values of B-splines and their derivatives       *
+     * work  : Working space for DBSPVD                                       *
+     * K     : Array to hold relevant components of the stiffness matrix K    *
+     * M     : Array to hold relevant components of the stiffness matrix M    *
+     * W     : Array to hold relevant components of the potenial matrix W     *
+     * H     : Array to hold relevant components of the matrix H = K + W      *
+     * wKM   : Quadrature weights for computing components of K and M         *
+     * xKM   : Quadrature points for computing components of K and M          *
+     * wW    : Quadrature weights for computing components of W               *
+     * xW    : Quadrature points for computing components of W                */
+    trs = (double *)malloc(N * sizeof(double));
+    ts = (double *)calloc(Nks, sizeof(double));
+    hs = (double *)malloc((N  - 1) * sizeof(double));
     vnikx = (double *)malloc(k * nderiv * sizeof(double));
     work = (double *)malloc(((k + 1) * (k + 2)) / 2 * sizeof(double));
-    K = (double *)calloc(k * dim, sizeof(double)); /* Stiffness matrix */
-    W = (double *)calloc(k * dim, sizeof(double)); /* Potential matrix */
-    data->M = M = (double *)calloc(k * dim, sizeof(double)); /* Mass matrix */
-    data->H = H = (double *)calloc(k * dim, sizeof(double)); /* H = K + W */
-    wKM = (double *)malloc(nKM * sizeof(double)); /* Weights K, M integrals */
-    xKM = (double *)malloc(nKM * sizeof(double)); /* Points K, M integrals */
-    wW = (double *)malloc(nW * sizeof(double)); /* Weights W integrals */
-    xW = (double *)malloc(nW * sizeof(double)); /* Points W integrals */
+    K = (double *)calloc(k * dim, sizeof(double));
+    W = (double *)calloc(k * dim, sizeof(double));
+    data->M = M = (double *)calloc(k * dim, sizeof(double));
+    data->H = H = (double *)calloc(k * dim, sizeof(double));
+    wKM = (double *)malloc(nKM * sizeof(double));
+    xKM = (double *)malloc(nKM * sizeof(double));
+    wW = (double *)malloc(nW * sizeof(double));
+    xW = (double *)malloc(nW * sizeof(double));
 
-    /* Initialise parametric model potential V */
+    /* Initialise parametric model potential V (see src/potential.c) */
     potential_initpar(ipar = data->ipar, rpar = data->rpar);
 
-    /* Validate settings */
+    /* Validate settings (see src/validate.c) */
     validate_settings(ipar[3]);
 
     /* Procedure                                                              *
@@ -123,14 +149,14 @@ eigensolver_data *eigensolver_data_init() {
      * generalised eigenvalue problem.                                        */
 
     /* Knots and step sizes */
-    ts[0] = 0.; /* First knot is zero */
+    trs[0] = 0.; /* First knot is zero */
     for (i = 1; i < N; i++) {
         im1 = i - 1;
         hs[im1] = step(i);
-        ts[i] = ts[im1] + hs[im1];
-        tkns[k - 1 + i] = ts[i];
+        trs[i] = trs[im1] + hs[im1];
+        ts[k - 1 + i] = trs[i];
     }
-    for (i = N - 2 + k; i < Nkns; tkns[i++] = settings.rmax); /* Multiplicity */
+    for (i = N - 2 + k; i < Nks, ts[i++] = rmax); /* Add multiplicity */
 
     /* Compute weights and points for Gauss-Legendre quadrature rule          *
      *                                                                        *
@@ -157,10 +183,10 @@ eigensolver_data *eigensolver_data_init() {
 
             /* Compute to interval adjusted weight and point */
             w = .5 * hs[i - 1] * wKM[j];
-            t = .5 * (hs[i - 1] * xKM[j] + ts[i] + ts[i - 1]);
+            t = .5 * (hs[i - 1] * xKM[j] + trs[i] + trs[i - 1]);
 
-            /* Largest integer satisfying tkns[ileft] <= t */
-            ileft = k - 1 + i - 1; /* tkns[ileft] = ts[i - 1] */
+            /* Largest integer satisfying ts[ileft] <= t */
+            ileft = k - 1 + i - 1; /* ts[ileft] = trs[i - 1] */
 
             /* Evaluate B-splines and derivatives at quadrature point t */
             ileft += 1; /* Add one, because in FORTRAN counting starts at ONE */
@@ -168,11 +194,10 @@ eigensolver_data *eigensolver_data_init() {
 
             /* Accumulate matrix components of K and M (order: column-major)  *
              *                                                                *
-             * The interval [ts[i - 1], ts[i]] correpsonds to the interval    *
-             * [tkns[i + k - 2], tkns[i + k - 1]] in the absolute index       *
-             * associted with the knots tkns, in which multiplicities are     *
-             * included. On this interval only the B-splines with indices     *
-             * i - 1, ..., i + k - 2 are non-zero.                            */
+             * The interval [trs[i - 1], trs[i]] correpsonds to the interval  *
+             * [ts[i + k - 2], ts[i + k - 1]] in terms of the full knot       *
+             * vector (i.e., with multiplicities). On this interval only the  *
+             * B-splines with indices i - 1, ..., i + k - 2 are non-zero.     */
             imin = i - 1;
             for (a = 0; a < k; a++) {
                 if ((aa = imin + a) == 0 || aa == Nbs - 1) { continue; }
@@ -202,10 +227,10 @@ eigensolver_data *eigensolver_data_init() {
 
             /* Compute to interval adjusted weight and point */
             w = .5 * hs[i - 1] * wW[j];
-            t = .5 * (hs[i - 1] * xW[j] + ts[i] + ts[i - 1]);
+            t = .5 * (hs[i - 1] * xW[j] + trs[i] + trs[i - 1]);
 
             /* Largest integer satisfying tkns[ileft] <= t */
-            ileft = k - 1 + i - 1; /* tkns[ileft] = tim1 (see function step) */
+            ileft = k - 1 + i - 1; /* ts[ileft] = tim1 (see function step) */
 
             /* Evaluate B-splines and derivatives at quadrature point t */
             ileft += 1; /* Add one, because in FORTRAN counting starts at ONE */
