@@ -1,5 +1,3 @@
-Update code for eigensolver
-
 Add const qualifiers in FORTRAN routines wherever possible and important, e.g.,
 I hand k to the BSPLINE method and I actually should make sure it is not
 chnaging k.
