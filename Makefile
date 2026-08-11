@@ -40,7 +40,7 @@ all:
 
 ### Library
 lib: ${LIB}/libalkcalc.so
-	@echo -e "\nBUILDING LIBRARY 'ALKCALC'\n"
+	@echo -e "\nBUILDING LIBRARY ALKCALC\n"
 ${LIB}/libalkcalc.so: ${OBJ}/${F4}.o
 	${LD} -shared -o ${LIB}/libalkcalc.so ${OBJ}/${F4}.o -lm
 

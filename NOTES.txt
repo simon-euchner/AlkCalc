@@ -26,3 +26,5 @@ Check if it is a problem to hand to FOURTRAN routine int32_t?
 
 Check why there can be unhysical increadibly negative eigenvalues. Also, think
 of a way to treat them consistently.
+
+Update Python interface

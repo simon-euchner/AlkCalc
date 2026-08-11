@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     solve(data);
 
     /* Clean up */
-    //eigensolver_data_free(data);
+    eigensolver_data_free(data);
 
     return 0;
 }
@@ -278,8 +278,8 @@ eigensolver_data *eigensolver_data_init() {
 
 /* Free data of type eigensolver_data                                         */
 void eigensolver_data_free(eigensolver_data *data) {
-    free(data->M); data->M = NULL;
-    free(data->H); data->H = NULL;
+    //free(data->M); data->M = NULL;
+    //free(data->H); data->H = NULL;
     free(data); data = NULL;
 }
 
@@ -325,7 +325,7 @@ void solve(eigensolver_data *data) {
     tend = clock(); data->runtime = (tend - tstart) / (double)CLOCKS_PER_SEC;
 
     /* Print information */
-    printf("ALGORITHM FINISHED SUCCESSFULLY (RUNTIME: %.3f S)\n\n"
+    printf("ALGORITHM FINISHED SUCCESSFULLY (RUNTIME: %.1f S)\n\n"
            "SAVING DATA\n\n", data->runtime);
 
     /* Prepare and save eigenenergies */
@@ -339,8 +339,6 @@ void solve(eigensolver_data *data) {
     /* Clean up */
     free(iwork); iwork = NULL;
     free(ifail); ifail = NULL;
-    free(ab); ab = NULL;
-    free(bb); bb = NULL;
     free(q); q = NULL;
     free(w); w = NULL;
     free(z); z = NULL;
@@ -408,15 +406,15 @@ static double step(int32_t i) {
 static void save_energies(eigensolver_data *data, const double *energies) {
 
     char *species, file[71], filename[51], buffer[101];
-    int32_t k, N, Nbs, Nks, l, J, nl, nmax, runtime, n;
+    int32_t k, Nks, N, Nbs, l, J, nl, nmax, runtime, n;
     double rmax, dti, dtf, EGS;
     FILE *fd;
 
     /* Constants */
     species = settings.species;
     k = settings.k;
-    N = settings.N;
     Nks = data->Nks;
+    N = settings.N;
     Nbs = data->Nbs;
     rmax = settings.rmax;
     dti = step(1);
@@ -446,9 +444,9 @@ static void save_energies(eigensolver_data *data, const double *energies) {
                   "ORBITAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "\n"
                   "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 " / 2\n"
                   "GROUND STATE ENERGY [HARTREE]: %1.8lf\n"
-                  "ORDER OF B-SPLINES: %" PRId32 "\n"
-                  "TOTAL NUMBER OF KNOTS: %" PRId32 "\n"
-                  "NUMBER OF KNOTS (NO MULTIPLICITIES): %" PRId32 "\n"
+                  "ORDER OF B-SPLINES (K): %" PRId32 "\n"
+                  "TOTAL NUMBER OF KNOTS (NKS): %" PRId32 "\n"
+                  "NUMBER OF KNOTS WITHOUT MULTIPLICITIES (N): %" PRId32 "\n"
                   "NUMBER OF B-SPLINES (NBS): %" PRId32 "\n"
                   "RMAX [BOHR'S RADIUS]: %1.3E\n"
                   "FIRST, FINAL NON-ZERO STEP SIZE: %1.3E, %1.3E\n\n\n\n"
@@ -472,7 +470,7 @@ static void save_energies(eigensolver_data *data, const double *energies) {
 static void save_states(eigensolver_data *data, const double *z) {
 
     char *species, file[LEN_PATH_TO_STATES + 101], filename[101], buffer[101];
-    int32_t l, J, nl, nmax, k, Nbs, dim, n, i;
+    int32_t l, J, nl, nmax, k, Nks, Nbs, dim, n, i;
     FILE *fd;
 
     /* Constants */
@@ -482,6 +480,7 @@ static void save_states(eigensolver_data *data, const double *z) {
     nl = data->ipar[3];
     nmax = settings.nmax;
     k = settings.k;
+    Nks = data->Nks;
     Nbs = data->Nbs;
     dim = data->dim;
 
@@ -505,11 +504,12 @@ static void save_states(eigensolver_data *data, const double *z) {
                       "PRINCIPAL QUANTUM NUMBER (N): %" PRId32 "\n"
                       "ORBITAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "\n"
                       "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 " / 2\n"
-                      "ORDER OF B-SPLINES (NBS): %" PRId32 "\n"
+                      "ORDER OF B-SPLINES (K): %" PRId32 "\n"
+                      "TOTAL NUMBER OF KNOTS (NKS): %" PRId32 "\n"
                       "NUMBER OF B-SPLINES (NBS): %" PRId32 "\n"
                       "COEFFICIENTS F(I) (I = 0, ..., NBS - 1)\n\n\n\n"
                       "F(I)\n\n",
-                      species, n, l, J, k, Nbs);
+                      species, n, l, J, k, Nks, Nbs);
 
         /* Save radial eigenstate */
         fmt_2d_exp(buffer, 15, 0.); /* f[0] = 0 (see theory/theory.pdf) */
@@ -555,9 +555,9 @@ static void save_knotdata(eigensolver_data *data) {
     }
     (void)fprintf(fd,
                   "KNOTDATA FOR SPECIES %s\n\n"
-                  "ORDER OF B-SPLINES: %" PRId32 "\n"
+                  "ORDER OF B-SPLINES (K): %" PRId32 "\n"
                   "TOTAL NUMBER OF KNOTS: %" PRId32 "\n"
-                  "NUMBER OF KNOTS (NO MULTIPLICITIES): %" PRId32 "\n"
+                  "NUMBER OF KNOTS WITHOUT MULTIPLICITIES (N): %" PRId32 "\n"
                   "RMAX [BOHR'S RADIUS]: %1.3E\n"
                   "FIRST, FINAL NON-ZERO STEP SIZE: %1.3E, %1.3E\n\n\n\n"
                   "I        T(I)                  H(I - K)\n\n",

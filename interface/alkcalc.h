@@ -54,7 +54,7 @@ typedef struct alkcalc_state_s {
     int32_t l; /* Orbital angular momentum quantum number */
     double j; /* Total angular momentum quantum number */
     int32_t k; /* Order of B-splines */
-    int32_t Nks; /* Number of knots */
+    int32_t Nks; /* Total number of knots */
     int32_t N; /* Number of knots (no multiplicities) */
     int32_t Nbs; /* Number of B-splines */
     double *t; /* Knots (ti) with multiplicities (see theory/theory.pdf) */
@@ -130,8 +130,8 @@ void alkcalc_state_free(alkcalc_state *state);
  * jk      : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  *           of ket                                                           *
  * -------------------------------------------------------------------------- */
-double alkcalc_rp(const char *species, int32_t nb, int32_t lb, double jb,
-                  double p, int32_t nk, int32_t lk, double jk);
+//double alkcalc_rp(const char *species, int32_t nb, int32_t lb, double jb,
+//                  double p, int32_t nk, int32_t lk, double jk);
 
 /* -------------------------------------------------------------------------- *
  * Clebsch-Gordan coefficients (see 'theory/theory.pdf', section 'Manual')    *
@@ -183,8 +183,8 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
  * jf      : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  *           of (f)                                                           *
  * -------------------------------------------------------------------------- */
-double alkcalc_fitof(const char *species, int32_t ni, int32_t li, double ji,
-                     int32_t nf, int32_t lf, double jf);
+//double alkcalc_fitof(const char *species, int32_t ni, int32_t li, double ji,
+//                     int32_t nf, int32_t lf, double jf);
 
 /* -------------------------------------------------------------------------- *
  * Lifetime of fine-structure state (nanoseconds)                             *
@@ -198,7 +198,7 @@ double alkcalc_fitof(const char *species, int32_t ni, int32_t li, double ji,
  * s       : Spin (Not an argument, since we always have s = 1 / 2!)          *
  * j       : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  * -------------------------------------------------------------------------- */
-double alkcalc_tau(double T, const char *species, int32_t n, int32_t dn,
-                   int32_t l, double j);
+//double alkcalc_tau(double T, const char *species, int32_t n, int32_t dn,
+//                   int32_t l, double j);
 
 #endif
