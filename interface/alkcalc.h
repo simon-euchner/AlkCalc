@@ -14,7 +14,6 @@
 #include <complex.h>
 #include <math.h>
 #include <float.h>
-#include <assert.h>
 
 #define PI 3.141592653589793238462643383279502884 /* Pi */
 
@@ -130,8 +129,8 @@ void alkcalc_state_free(alkcalc_state *state);
  * jk      : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  *           of ket                                                           *
  * -------------------------------------------------------------------------- */
-//double alkcalc_rp(const char *species, int32_t nb, int32_t lb, double jb,
-//                  double p, int32_t nk, int32_t lk, double jk);
+double alkcalc_rp(const char *species, int32_t nb, int32_t lb, double jb,
+                  double p, int32_t nk, int32_t lk, double jk);
 
 /* -------------------------------------------------------------------------- *
  * Clebsch-Gordan coefficients (see 'theory/theory.pdf', section 'Manual')    *
@@ -183,8 +182,8 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
  * jf      : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  *           of (f)                                                           *
  * -------------------------------------------------------------------------- */
-//double alkcalc_fitof(const char *species, int32_t ni, int32_t li, double ji,
-//                     int32_t nf, int32_t lf, double jf);
+double alkcalc_fitof(const char *species, int32_t ni, int32_t li, double ji,
+                     int32_t nf, int32_t lf, double jf);
 
 /* -------------------------------------------------------------------------- *
  * Lifetime of fine-structure state (nanoseconds)                             *
@@ -198,7 +197,7 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
  * s       : Spin (Not an argument, since we always have s = 1 / 2!)          *
  * j       : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  * -------------------------------------------------------------------------- */
-//double alkcalc_tau(double T, const char *species, int32_t n, int32_t dn,
-//                   int32_t l, double j);
+double alkcalc_tau(double T, const char *species, int32_t n, int32_t dn,
+                   int32_t l, double j);
 
 #endif

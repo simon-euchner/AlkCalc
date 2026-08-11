@@ -658,13 +658,15 @@
     in practice the support can be considered finite whenever the value of the
     radial eigenstates beyond a certain value of $r$ (or equivalently $t$) stays
     below machine precision. The next step in the construction of the B-splines
-    is to choose a family of points $(t_i)_{i=0,\dots,N-1+2d}$ in the interval
-    $I$, the so-called \emph{knots}.\footnote{The family
-    $(t_i)_{i=0,\dots,N-1+2d}$ is sometimes called the \emph{knot vector} in the
-    literature.} Here, $N\in\mathbb{N}$ is the number of unique knots and
-    $d\geq0$ is the degree of the B-splines: each B-spline is a piecewise
-    polynomial function; a degree-$d$ B-spline is a B-spline where all these
-    polynomials have (maximally) degree $d$. The knots $t_i$ are defined as
+    is to choose a family of points $(t_i)_{i=0,\dots,N_\mathrm{ks}-1}$, the
+    so-called \emph{knots}, in the interval $I$, where $N_\mathrm{ks}=N-1+2d$ is
+    the total number of \emph{knots}.\footnote{The family
+    $(t_i)_{i=0,\dots,N_\mathrm{ks}-1}$ is sometimes called the \emph{knot
+    vector} in the literature.} Here, $N\in\mathbb{N}$ is the number of unique
+    knots and $d\geq0$ is the degree of the B-splines: each B-spline is a
+    piecewise polynomial function; a degree-$d$ B-spline is a B-spline where all
+    these polynomials have (maximally) degree $d$. The knots $t_i$ are defined
+    as
     \begin{equation}
         t_i
         =

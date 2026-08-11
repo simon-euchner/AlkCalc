@@ -48,8 +48,9 @@ double alkcalc_Enlsj(const char *species, int32_t n, int32_t l, double j) {
     }
 
     /* Extract energy */
-    move(fd, 9);
-    (void)fscanf(fd, "MINIMAL PRINCIPAL QUANTUM NUMBER: %" SCNd32 " ", &nl);
+    move(fd, 3);
+    (void)fscanf(fd, "MINIMAL PRINCIPAL QUANTUM NUMBER: %" SCNd32 " ",
+                 &nl);
     if (n < nl) {
         ERROR("REQUESTED EIGENENERGY DOES NOT EXIST");
     }
@@ -58,7 +59,7 @@ double alkcalc_Enlsj(const char *species, int32_t n, int32_t l, double j) {
     if (nmax < n) {
         ERROR("REQUESTED EIGENENERGY NOT AVAILABLE");
     }
-    move(fd, n + 1);
+    move(fd, n + 13);
     (void)fscanf(fd, "%" SCNd32 "     %lf ", &dummy, &E);
 
     /* Clean up */
@@ -206,86 +207,36 @@ void alkcalc_state_free(alkcalc_state *state) {
  * jk      : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  *           of ket                                                           *
  * -------------------------------------------------------------------------- */
-//double alkcalc_rp(const char *species, int32_t nb, int32_t lb, double jb,
-//                  double p, int32_t nk, int32_t lk, double jk) {
-//
-//    int32_t dim, k;
-//    double *t, *h, *Rpd, *Rpo, isr3, tkm1, tk, tkp1, hk, hkp1, tm, tp, pm, pp,
-//           I1, I2, I3, *f, *g, rp;
-//    alkcalc_state *bra, *ket;
-//
-//    /* Load states */
-//    bra = alkcalc_fnlsj('f', species, nb, lb, jb);
-//    ket = alkcalc_fnlsj('p', species, nk, lk, jk);
-//
-//    /* Extract discretisation data */
-//    t = bra->t; h = bra->h;
-//
-//    /* Allocate memory for matrix Rp */
-//    Rpd = (double *)malloc((dim = bra->dim) * sizeof(double)); /* Diagonal */
-//    Rpo = (double *)malloc((dim - 1) * sizeof(double)); /* Off-diagonal */
-//
-//    /* Compute components of matrix Rp (diagonal [d] and off-diagonal [o]) */
-//    isr3 = 1. / sqrt(3.);
-//    for (k = 1; k < dim; k++) {
-//
-//        /* Discretisation data */
-//        tkm1 = t[k - 1]; tk = t[k]; tkp1 = t[k + 1]; hk = h[k - 1]; hkp1 = h[k];
-//
-//        /* Integral for (Rp)k,kp1 */
-//        tm = .5 * (tk + tkp1 - isr3 * hkp1);
-//        tp = .5 * (tk + tkp1 + isr3 * hkp1);
-//        pm = pow(tm, p); pp = pow(tp, p);
-//        I1 = .5 * ((tkp1 - tm) * (tm - tk) * pm
-//           + (tkp1 - tp) * (tp - tk) * pp) / hkp1;
-//        Rpo[k - 1] = I1;
-//
-//        /* Integrals for (Rp)k,k */
-//        I2 = .5 * ((tkp1 - tm) * (tkp1 - tm) * pm
-//           + (tkp1 - tp) * (tkp1 - tp) * pp) / hkp1;
-//        tm = .5 * (tkm1 + tk - isr3 * hk); tp = .5 * (tkm1 + tk + isr3 * hk);
-//        pm = pow(tm, p); pp = pow(tp, p);
-//        I3 = .5 * ((tm - tkm1) * (tm - tkm1) * pm
-//           + (tp - tkm1) * (tp - tkm1) * pp) / hk;
-//        Rpd[k - 1] = I2 + I3;
-//    }
-//    tkm1 = t[dim - 1]; tk = t[dim]; tkp1 = t[dim + 1];
-//    hk = h[dim - 1]; hkp1 = h[dim];
-//    tm = .5 * (tk + tkp1 - isr3 * hkp1); tp = .5 * (tk + tkp1 + isr3 * hkp1);
-//    pm = pow(tm, p); pp = pow(tp, p);
-//    I2 = .5 * (   (tkp1 - tm) * (tkp1 - tm) * pm
-//                + (tkp1 - tp) * (tkp1 - tp) * pp ) / hkp1;
-//    tm = .5 * (tkm1 + tk - isr3 * hk); tp = .5 * (tkm1 + tk + isr3 * hk);
-//    pm = pow(tm, p); pp = pow(tp, p);
-//    I3 = .5 * (   (tm - tkm1) * (tm - tkm1) * pm
-//                + (tp - tkm1) * (tp - tkm1) * pp ) / hk;
-//    Rpd[dim - 1] = I2 + I3;
-//
-//    /* Avoid warning by compiler because Rpo[0] is not initialised if dim is  *
-//     * less than 2, i.e., if N < 4. Practically, this of course not a         *
-//     * problem, because N must be large, e.g. 100000, to yield sensible       *
-//     * results. The assertion just tells the compiler there is nothing to     *
-//     * worry about. Further, the condition N > 3, is presented to the user in *
-//     * 'interface/settings.c'.                                                */
-//    assert(dim >= 2);
-//
-//    /* Compute matrix element */
-//    f = bra->fnlsj; g = ket->fnlsj;
-//    rp = f[0] * (Rpd[0] * g[0] + Rpo[0] * g[1]);
-//    for (k = 1; k < dim - 1; k++) {
-//        rp += f[k] * (   Rpo[k - 1] * g[k - 1]
-//                       + Rpd[k] * g[k] + Rpo[k] * g[k + 1] );
-//    }
-//    rp += f[dim - 1] * (Rpo[dim - 2] * g[dim - 2] + Rpd[dim - 1] * g[dim - 1]);
-//
-//    /* Clean up */
-//    alkcalc_state_free(bra); bra = NULL;
-//    alkcalc_state_free(ket); ket = NULL;
-//    free(Rpd); Rpd = NULL;
-//    free(Rpo); Rpo = NULL;
-//
-//    return rp;
-//}
+double alkcalc_rp(const char *species, int32_t nb, int32_t lb, double jb,
+                  double p, int32_t nk, int32_t lk, double jk) {
+
+    int32_t dim, i;
+    double *ts, *trs, *hs, *Rpd, *Rpo, isr3, tkm1, tk, tkp1, hk, hkp1, tm, tp,
+           pm, pp, I1, I2, I3, *f, *g, rp;
+    alkcalc_state *bra, *ket;
+
+    /* Load states */
+    bra = alkcalc_fnlsj('f', species, nb, lb, jb);
+    ket = alkcalc_fnlsj('p', species, nk, lk, jk);
+
+    /* Extract knotdata (trs: knot vector without mulitplicities) */
+    ts = bra->t; trs = bra->t + bra->k - 1; hs = bra->h;
+
+    /* Allocate memory for matrix Rp */
+    // ...
+
+    /* Compute components of matrix Rp (diagonal [d] and off-diagonal [o]) */
+    // ...
+
+    /* Compute matrix element */
+    // ...
+
+    /* Clean up */
+    alkcalc_state_free(bra); bra = NULL;
+    alkcalc_state_free(ket); ket = NULL;
+
+    return rp;
+}
 
 /* -------------------------------------------------------------------------- *
  * Clebsch-Gordan coefficients (see 'theory/theory.pdf', section 'Manual')    *
@@ -423,57 +374,57 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
  * jf      : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  *           of (f)                                                           *
  * -------------------------------------------------------------------------- */
-//double alkcalc_fitof(const char *species, int32_t ni, int32_t li, double ji,
-//                     int32_t nf, int32_t lf, double jf) {
-//
-//    int32_t JI, JF, llp1, llm1;
-//    double Efi, r, al, fitof;
-//
-//    /* Apply selection rules */
-//    JI = CONVERT(ji); JF = CONVERT(jf);
-//    if (JI < 0 || JF < 0 || li < 0 || lf < 0) { return 0; }
-//    if (INTEGER_ABS(JF-JI) > 2 || INTEGER_ABS(lf-li) != 1) { return 0.; }
-//
-//    /* Energy difference between initial (i) and final (f) state in Hartree */
-//    Efi = alkcalc_Enlsj(species, nf, lf, jf)
-//        - alkcalc_Enlsj(species, ni, li, ji);
-//
-//    /* Radial dipole-transition matrix element between (i) and (f) */
-//    r = alkcalc_rp(species, ni, li, ji, 1., nf, lf, jf);
-//
-//    /* Angular factor */
-//    llp1 = 2 * li + 1; llm1 = 2 * li - 1;
-//    if (lf == li + 1) { /* lf - li = 1 */
-//        if (JI == llp1 && JF == llp1) {
-//            al = 1. / ((llp1 + 2.) * llp1);
-//        } else
-//        if (JI == llm1 && JF == llp1) {
-//            al = (li + 1.) / llp1;
-//        } else
-//        if (JI == llp1 && JF == llp1 + 2) {
-//            al = (li + 2.) / (llp1 + 2);
-//        } else {
-//            return 0;
-//        }
-//    } else { /* lf - li = -1 */
-//        if (JI == llm1 && JF == llm1) {
-//            al = 1. / (llp1 * llm1);
-//        } else
-//        if (JI == llp1 && JF == llm1) {
-//            al = (double)li / llp1;
-//        } else
-//        if (JI == llm1 && JF == llm1 - 2) {
-//            al = (li - 1.) / llm1;
-//        } else {
-//            return 0;
-//        }
-//    }
-//
-//    /* Assemble result */
-//    fitof = 2. / 3. * Efi * r * r * al;
-//
-//    return fitof;
-//}
+double alkcalc_fitof(const char *species, int32_t ni, int32_t li, double ji,
+                     int32_t nf, int32_t lf, double jf) {
+
+    int32_t JI, JF, llp1, llm1;
+    double Efi, r, al, fitof;
+
+    /* Apply selection rules */
+    JI = CONVERT(ji); JF = CONVERT(jf);
+    if (JI < 0 || JF < 0 || li < 0 || lf < 0) { return 0; }
+    if (INTEGER_ABS(JF-JI) > 2 || INTEGER_ABS(lf-li) != 1) { return 0.; }
+
+    /* Energy difference between initial (i) and final (f) state in Hartree */
+    Efi = alkcalc_Enlsj(species, nf, lf, jf)
+        - alkcalc_Enlsj(species, ni, li, ji);
+
+    /* Radial dipole-transition matrix element between (i) and (f) */
+    r = alkcalc_rp(species, ni, li, ji, 1., nf, lf, jf);
+
+    /* Angular factor */
+    llp1 = 2 * li + 1; llm1 = 2 * li - 1;
+    if (lf == li + 1) { /* lf - li = 1 */
+        if (JI == llp1 && JF == llp1) {
+            al = 1. / ((llp1 + 2.) * llp1);
+        } else
+        if (JI == llm1 && JF == llp1) {
+            al = (li + 1.) / llp1;
+        } else
+        if (JI == llp1 && JF == llp1 + 2) {
+            al = (li + 2.) / (llp1 + 2);
+        } else {
+            return 0;
+        }
+    } else { /* lf - li = -1 */
+        if (JI == llm1 && JF == llm1) {
+            al = 1. / (llp1 * llm1);
+        } else
+        if (JI == llp1 && JF == llm1) {
+            al = (double)li / llp1;
+        } else
+        if (JI == llm1 && JF == llm1 - 2) {
+            al = (li - 1.) / llm1;
+        } else {
+            return 0;
+        }
+    }
+
+    /* Assemble result */
+    fitof = 2. / 3. * Efi * r * r * al;
+
+    return fitof;
+}
 
 /* -------------------------------------------------------------------------- *
  * Lifetime of fine-structure state (nanoseconds)                             *
@@ -487,164 +438,164 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
  * s       : Spin (Not an argument, since we always have s = 1 / 2!)          *
  * j       : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  * -------------------------------------------------------------------------- */
-//double alkcalc_tau(double T, const char *species, int32_t n, int32_t dn,
-//                   int32_t l, double j) {
-//
-//    int32_t lp, lm, nmnlp1, nmxlp1, nlp1, nmnlm1, nmxlm1, nlm1, J, k;
-//    double En, Gamma, jp, jm, hnu, fftoi, nocc, tau;
-//
-//    /* Get lowest n' such that E(n,l,s,l+s) < E(n',l',s,l'+s) is still true */
-//    lp = l + 1; lm = l - 1;
-//    En = alkcalc_Enlsj(species, n, l, j);
-//    nextrm(species, &nmnlp1, &nmxlp1, lp, lp + .5); /* l' = l + 1 */
-//    nlp1 = (n < nmnlp1) ? nmnlp1 : n;
-//    if (alkcalc_Enlsj(species, nlp1, lp, lp + .5) > En) {
-//        while (    nmnlp1 < --nlp1
-//                && alkcalc_Enlsj(species, nlp1, lp, lp + .5) > En );
-//        nlp1++;
-//    } else {
-//        while (alkcalc_Enlsj(species, ++nlp1, lp, lp + .5) < En);
-//    }
-//    if (!l) { nlm1 = -1; nmnlm1 = 0; goto SkipedSState; } /* l' = l - 1 */
-//    nextrm(species, &nmnlm1, &nmxlm1, lm, lm + .5);
-//    nlm1 = (n < nmnlm1) ? nmnlm1 : n;
-//    if (alkcalc_Enlsj(species, nlm1, lm, lm + .5) > En) {
-//        while (    nmnlm1 < --nlm1
-//                && alkcalc_Enlsj(species, nlm1, lm, lm + .5) > En );
-//        nlm1++;
-//    } else {
-//        while (alkcalc_Enlsj(species, ++nlm1, lm, lm + .5) < En);
-//    }
-//SkipedSState:
-//
-//    /* Compute decay rate Gamma */
-//    Gamma = 0.;
-//    J = CONVERT(j); jp = l + .5; jm = l - .5;
-//    if (J == 2 * l + 1) { /* j = l + s */
-//
-//        /* Emission: l' = l + 1 */
-//        for (k = nlp1 - 1; k >= nmnlp1; k--) {
-//
-//            /* j' = l + s */
-//            hnu = En - alkcalc_Enlsj(species, k, lp, jp);
-//            fftoi = -alkcalc_fitof(species, n, l, j, k, lp, jp);
-//            nocc = thermal_photon_occupation(hnu, T);
-//            Gamma += hnu * hnu * fftoi * (1. + nocc);
-//
-//            /* j' = l + 3s */
-//            hnu = En - alkcalc_Enlsj(species, k, lp, jp + 1.);
-//            fftoi = -alkcalc_fitof(species, n, l, j, k, lp, jp + 1.);
-//            nocc = thermal_photon_occupation(hnu, T);
-//            Gamma += hnu * hnu * fftoi * (1. + nocc);
-//        }
-//
-//        /* Emission: l' = l - 1 */
-//        for (k = nlm1 - 1; k >= nmnlm1; k--) {
-//
-//            /* j'=l-s */
-//            hnu = En - alkcalc_Enlsj(species, k, lm, jm);
-//            fftoi = -alkcalc_fitof(species, n, l, j, k, lm, jm);
-//            nocc = thermal_photon_occupation(hnu, T);
-//            Gamma += hnu * hnu * fftoi * (1. + nocc);
-//        }
-//
-//        /* Absorption: l' = l + 1 */
-//        for (k = nlp1; k < nlp1 + dn; k++) {
-//
-//            /* j'=l+s */
-//            hnu = alkcalc_Enlsj(species, k, lp, jp) - En;
-//            fftoi = alkcalc_fitof(species, n, l, j, k, lp, jp);
-//            nocc = thermal_photon_occupation(hnu, T);
-//            Gamma += hnu * hnu * fftoi * nocc;
-//
-//            /* j'=l+3s */
-//            hnu = alkcalc_Enlsj(species, k, lp, jp + 1.) - En;
-//            fftoi = alkcalc_fitof(species, n, l, j, k, lp, jp + 1.);
-//            nocc = thermal_photon_occupation(hnu, T);
-//            Gamma += hnu * hnu * fftoi * nocc;
-//        }
-//
-//        /* Absorption: l' = l - 1 */
-//        if (l) {
-//            for (k = nlm1; k < nlm1 + dn; k++) {
-//
-//                /* j'=l-s */
-//                hnu = alkcalc_Enlsj(species, k, lm, jm) - En;
-//                fftoi = alkcalc_fitof(species, n, l, j, k, lm, jm);
-//                nocc = thermal_photon_occupation(hnu, T);
-//                Gamma += hnu * hnu * fftoi * nocc;
-//            }
-//        }
-//    } else { /* j = l - s */
-//
-//        /* Emission: l' = l + 1 */
-//        for (k = nlp1 - 1; k >= nmnlp1; k--) {
-//
-//            /* j'=l+s */
-//            hnu = En - alkcalc_Enlsj(species, k, lp, jp);
-//            fftoi = -alkcalc_fitof(species, n, l, j, k, lp, jp);
-//            nocc = thermal_photon_occupation(hnu, T);
-//            Gamma += hnu * hnu * fftoi * (1. + nocc);
-//        }
-//
-//        /* Emission: l = l - 1 */
-//        for (k = nlm1 - 1; k >= nmnlm1; k--) {
-//
-//            /* j'=l-s */
-//            hnu = En - alkcalc_Enlsj(species, k, lm, jm);
-//            fftoi = -alkcalc_fitof(species, n, l, j, k, lm, jm);
-//            nocc = thermal_photon_occupation(hnu, T);
-//            Gamma += hnu * hnu * fftoi * (1. + nocc);
-//
-//            /* j' = l - 3s */
-//            if (l > 1) { /* P(j=1/2) -> S(j'=-1/2) is not possible */
-//                hnu = En - alkcalc_Enlsj(species, k, lm, jm - 1.);
-//                fftoi = -alkcalc_fitof(species, n, l, j, k, lm, jm - 1.);
-//                nocc = thermal_photon_occupation(hnu, T);
-//                Gamma += hnu * hnu * fftoi * (1. + nocc);
-//            }
-//        }
-//
-//        /* Absorption: l' = l + 1 */
-//        for (k = nlp1; k < nlp1 + dn; k++) {
-//
-//            /* j'=l+s */
-//            hnu = alkcalc_Enlsj(species, k, lp, jp) - En;
-//            fftoi = alkcalc_fitof(species, n, l, j, k, lp, jp);
-//            nocc = thermal_photon_occupation(hnu, T);
-//            Gamma += hnu * hnu * fftoi * nocc;
-//        }
-//
-//        /* Absorption: l = l - 1 */
-//        if (l) {
-//            for (k = nlm1; k < nlm1 + dn; k++) {
-//
-//                /* j' = l - s */
-//                hnu = alkcalc_Enlsj(species, k, lm, jm) - En;
-//                fftoi = alkcalc_fitof(species, n, l, j, k, lm, jm);
-//                nocc = thermal_photon_occupation(hnu, T);
-//                Gamma += hnu * hnu * fftoi * nocc;
-//
-//                /* j'=l-3s */
-//                if (l > 1) { /* P(j = 1 / 2) -> S(j' = -1 / 2) not possible */
-//                    hnu = alkcalc_Enlsj(species, k, lm, jm - 1.) - En;
-//                    fftoi = alkcalc_fitof(species, n, l, j, k, lm, jm - 1.);
-//                    nocc = thermal_photon_occupation(hnu, T);
-//                    Gamma += hnu * hnu * fftoi * nocc;
-//                }
-//            }
-//        }
-//    }
-//
-//    /* Compute lifetime in units of nanoseconds                               *
-//     *                                                                        *
-//     * The conversion factor used below is 2 * alpha**3 * EH / hbar, where    *
-//     * alpha is the fine-structure constant, EH is the Hartree, and hbar is   *
-//     * the reduced Planck constant; for their values, see Ref. [5].           */
-//    tau = 1. / (32.1300103 * Gamma);
-//
-//    return tau;
-//}
+double alkcalc_tau(double T, const char *species, int32_t n, int32_t dn,
+                   int32_t l, double j) {
+
+    int32_t lp, lm, nmnlp1, nmxlp1, nlp1, nmnlm1, nmxlm1, nlm1, J, k;
+    double En, Gamma, jp, jm, hnu, fftoi, nocc, tau;
+
+    /* Get lowest n' such that E(n,l,s,l+s) < E(n',l',s,l'+s) is still true */
+    lp = l + 1; lm = l - 1;
+    En = alkcalc_Enlsj(species, n, l, j);
+    nextrm(species, &nmnlp1, &nmxlp1, lp, lp + .5); /* l' = l + 1 */
+    nlp1 = (n < nmnlp1) ? nmnlp1 : n;
+    if (alkcalc_Enlsj(species, nlp1, lp, lp + .5) > En) {
+        while (    nmnlp1 < --nlp1
+                && alkcalc_Enlsj(species, nlp1, lp, lp + .5) > En );
+        nlp1++;
+    } else {
+        while (alkcalc_Enlsj(species, ++nlp1, lp, lp + .5) < En);
+    }
+    if (!l) { nlm1 = -1; nmnlm1 = 0; goto SkipedSState; } /* l' = l - 1 */
+    nextrm(species, &nmnlm1, &nmxlm1, lm, lm + .5);
+    nlm1 = (n < nmnlm1) ? nmnlm1 : n;
+    if (alkcalc_Enlsj(species, nlm1, lm, lm + .5) > En) {
+        while (    nmnlm1 < --nlm1
+                && alkcalc_Enlsj(species, nlm1, lm, lm + .5) > En );
+        nlm1++;
+    } else {
+        while (alkcalc_Enlsj(species, ++nlm1, lm, lm + .5) < En);
+    }
+SkipedSState:
+
+    /* Compute decay rate Gamma */
+    Gamma = 0.;
+    J = CONVERT(j); jp = l + .5; jm = l - .5;
+    if (J == 2 * l + 1) { /* j = l + s */
+
+        /* Emission: l' = l + 1 */
+        for (k = nlp1 - 1; k >= nmnlp1; k--) {
+
+            /* j' = l + s */
+            hnu = En - alkcalc_Enlsj(species, k, lp, jp);
+            fftoi = -alkcalc_fitof(species, n, l, j, k, lp, jp);
+            nocc = thermal_photon_occupation(hnu, T);
+            Gamma += hnu * hnu * fftoi * (1. + nocc);
+
+            /* j' = l + 3s */
+            hnu = En - alkcalc_Enlsj(species, k, lp, jp + 1.);
+            fftoi = -alkcalc_fitof(species, n, l, j, k, lp, jp + 1.);
+            nocc = thermal_photon_occupation(hnu, T);
+            Gamma += hnu * hnu * fftoi * (1. + nocc);
+        }
+
+        /* Emission: l' = l - 1 */
+        for (k = nlm1 - 1; k >= nmnlm1; k--) {
+
+            /* j'=l-s */
+            hnu = En - alkcalc_Enlsj(species, k, lm, jm);
+            fftoi = -alkcalc_fitof(species, n, l, j, k, lm, jm);
+            nocc = thermal_photon_occupation(hnu, T);
+            Gamma += hnu * hnu * fftoi * (1. + nocc);
+        }
+
+        /* Absorption: l' = l + 1 */
+        for (k = nlp1; k < nlp1 + dn; k++) {
+
+            /* j'=l+s */
+            hnu = alkcalc_Enlsj(species, k, lp, jp) - En;
+            fftoi = alkcalc_fitof(species, n, l, j, k, lp, jp);
+            nocc = thermal_photon_occupation(hnu, T);
+            Gamma += hnu * hnu * fftoi * nocc;
+
+            /* j'=l+3s */
+            hnu = alkcalc_Enlsj(species, k, lp, jp + 1.) - En;
+            fftoi = alkcalc_fitof(species, n, l, j, k, lp, jp + 1.);
+            nocc = thermal_photon_occupation(hnu, T);
+            Gamma += hnu * hnu * fftoi * nocc;
+        }
+
+        /* Absorption: l' = l - 1 */
+        if (l) {
+            for (k = nlm1; k < nlm1 + dn; k++) {
+
+                /* j'=l-s */
+                hnu = alkcalc_Enlsj(species, k, lm, jm) - En;
+                fftoi = alkcalc_fitof(species, n, l, j, k, lm, jm);
+                nocc = thermal_photon_occupation(hnu, T);
+                Gamma += hnu * hnu * fftoi * nocc;
+            }
+        }
+    } else { /* j = l - s */
+
+        /* Emission: l' = l + 1 */
+        for (k = nlp1 - 1; k >= nmnlp1; k--) {
+
+            /* j'=l+s */
+            hnu = En - alkcalc_Enlsj(species, k, lp, jp);
+            fftoi = -alkcalc_fitof(species, n, l, j, k, lp, jp);
+            nocc = thermal_photon_occupation(hnu, T);
+            Gamma += hnu * hnu * fftoi * (1. + nocc);
+        }
+
+        /* Emission: l = l - 1 */
+        for (k = nlm1 - 1; k >= nmnlm1; k--) {
+
+            /* j'=l-s */
+            hnu = En - alkcalc_Enlsj(species, k, lm, jm);
+            fftoi = -alkcalc_fitof(species, n, l, j, k, lm, jm);
+            nocc = thermal_photon_occupation(hnu, T);
+            Gamma += hnu * hnu * fftoi * (1. + nocc);
+
+            /* j' = l - 3s */
+            if (l > 1) { /* P(j=1/2) -> S(j'=-1/2) is not possible */
+                hnu = En - alkcalc_Enlsj(species, k, lm, jm - 1.);
+                fftoi = -alkcalc_fitof(species, n, l, j, k, lm, jm - 1.);
+                nocc = thermal_photon_occupation(hnu, T);
+                Gamma += hnu * hnu * fftoi * (1. + nocc);
+            }
+        }
+
+        /* Absorption: l' = l + 1 */
+        for (k = nlp1; k < nlp1 + dn; k++) {
+
+            /* j'=l+s */
+            hnu = alkcalc_Enlsj(species, k, lp, jp) - En;
+            fftoi = alkcalc_fitof(species, n, l, j, k, lp, jp);
+            nocc = thermal_photon_occupation(hnu, T);
+            Gamma += hnu * hnu * fftoi * nocc;
+        }
+
+        /* Absorption: l = l - 1 */
+        if (l) {
+            for (k = nlm1; k < nlm1 + dn; k++) {
+
+                /* j' = l - s */
+                hnu = alkcalc_Enlsj(species, k, lm, jm) - En;
+                fftoi = alkcalc_fitof(species, n, l, j, k, lm, jm);
+                nocc = thermal_photon_occupation(hnu, T);
+                Gamma += hnu * hnu * fftoi * nocc;
+
+                /* j'=l-3s */
+                if (l > 1) { /* P(j = 1 / 2) -> S(j' = -1 / 2) not possible */
+                    hnu = alkcalc_Enlsj(species, k, lm, jm - 1.) - En;
+                    fftoi = alkcalc_fitof(species, n, l, j, k, lm, jm - 1.);
+                    nocc = thermal_photon_occupation(hnu, T);
+                    Gamma += hnu * hnu * fftoi * nocc;
+                }
+            }
+        }
+    }
+
+    /* Compute lifetime in units of nanoseconds                               *
+     *                                                                        *
+     * The conversion factor used below is 2 * alpha**3 * EH / hbar, where    *
+     * alpha is the fine-structure constant, EH is the Hartree, and hbar is   *
+     * the reduced Planck constant; for their values, see Ref. [5].           */
+    tau = 1. / (32.1300103 * Gamma);
+
+    return tau;
+}
 
 /* -------------------------------------------------------------------------- *
  * Helper functions                                                           *
