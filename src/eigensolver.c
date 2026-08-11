@@ -408,7 +408,7 @@ static double step(int32_t i) {
 static void save_energies(eigensolver_data *data, const double *energies) {
 
     char *species, file[71], filename[51], buffer[101];
-    int32_t k, N, Nks, l, J, nl, nmax, runtime, n;
+    int32_t k, N, Nbs, Nks, l, J, nl, nmax, runtime, n;
     double rmax, dti, dtf, EGS;
     FILE *fd;
 
@@ -417,6 +417,7 @@ static void save_energies(eigensolver_data *data, const double *energies) {
     k = settings.k;
     N = settings.N;
     Nks = data->Nks;
+    Nbs = data->Nbs;
     rmax = settings.rmax;
     dti = step(1);
     dtf = step(settings.N - 1);
@@ -448,11 +449,12 @@ static void save_energies(eigensolver_data *data, const double *energies) {
                   "ORDER OF B-SPLINES: %" PRId32 "\n"
                   "TOTAL NUMBER OF KNOTS: %" PRId32 "\n"
                   "NUMBER OF KNOTS (NO MULTIPLICITIES): %" PRId32 "\n"
+                  "NUMBER OF B-SPLINES (NBS): %" PRId32 "\n"
                   "RMAX [BOHR'S RADIUS]: %1.3E\n"
                   "FIRST, FINAL NON-ZERO STEP SIZE: %1.3E, %1.3E\n\n\n\n"
                   "N   ENERGY\n\n",
-                  species, runtime, nl, nmax, l, J, EGS, k, Nks, N, rmax, dti,
-                  dtf);
+                  species, runtime, nl, nmax, l, J, EGS, k, Nks, N, Nbs, rmax,
+                  dti, dtf);
 
     /* Save eigenenergies */
     n = 0;
@@ -470,7 +472,7 @@ static void save_energies(eigensolver_data *data, const double *energies) {
 static void save_states(eigensolver_data *data, const double *z) {
 
     char *species, file[LEN_PATH_TO_STATES + 101], filename[101], buffer[101];
-    int32_t l, J, nl, nmax, Nbs, dim, n, i;
+    int32_t l, J, nl, nmax, k, Nbs, dim, n, i;
     FILE *fd;
 
     /* Constants */
@@ -479,6 +481,7 @@ static void save_states(eigensolver_data *data, const double *z) {
     J = CONVERT(settings.j);
     nl = data->ipar[3];
     nmax = settings.nmax;
+    k = settings.k;
     Nbs = data->Nbs;
     dim = data->dim;
 
@@ -502,10 +505,11 @@ static void save_states(eigensolver_data *data, const double *z) {
                       "PRINCIPAL QUANTUM NUMBER (N): %" PRId32 "\n"
                       "ORBITAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "\n"
                       "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 " / 2\n"
+                      "ORDER OF B-SPLINES (NBS): %" PRId32 "\n"
                       "NUMBER OF B-SPLINES (NBS): %" PRId32 "\n"
                       "COEFFICIENTS F(I) (I = 0, ..., NBS - 1)\n\n\n\n"
                       "F(I)\n\n",
-                      species, n, l, J, Nbs);
+                      species, n, l, J, k, Nbs);
 
         /* Save radial eigenstate */
         fmt_2d_exp(buffer, 15, 0.); /* f[0] = 0 (see theory/theory.pdf) */

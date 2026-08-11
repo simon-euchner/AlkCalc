@@ -83,7 +83,7 @@ alkcalc_state *alkcalc_fnlsj(char result, const char *species, int32_t n,
                              int32_t l, double j) {
 
     char file[LEN_PATH_TO_STATES + 101], filename[101], *buffer, *bfr;
-    int32_t J, N, dim, dummy, ndi, ndf, a, b, c, d, k;
+    int32_t J, k, Nbs, dim, dummy, ndi, ndf, a, b, c, d, i;
     double *t, *h, *fnlsj;
     FILE *fd;
     alkcalc_state *state;
@@ -100,16 +100,17 @@ alkcalc_state *alkcalc_fnlsj(char result, const char *species, int32_t n,
     }
 
     /* Read in metadata and move file pointer to data */
+    move(fd, 5);
+    (void)fscanf(fd, "ORDER OF B-SPLINES: %" SCNd32 " ", &k);
+    (void)fscanf(fd, "NUMBER OF B-SPLINES: %" SCNd32 " ", &Nbs);
     move(fd, 7);
-    (void)fscanf(fd, "NUMBER OF DISCRETISATION POINTS: %" SCNd32 " ", &N);
-    move(fd, 2);
 
     /* Allocate memory for result */
     state = (alkcalc_state *)malloc(sizeof(alkcalc_state));
-    state->dim = dim = (state->N = N) - 2;
+    state->k = k; state->Nbs = Nbs;
     switch (result) {
         case 'f':
-            state->t = t = (double *)malloc(N * sizeof(double));
+            state->t = t = (double *)malloc(Nks * sizeof(double));
             state->h = h = (double *)malloc((N - 1) * sizeof(double));
             break;
         case 'p':
@@ -117,10 +118,10 @@ alkcalc_state *alkcalc_fnlsj(char result, const char *species, int32_t n,
             state->h = h = NULL;
             break;
         default:
-            ERROR("INVALID ARGUMENT FOR 'RESULT'");
+            ERROR("INVALID VALUE TO FIRST ARGUMENT OF ALKCALC_FNLSJ");
             break;
     }
-    state->fnlsj = fnlsj = (double *)malloc(dim * sizeof(double));
+    state->fnlsj = fnlsj = (double *)malloc(Nbs * sizeof(double));
 
     /* Number of digits                                                       *
      *                                                                        *
@@ -138,7 +139,7 @@ alkcalc_state *alkcalc_fnlsj(char result, const char *species, int32_t n,
 
     /* Read in radial eigenstate */
     (void)fread(buffer = (char *)malloc(b), 1, b, fd);
-    for (k = 0; k < dim; k++) { state->fnlsj[k] = parse(buffer + a * k, ndf); }
+    for (i = 0; i < Nbs; i++) { state->fnlsj[i] = parse(buffer + a * i, ndf); }
     free(buffer); buffer = NULL;
 
     /* Close file */
@@ -150,18 +151,18 @@ alkcalc_state *alkcalc_fnlsj(char result, const char *species, int32_t n,
     /* Read in discretisation data (if requested, i.e., if result = 'f') */
     if (result == 'p') { return state; }
     file[0] = filename[0] = '\0';
-    (void)sprintf(filename, "data/discretisation-%s.dat", species);
+    (void)sprintf(filename, "data/knotdata-%s.dat", species);
     (void)strcpy(file, PATH_TO_ALKCALC);
     (void)strcat(file, filename);
     if (!(fd = fopen(file, "r"))) {
-        ERROR("REQUESTED DISCRETISATION DATA DOES NOT EXIST");
+        ERROR("REQUESTED KNOTDATA DOES NOT EXIST");
     }
     move(fd, 8);
     (void)fscanf(fd, "%" SCNd32 " %lf ", &dummy, t);
     (void)fread(bfr = buffer = (char *)malloc(d), 1, d, fd);
-    for (k = 0; k < N - 2; k++) {
-        state->t[k + 1] = parse(bfr += c, ndf);
-        state->h[k] = parse(bfr += a, ndf);
+    for (i = 0; i < N - 2; i++) {
+        state->t[i + 1] = parse(bfr += c, ndf);
+        state->h[i] = parse(bfr += a, ndf);
         bfr += a;
     }
     state->t[N - 2 + 1] = parse(bfr += c, ndf);

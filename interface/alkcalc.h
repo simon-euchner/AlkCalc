@@ -50,20 +50,22 @@
  * Data type for radial eigenstates                                           *
  * -------------------------------------------------------------------------- */
 typedef struct alkcalc_state_s {
-    int32_t N; /* Number of discretisation points */
-    int32_t dim; /* Dimension of 'fnlsj', dim = N-2 */
     int32_t n; /* Prinzipal quantum number */
     int32_t l; /* Orbital angular momentum quantum number */
     double j; /* Total angular momentum quantum number */
-    double *t; /* Discretisation points, t[0] = 0, ..., t[N-1] = tmax */
-    double *h; /* Stepsizes, h[0] = t1 - t0, ..., h[N-2] = tN-1 - tN-2 */
-    double *fnlsj; /* Radial eigenstate in basis of elements, dimension 'dim' */
+    int32_t k; /* Order of B-splines */
+    int32_t Nks; /* Number of knots */
+    int32_t N; /* Number of knots (no multiplicities) */
+    int32_t Nbs; /* Number of B-splines */
+    double *t; /* Knots (ti) with multiplicities (see theory/theory.pdf) */
+    double *h; /* Step sizes, h[0] = t[k] - [k - 1], ..., h[N - 1] */
+    double *fnlsj; /* Radial eigenstate, vector (fi) (see theory/theory.pdf) */
 } alkcalc_state;
 
 /* -------------------------------------------------------------------------- *
  * Data type for Clebsch-Gordan coefficients, exactly representing the        *
  * following real number:                                                     *
- *     sign * sqrt( numerator / denominator )                                 *
+ *     sign * sqrt(numerator / denominator)                                   *
  * -------------------------------------------------------------------------- */
 typedef struct alkcalc_cg_s {
     int8_t sign;
