@@ -26,3 +26,17 @@ Check why there can be unhysical increadibly negative eigenvalues. Also, think
 of a way to treat them consistently.
 
 Update Python interface
+
+OpenBLAS is required (C version) for dsbmv (MAYBE WRITE OWN INTERFACE, remove
+unnessecary headers then of course and be careful to update README's, also
+update Makefile to linke not against stuff I do not need, somehow, I can compile
+the library without the header cblas.h?, seems I also do not need to link
+against lcblas when creating the lakcalc library file.)
+
+For Hydrgen and k=3 and N=4 something goes wrong (probably someting to do with
+nl and maybe m is negative or il is negative)
+
+Make sign of radial eigenstates consistent
+
+Comiling is weird, I need to put the path to all libraries instead of just
+putting -lalkcalc and be done with it.

@@ -210,28 +210,117 @@ void alkcalc_state_free(alkcalc_state *state) {
 double alkcalc_rp(const char *species, int32_t nb, int32_t lb, double jb,
                   double p, int32_t nk, int32_t lk, double jk) {
 
-    int32_t dim, i;
-    double *ts, *trs, *hs, *Rpd, *Rpo, isr3, tkm1, tk, tkp1, hk, hkp1, tm, tp,
-           pm, pp, I1, I2, I3, *f, *g, rp;
+    int32_t k, N, Nbs, dim, nRp, ip, i, imin, j, ileft, nderiv, a, ia, b, ib,
+            iarr, d, ldRp, incX, incY;
+    double *ts, *trs, *hs, *brafnlsj, *ketfnlsj, *ketfnlsj_cpy, *Rp, *wRp, *xRp,
+           *vnikx, *work, w, t, alpha, beta, rp;
     alkcalc_state *bra, *ket;
 
     /* Load states */
     bra = alkcalc_fnlsj('f', species, nb, lb, jb);
     ket = alkcalc_fnlsj('p', species, nk, lk, jk);
 
-    /* Extract knotdata (trs: knot vector without mulitplicities) */
+    /* Extract data (trs: knot vector without mulitplicities) */
+    k = bra->k; N = bra->N; Nbs = bra->Nbs; dim = Nbs - 2;
     ts = bra->t; trs = bra->t + bra->k - 1; hs = bra->h;
+    brafnlsj = bra->fnlsj; ketfnlsj = ket->fnlsj;
 
-    /* Allocate memory for matrix Rp */
-    // ...
+    /* Order nRp of Gauss-Legendre quadrature for the matrix Rp               *
+     *                                                                        *
+     * When the power p is (almost; see code below for meaning of 'almost') a *
+     * non-negative integer, the matrix component can be computed exactly up  *
+     * to machine precision. In this case, nRp = k - 1 + p / 2 yields the     *
+     * correct result for even p and nRp = k - 1 + (p - 1) / 2 yields the     *
+     * correct result for odd p. In all other cases, it is best to            *
+     * precision exact result for odd p. In all other cases the integral is   *
+     * approximated. For this is it best to choose a high quadrature order    *
+     * nRp. This is the point in the code where this order is hard-coded. It  *
+     * be adjusted by the user, if necessary.                                 */
+    if ((ip = (int32_t)round(p)) >= 0. && fabs(p - ip) < 1e-11) { /* Integer */
+        if (ip & 1) { /* Odd */
+            nRp = k - 1 + (ip - 1) / 2;
+        } else { /* Even */
+            nRp = k - 1 + ip / 2;
+        }
+    } else { /* General */
+        nRp = 1000;
+    }
 
-    /* Compute components of matrix Rp (diagonal [d] and off-diagonal [o]) */
-    // ...
+    /* Allocate memory */
+    nderiv = 1; /* No derivatives of B-splines are needed (see DBSPVD) */
+    ketfnlsj_cpy = (double *)malloc(dim * sizeof(double));
+    Rp = (double *)calloc(k * dim, sizeof(double));
+    wRp = (double *)malloc(nRp * sizeof(double));
+    xRp = (double *)malloc(nRp * sizeof(double));
+    vnikx = (double *)malloc(k * nderiv * sizeof(double));
+    work = (double *)malloc(((k + 1) * (k + 2)) / 2 * sizeof(double));
 
-    /* Compute matrix element */
-    // ...
+    /* Compute weights and points for Gauss-Legendre quadrature rule          *
+     *                                                                        *
+     * The weights, wRp, and the points, xRp, are computed. Both are arrays   *
+     * of length nRp. The weights and points are computed for integrals over  *
+     * the interval [-1, 1]. For more information, see theory/theory.pdf.     */
+    gaussq_c(&nRp, xRp, wRp); /* Call to GAUSSQ (Quadrature order nRp) */
+
+    /* Construct matrix Rp (see theory/theory.pdf) */
+    for (i = 1; i < N; i++) { /* Loop over intervals [ts[i - 1], ts[i]] */
+
+        /* The interval [trs[i - 1], trs[i]] correpsonds to the interval      *
+         * [ts[i + k - 2], ts[i + k - 1]] in terms of the full knot           *
+         * vector ts. On this interval only the B-splines with indices        *
+         * imin = i - 1, ..., i + k - 2 are non-zero.                         */
+        imin = i - 1;
+
+        for (j = 0; j < nRp; j++) { /* Loop over quadrature points */
+
+            /* Compute to interval adjusted weight, w, and point, t */
+            w = .5 * hs[i - 1] * wRp[j];
+            t = .5 * (hs[i - 1] * xRp[j] + trs[i] + trs[i - 1]);
+
+            /* Largest integer satisfying ts[ileft] <= t */
+            ileft = k - 1 + i - 1; /* ts[ileft] = trs[i - 1] */
+
+            /* Evaluate B-splines and derivatives at quadrature point t */
+            ileft += 1; /* Add one, because in FORTRAN counting starts at ONE */
+            dbspvd_c(ts, &k, &nderiv, &t, &ileft, vnikx, work);
+
+            /* Accumulate matrix components of K and M (order: column-major) */
+            for (a = 0; a < k; a++) {
+                ia = imin + a; /* Index of relevant B-spline */
+                if (ia == 0 || ia == Nbs - 1) { continue; }
+                for (b = 0; b <= a; b++) {
+                    ib = imin + b; /* Index of relevant B-spline */
+                    if (ib == 0 || ib == Nbs - 1) { continue; }
+
+                    /* Array index for column-major upper (U) (see EIGLAPACK) */
+                    iarr = (ia - 1) * k + k - (a - b) - 1;
+
+                    /* Accumulate matrix components */
+                    Rp[iarr] += w * vnikx[a] * pow(t, p) * vnikx[b];
+                }
+            }
+        }
+    }
+
+    /* Compute action of Rp on bra; dsbmv: y -> y = alpha * A * x + beta * y */
+    d = k - 1; alpha = 1.; ldRp = k; beta = 0.; incX = incY = 1;
+    for (i = 0; i < dim; i++) { ketfnlsj_cpy[i] = ketfnlsj[1 + i]; }
+    cblas_dsbmv(CblasColMajor, CblasUpper, dim, d, alpha, Rp, ldRp,
+                ketfnlsj_cpy, incX, beta, ketfnlsj + 1, incY);
+
+    /* Compute radial matrix element */
+    rp = 0.;
+    for (i = 1; i < dim + 1; i++) {
+        rp += brafnlsj[i] * ketfnlsj[i];
+    }
 
     /* Clean up */
+    free(ketfnlsj_cpy); ketfnlsj_cpy = NULL;
+    free(Rp); Rp = NULL;
+    free(wRp); wRp = NULL;
+    free(xRp); xRp = NULL;
+    free(vnikx); vnikx = NULL;
+    free(work); work = NULL;
     alkcalc_state_free(bra); bra = NULL;
     alkcalc_state_free(ket); ket = NULL;
 

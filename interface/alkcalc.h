@@ -14,6 +14,9 @@
 #include <complex.h>
 #include <math.h>
 #include <float.h>
+#include <cblas.h>
+#include "../GAUSSQ/inc/gaussq.h"
+#include "../BSPLINES/inc/bsplines.h"
 
 #define PI 3.141592653589793238462643383279502884 /* Pi */
 

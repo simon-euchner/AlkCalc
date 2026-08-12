@@ -302,7 +302,7 @@ void solve(eigensolver_data *data) {
     bb = data->M;
     ldbb = settings.k;
     ldq = n;
-    il = 2;
+    il = 1;
     iu = settings.nmax - data->ipar[3];
     ldz = n;
 
