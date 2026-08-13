@@ -22,11 +22,13 @@ cdef extern from "alkcalc.h":
     # --------------------------------------------------------------------------
 
     cdef struct alkcalc_state_s:
-        int32_t N
-        int32_t dim
         int32_t n
         int32_t l
         double j
+        int32_t k
+        int32_t Nks
+        int32_t N
+        int32_t Nbs
         double *t
         double *h
         double *fnlsj

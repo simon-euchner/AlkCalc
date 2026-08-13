@@ -38,45 +38,51 @@ class State:
 
     Attributes
     ----------
-    N : int
-        Total number of discretisation points.
-    dim : int
-        Dimension of the basis used in the calculation.
     n : int
         Principal quantum number.
     l : int
-        Orbital angular momentum quantum number l = 0, 1, ..., n-1.
+        Orbital angular momentum quantum number l = 0, 1, ..., n - 1.
     j : float
-        Total angular momentum quantum number j = |l - 1/2| or |l + 1/2|.
+        Total angular momentum quantum number j = |l - 1 / 2| or |l + 1 / 2|.
+    k : int
+        Order of B-splines.
+    Nks : int
+        Total number of knots on which the B-splines are defined.
+    N : int
+        Number of knots without multiplicities.
+    Nbs : int
+        Number of B-splines.
     t : NDArray[float64]
-        Discretisation points. This is a numpy array which contains the
-        the points tk, k = 0, ..., N-1, which discretise the interval [0, tmax].
-        Here, tmax represents the maximally considered radius rmax = tmax * aB
-        and N is the number of discretisation points tk. Note that t0 = 0 and
-        tN-1 = tmax.
+        Knots. This is a numpy array which contains the knots ti, i = 0, ...,
+        Nks - 1, in the interval [0, tmax] with t[0] = 0 and t[Nks - 1] = tmax.
+        Here, tmax is the maximally considered radius rmax = tmax * aB, where aB
+        is Bohr's radius.
     h : NDArray[float64]
-        Step sizes. This is a numpy array of length N-1, with entries
-        hk = tk - tk-1, k = 1, ..., N-1. These are the (non-uniform) step sizes
-        of the grid defined by tk.
+        Step sizes. This is a numpy array of length N - 1 with entries
+        h[i] = t[d + i] - t[d + i - 1], i = 1, ..., N - 1. Here, d = k - 1 is
+        the degree of the B-splines.
     fnlsj : NDArray[float64]
         Values of the radial eigenstate. This is a numpy array which contains
-        the values fnlsj(tk), k = 1, ..., dim, where dim = N-2. Note that the
-        boundary terms are by construction zero, i.e.,
-        fnlsj(t0) = fnlsj(tN-1) = 0.
+        the coefficients fi, i = 0, ..., Nbs - 1, representing the radial
+        eigenstate. The boundary coefficients f[0] and f[Nbs - 1] are set to
+        zero in order to enforce the boundary conditions fnlsj(0) = fnlsj(tmax)
+        = 0.
 
     Notes
     -----
     The total wave-function is defined as the product of the angular spinor and
     the radial eigenstate Rnlsj. This dataclass represents Rnlsj in terms of
-    fnlsj(t) = sqrt(aB) * r * Rnlsj(r), where t = r / aB with Bohr's radius aB.
+    fnlsj(t) = sqrt(aB) * r * Rnlsj(r), where t = r / aB, with Bohr's radius aB.
     Note that fnlsj is dimensionless, because the dimension of Rnlsj is
     1 / sqrt(aB)**3.
     """
-    N: int
-    dim: int
     n: int
     l: int
     j: float
+    k: int
+    Nks: int
+    N: int
+    Nbs: int
     t: NDArray[float64]
     h: NDArray[float64]
     fnlsj: NDArray[float64]
@@ -109,8 +115,8 @@ class CG:
         C = s * sqrt(numerator / denominator) .
 
     The Clebsch-Gordan determines the change of basis between the states
-    |j1,m1>|j2,m2> and |j,mj>. We choose the Condon-Shortley phase convention,
-    that is, we choose the Clebsch-Gordan coefficient with mj = j1 + j2 to be
+    |j1,m1>|j2,m2> and |j,mj>. The Condon-Shortley phase convention is applied,
+    that is, the Clebsch-Gordan coefficient with mj = j1 + j2 is chosen
     positive.
     """
     sign: int
@@ -123,14 +129,14 @@ class Spinor:
     Container for spinor data.
 
     The spinor is represented in the basis (|u>, |d>), where |u> and |d> are the
-    spin-1/2 eigenstates with spin +1/2 and -1/2, respectively.
+    spin-1/2 eigenstates with spin +1 / 2 and -1 / 2, respectively.
 
     Attributes
     ----------
     u: float
-        Component of spinor associated with +1/2.
+        Component of spinor associated with +1 / 2.
     d: float
-        Component of spinor associated with -1/2.
+        Component of spinor associated with -1 / 2.
     """
     u: complex
     d: complex
@@ -152,15 +158,15 @@ def energy(species: str, n: int, l: int, j: float) -> float:
     n : int
         Principal quantum number.
     l : int
-        Orbital angular momentum quantum number l = 0, 1, ..., n-1.
+        Orbital angular momentum quantum number l = 0, 1, ..., n - 1.
     j : float
-        Total angular momentum quantum number j = |l - 1/2|, |l + 1/2|.
+        Total angular momentum quantum number j = |l - 1 / 2|, |l + 1 / 2|.
 
     Returns
     -------
     float
-        Eigenenergy corresponding to the quantum numbers n, l, s = 1/2, and j in
-        units of Hartree.
+        Eigenenergy corresponding to the quantum numbers n, l, s = 1 / 2, and j
+        in units of Hartree.
     """
     species_ascii = species.encode("ascii")
     return _enlsj_core(species_ascii, n, l, j)
@@ -173,7 +179,7 @@ def state(species: str, n: int, l: int, j: float, result: str = "f") -> State:
     the radial eigenstate Rnlsj. This function returns the state
     fnlsj(t) = sqrt(aB) * r * Rnlsj(r) , where t = r / aB with Bohr's radius aB.
     Note that fnlsj is dimensionless, because the dimension of Rnlsj is
-    1/aB**(3/2).
+    1 / aB**(3 / 2).
 
     Parameters
     ----------
@@ -183,9 +189,9 @@ def state(species: str, n: int, l: int, j: float, result: str = "f") -> State:
     n : int
         Principal quantum number.
     l : int
-        Orbital angular momentum quantum number l = 0, 1, ..., n-1.
+        Orbital angular momentum quantum number l = 0, 1, ..., n - 1.
     j : float
-        Total angular momentum quantum number j = |l - 1/2|, |l + 1/2|.
+        Total angular momentum quantum number j = |l - 1 / 2|, |l + 1 / 2|.
     result : str, optional
         Character for deciding if discretisation data is returned. If it is
         `"f"` (full), the full result is returned. If result is `"p"` (partial),
@@ -202,11 +208,13 @@ def state(species: str, n: int, l: int, j: float, result: str = "f") -> State:
     core = _StateCore(species_ascii, n, l, j, result_ascii)
     core.t.flags.writeable = False
     return State(
-            N=core.N,
-            dim=core.dim,
             n=core.n,
             l=core.l,
             j=core.j,
+            k=core.k,
+            Nks=core.Nks,
+            N=core.N,
+            Nbs=core.Nbs,
             t=core.t,
             h=core.h,
             fnlsj=core.fnlsj,
@@ -230,9 +238,9 @@ def radial_matrix_element(
     nb : int
         Principal quantum number of bra.
     lb : int
-        Orbital angular momentum quantum number l = 0, 1, ..., n-1 of bra.
+        Orbital angular momentum quantum number l = 0, 1, ..., n - 1 of bra.
     jb : float
-        Total angular momentum quantum number j = |l - 1/2|, |l + 1/2| of bra.
+        Total angular momentum quantum number j = |l - 1 / 2|, |l + 1 / 2| of bra.
     p : float
         Power of radius operator. For instance, if `p` is zero, the overlap
         between the radial eigenstates is calculated, or if `p` is unity, the
@@ -240,9 +248,10 @@ def radial_matrix_element(
     nk : int
         Principal quantum number of ket.
     lk : int
-        Orbital angular momentum quantum number l = 0, 1, ..., n-1 of ket.
+        Orbital angular momentum quantum number l = 0, 1, ..., n - 1 of ket.
     jk : float
-        Total angular momentum quantum number j = |l - 1/2|, |l + 1/2| of ket.
+        Total angular momentum quantum number j = |l - 1 / 2|, |l + 1 / 2| of
+        ket.
 
     Returns
     -------
@@ -320,7 +329,7 @@ def spinor_uncoupled_basis(
     Parameters
     ----------
     l : int
-        Orbital angular momentum quantum number l = 0, 1, ..., n-1.
+        Orbital angular momentum quantum number l = 0, 1, ..., n - 1.
     ml : int
         Magnetic quantum number of obital angular momentum.
     ms : float
@@ -328,7 +337,7 @@ def spinor_uncoupled_basis(
     theta : float
         Polar angle (Zenitwinkel) in the range [0, pi].
     phi : float
-        Azimuthal angle (Azimut) in the range [0, 2pi].
+        Azimuthal angle (Azimut) in the range [0, 2 * pi].
 
     Returns
     -------
@@ -336,12 +345,11 @@ def spinor_uncoupled_basis(
         Spinor associated to an uncoupled basis state. It is computed as
         follows:
 
-            [ Ylml, 0 ] if `ms` is +1/2 (up) ,
+            [ Ylml, 0 ] if `ms` is +1 / 2 (up) ,
 
-            [ 0, Ylml ] if `ms` is -1/2 (down) .
+            [ 0, Ylml ] if `ms` is -1 / 2 (down) .
 
-        Here, Ylml is a spherical harmonic. For these, we assume the
-        Condon-Shortley phase convention.
+        Here, Ylml is a spherical harmonic including the Condon-Shortley phase.
     """
     core = _SpinorUncoupledBasis(l, ml, ms, theta, phi)
     return Spinor(
@@ -362,7 +370,7 @@ def spinor_coupled_basis(
     Parameters
     ----------
     l : int
-        Orbital angular momentum quantum number l = 0, 1, ..., n-1.
+        Orbital angular momentum quantum number l = 0, 1, ..., n - 1.
     j : float
         Total angular momentum quantum number.
     mj : float
@@ -370,7 +378,7 @@ def spinor_coupled_basis(
     theta : float
         Polar angle (Zenitwinkel) in the range [0, pi].
     phi : float
-        Azimuthal angle (Azimut) in the range [0, 2pi].
+        Azimuthal angle (Azimut) in the range [0, 2 * pi].
 
     Returns
     -------
@@ -378,12 +386,12 @@ def spinor_coupled_basis(
         Spinor associated to a coupled basis (fine-structure) state. It is
         computed as follows:
 
-            [ C(l,mj-1/2,1/2,+1/2,j,mj) * Ylmj-1/2,
-              C(l,mj+1/2,1/2,-1/2,j,mj) * Ylmj+1/2 ] .
+            [ C(l, mj - 1 / 2, 1 / 2, +1 / 2, j, mj) * Ylmj - 1 / 2,
+              C(l, mj + 1 / 2, 1 / 2, -1 / 2, j, mj) * Ylmj + 1 / 2 ] .
 
-        Here, Ylml is a spherical harmonic and C(j1,m1,j2,m2,j,mj) is the
-        Clebsch-Gordan coefficient which couples j1 and j2 to yield j. For both,
-        we assume the Condon-Shortley phase convention.
+        Here, Ylml is a spherical harmonic and C(j1, m1, j2, m2, j, mj) is the
+        Clebsch-Gordan coefficient which couples j1 and j2 to yield j. For both
+        the Condon-Shortley phase convention is applied.
     """
     core = _SpinorCoupledBasis(l, j, mj, theta, phi)
     return Spinor(
@@ -411,18 +419,18 @@ def oscillator_strength(
     ni : int
         Principal quantum number of initial state.
     li : int
-        Orbital angular momentum quantum number l = 0, 1, ..., n-1 of initial
+        Orbital angular momentum quantum number l = 0, 1, ..., n - 1 of initial
         state.
     ji : float
-        Total angular momentum quantum number j = |l - 1/2|, |l + 1/2| of final
-        state.
+        Total angular momentum quantum number j = |l - 1 / 2|, |l + 1 / 2| of
+        final state.
     nf : int
         Principal quantum number of initial state.
     lf : int
-        Orbital angular momentum quantum number l = 0, 1, ..., n-1 of final
+        Orbital angular momentum quantum number l = 0, 1, ..., n - 1 of final
         state.
     jf : float
-        Total angular momentum quantum number j = |l - 1/2|, |l + 1/2| of
+        Total angular momentum quantum number j = |l - 1 / 2|, |l + 1 / 2| of
         final state.
 
     Returns
@@ -464,15 +472,15 @@ def lifetime(
         lifetime. For instance, if `dn` is 5, decay up to (and including) states
         with n+5 is considered.
     l : int
-        Orbital angular momentum quantum number l = 0, 1, ..., n-1.
+        Orbital angular momentum quantum number l = 0, 1, ..., n - 1.
     j : float
-        Total angular momentum quantum number j = |l - 1/2|, |l + 1/2|.
+        Total angular momentum quantum number j = |l - 1 / 2|, |l + 1 / 2|.
 
     Returns
     -------
     float
-        Lifetime of the fine-structure state with quantum numbers n, l, s = 1/2,
-        and j in nanoseconds.
+        Lifetime of the fine-structure state with quantum numbers n, l, s =
+        1 / 2, and j in nanoseconds.
     """
     species_ascii = species.encode("ascii")
     return _tau_core(T, species_ascii, n, dn, l, j)

@@ -40,3 +40,5 @@ Make sign of radial eigenstates consistent
 
 Comiling is weird, I need to put the path to all libraries instead of just
 putting -lalkcalc and be done with it.
+
+Python state function segfaults.

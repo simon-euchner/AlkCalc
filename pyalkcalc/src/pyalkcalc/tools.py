@@ -30,7 +30,7 @@ def plot_state(
     the radial eigenstate Rnlsj. This function plots the state
     fnlsj(t) = sqrt(aB) * r * Rnlsj(r) , where t = r / aB with Bohr's radius aB.
     Note that fnlsj is dimensionless, because the dimension of Rnlsj is
-    1/aB**(3/2).
+    1 / aB**(3 / 2).
 
     Parameters
     ----------
@@ -40,9 +40,9 @@ def plot_state(
     n : int
         Principal quantum number.
     l : int
-        Orbital angular momentum quantum number l = 0, 1, ..., n-1.
+        Orbital angular momentum quantum number l = 0, 1, ..., n - 1.
     j : float
-        Total angular momentum quantum number j = |l - 1/2|, |l + 1/2|.
+        Total angular momentum quantum number j = |l - 1 / 2|, |l + 1 / 2|.
     ax : matplotlib.axes.Axes, optional
         Axes to plot on. If `None`, a new figure is created.
     """
