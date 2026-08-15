@@ -31,6 +31,11 @@
  * -------------------------------------------------------------------------- */
 
 #include "../inc/eigensolver.h"
+#include "../interface/settings.h"
+
+#define FC 0.0072973525643 /* Fine-strct. cnst., 0.0072973525643(11) Ref. [5] */
+#define ME 0.0005485799090441 /* me, 0.0005485799090441(97) u Ref. [5] */
+#define SPECIES_DATA "./interface/species.dat"
 
 /* -------------------------------------------------------------------------- *
  * Parameters for potential                                                   *

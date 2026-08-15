@@ -5,6 +5,7 @@
  * -------------------------------------------------------------------------- */
 
 #include "../inc/eigensolver.h"
+#include "../interface/settings.h"
 
 /* Validate input parameters                                                  *
  *                                                                            *
@@ -85,9 +86,9 @@ void validate_settings(int32_t nl) {
      * Information   : By coupling l with s = 1 / 2, the only possible total  *
      *                 angular momentum quantum numbers are j = |l - s| and   *
      *                 j = l + s.                                             */
-    J = (int32_t)floor(2. * j + .5);
-    Jlower = (int32_t)floor(2. * fabs(l - .5) + .5);
-    Jupper = (int32_t)floor(2. * (l + .5) + .5);
+    J = CONVERT(j);
+    Jlower = CONVERT(fabs(l - .5));
+    Jupper = CONVERT(l + .5);
     if (J != Jlower && J != Jupper) {
         ERROR("INVALID J: J IS NEITHER |L - S| NOR L + S");
     }

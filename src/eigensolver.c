@@ -7,8 +7,22 @@
  * For more information please see theory/theory.pdf.                         *
  * -------------------------------------------------------------------------- */
 
+#include <time.h>
 #include "../inc/eigensolver.h"
+#include "../interface/settings.h"
+#include "../GAUSSQ/inc/gaussq.h"
+#include "../BSPLINES/inc/bsplines.h"
+#include "../EIGLAPACK/inc/eiglapack.h"
 
+/* Data type to store data for eigensolver */
+typedef struct eigensolver_data_s {
+    int32_t Nks, Nbs, dim, ipar[4];
+    double *M, *H, rpar[10], runtime;
+} eigensolver_data;
+
+static eigensolver_data *eigensolver_data_init(void);
+static void solve(eigensolver_data *);
+static void eigensolver_data_free(eigensolver_data *);
 static double step(int32_t);
 static void save_energies(eigensolver_data *, const double *);
 static void save_states(eigensolver_data *, const double *);
@@ -34,7 +48,7 @@ int main(int argc, char **argv)
 /* -------------------------------------------------------------------------- */
 
 /* Initialise generalised eigenvalue problem (result owned by caller)         */
-eigensolver_data *eigensolver_data_init() {
+static eigensolver_data *eigensolver_data_init(void) {
 
     int32_t k, N, Nks, Nbs, dim, nderivKM, nderivW, nderivm, nKM, nW, *ipar, i,
             im1, imin, j, ileft, a, ia, b, ib, iarr, l;
@@ -277,14 +291,14 @@ eigensolver_data *eigensolver_data_init() {
 }
 
 /* Free data of type eigensolver_data                                         */
-void eigensolver_data_free(eigensolver_data *data) {
-    //free(data->M); data->M = NULL;
-    //free(data->H); data->H = NULL;
+static void eigensolver_data_free(eigensolver_data *data) {
+    free(data->M); data->M = NULL;
+    free(data->H); data->H = NULL;
     free(data); data = NULL;
 }
 
 /* Solve generalised eigenvalue problem (result owned by caller)              */
-void solve(eigensolver_data *data) {
+static void solve(eigensolver_data *data) {
 
     int32_t n, ka, kb, ldab, ldbb, ldq, il, iu, ldz, m, *iwork, *ifail, info, i;
     double *ab, *bb, *q, *w, *z, *work, iC;
