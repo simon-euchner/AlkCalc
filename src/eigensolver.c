@@ -440,7 +440,7 @@ static void save_energies(eigensolver_data *data, const double *energies) {
                   "EIGENENERGIES FOR %s [HARTREE]\n\n"
                   "CPU TIME TO GENERATE DATA SET [S]: %" PRId32 "\n"
                   "MINIMAL PRINCIPAL QUANTUM NUMBER: %" PRId32 "\n"
-                  "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" PRId32 "\n"
+                  "MAXIMAL PRINCIPAL QUANTUM NUMBER: %" PRId32 "\n"
                   "ORBITAL ANGULAR MOMENTUM [HBAR]: %" PRId32 "\n"
                   "TOTAL ANGULAR MOMENTUM [HBAR]: %" PRId32 " / 2\n"
                   "GROUND STATE ENERGY [HARTREE]: %1.8lf\n"

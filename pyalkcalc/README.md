@@ -69,11 +69,11 @@ ensure you have `pytest` installed. Then, run the tests from the project root:
 pytest -v
 ```
 
-Note that some tests require atomic data (by default for `"40CA+"`) to be
-present in your *AlkCalc* installation. If the data is missing, those tests will
-fail (and likely terminate the test process due to the C library behavior). You
-can change the species used for testing by modifying the variable `TEST_SPECIES`
-in `tests/test_api.py`.
+Note that some tests require atomic data (by default for `"1H"`) to be present
+in your *AlkCalc* installation. If the data is missing, those tests will fail
+(and likely terminate the test process due to the C library behavior). You can
+change the species used for testing by modifying the variable `TEST_SPECIES` in
+`tests/test_api.py`.
 
 
 

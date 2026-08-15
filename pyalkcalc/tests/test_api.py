@@ -66,7 +66,7 @@ def test_radial_matrix_element_data():
     """
     ### Overlap of state with itself
     overlap = radial_matrix_element(
-            TEST_SPECIES, 4, 0, .5, .0, 4, 0, .5
+            TEST_SPECIES, 4, 0, .5, 0., 4, 0, .5
     )
     assert pytest.approx(overlap, abs=1e-2) == 1.
 
@@ -82,7 +82,7 @@ def test_lifetime_data():
     """
     Test lifetime for 4P state.
     """
-    tau = lifetime(.0, TEST_SPECIES, 4, 0, 1, 1.5)
+    tau = lifetime(0., TEST_SPECIES, 4, 0, 1, 1.5)
     assert isinstance(tau, float)
     assert tau > 0
 
@@ -96,18 +96,24 @@ def test_state_dataclass():
     Test State dataclass instantiation.
     """
     s = State(
-            N=10,
-            dim=8,
             n=1,
             l=0,
             j=.5,
-            t=np.zeros(10),
+            k=8,
+            Nks=20,
+            N=10,
+            Nbs=8,
+            t=np.zeros(20),
             h=np.zeros(9),
             fnlsj=np.zeros(8),
     )
-    assert s.N == 10
-    assert s.dim == 8
     assert s.n == 1
+    assert s.l == 0
+    assert s.j == .5
+    assert s.k == 8
+    assert s.Nks == 20
+    assert s.N == 10
+    assert s.Nbs == 8
 
 def test_cg_dataclass():
     """
@@ -123,8 +129,8 @@ def test_spinor_dataclass():
     Test Spinor dataclass instantiation.
     """
     sp = Spinor(u=1.+0j, d=.0+1j)
-    assert sp.u == 1.+0j
-    assert sp.d == .0+1j
+    assert sp.u == 1. + 0j
+    assert sp.d == 0. + 1j
 
 
 # ==============================================================================
@@ -150,7 +156,7 @@ def test_clebsch_gordan_half_integer():
     """
 
     ### C(.5, .5, .5, -.5, 1., .0) = 1/sqrt(2)
-    cg = clebsch_gordan_coefficient(.5, .5, .5, -.5, 1., .0)
+    cg = clebsch_gordan_coefficient(.5, .5, .5, -.5, 1., 0.)
 
     assert cg.sign == 1
     assert cg.numerator == 1
@@ -163,7 +169,7 @@ def test_clebsch_gordan_numeric():
 
     ### C(1, 1, 0, 0, 1, 1) = 1
     val = clebsch_gordan_coefficient(
-            1., 1., .0, .0, 1., 1., result="numeric"
+            1., 1., 0., 0., 1., 1., result="numeric"
     )
 
     assert isinstance(val, float)
@@ -175,7 +181,7 @@ def test_clebsch_gordan_error():
     """
     with pytest.raises(ValueError):
         clebsch_gordan_coefficient(
-                1., 1., .0, .0, 1., 1., result="invalid"
+                1., 1., 0., 0., 1., 1., result="invalid"
         )
 
 def test_spinor_uncoupled():
@@ -184,7 +190,7 @@ def test_spinor_uncoupled():
     """
 
     ### ms = .5 (up)
-    sp = spinor_uncoupled_basis(0, 0, .5, .0, .0)
+    sp = spinor_uncoupled_basis(0, 0, .5, 0., 0.)
 
     assert isinstance(sp, Spinor)
     assert isinstance(sp.u, complex)
@@ -194,7 +200,7 @@ def test_spinor_coupled():
     """
     Test spinor in coupled basis.
     """
-    sp = spinor_coupled_basis(0, .5, .5, .0, .0)
+    sp = spinor_coupled_basis(0, .5, .5, 0., 0.)
     assert isinstance(sp, Spinor)
     assert isinstance(sp.u, complex)
     assert isinstance(sp.d, complex)

@@ -43,7 +43,8 @@ lib: ${LIB}/libalkcalc.so
 	@echo -e "\nBUILDING LIBRARY ALKCALC\n"
 ${LIB}/libalkcalc.so: ${OBJ}/${F4}.o
 	${LD} -shared -o ${LIB}/libalkcalc.so -L${GAQ}/ -L${BSP}/ ${OBJ}/${F4}.o \
-	-lm -lcblas -lgaussq -lbsplines -Wl,-rpath,{${GAQ}/,${BSP}/}
+	-lm -lcblas -lgaussq -lbsplines -Wl,-rpath,'$$ORIGIN/../${GAQ}/' \
+	-Wl,-rpath,'$$ORIGIN/../${BSP}/'
 
 ### Eigenenergies and radial eigenstates
 solve: ${TMP}/e${TMSTMP}

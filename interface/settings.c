@@ -36,11 +36,11 @@
  * rmax      : Maximal radius in units of Bohr's radius, aB                   *
  * -------------------------------------------------------------------------- */
 const alkcalc_settings settings = {
-    .species =                                                     "88SR+"     ,
-    .k       =                                                         12      ,
-    .N       =                                                       1000      ,
+    .species =                                                     "40CA+"     ,
+    .k       =                                                          8      ,
+    .N       =                                                       2000      ,
     .nmax    =                                                        120      ,
-    .l       =                                                          1      ,
-    .j       =                                                           .5    ,
+    .l       =                                                          2      ,
+    .j       =                                                          2.5    ,
     .rmax    =                                                      20000.
 };

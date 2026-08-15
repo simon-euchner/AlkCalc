@@ -89,14 +89,6 @@ cdef class _StateCore:
             self.state_ptr = NULL
 
     @property
-    def N(self):
-        return self.state_ptr.N
-
-    @property
-    def dim(self):
-        return self.state_ptr.dim
-
-    @property
     def n(self):
         return self.state_ptr.n
 
@@ -109,9 +101,25 @@ cdef class _StateCore:
         return self.state_ptr.j
 
     @property
+    def k(self):
+        return self.state_ptr.k
+
+    @property
+    def Nks(self):
+        return self.state_ptr.Nks
+
+    @property
+    def N(self):
+        return self.state_ptr.N
+
+    @property
+    def Nbs(self):
+        return self.state_ptr.Nbs
+
+    @property
     def t(self):
         if self.state_ptr.t == NULL: return empty(0, dtype=float64)
-        cdef int32_t ln = self.state_ptr.N
+        cdef int32_t ln = self.state_ptr.Nks
         cdef np.ndarray[double, ndim=1, mode="c"] out = empty(ln, dtype=float64)
         memcpy(&out[0], self.state_ptr.t, ln * sizeof(double))
         return out
@@ -126,7 +134,7 @@ cdef class _StateCore:
 
     @property
     def fnlsj(self):
-        cdef int32_t ln = self.state_ptr.dim
+        cdef int32_t ln = self.state_ptr.Nbs
         cdef np.ndarray[double, ndim=1, mode="c"] out = empty(ln, dtype=float64)
         memcpy(&out[0], self.state_ptr.fnlsj, ln * sizeof(double))
         return out

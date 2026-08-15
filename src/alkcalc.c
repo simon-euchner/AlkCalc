@@ -54,7 +54,7 @@ double alkcalc_Enlsj(const char *species, int32_t n, int32_t l, double j) {
     if (n < nl) {
         ERROR("REQUESTED EIGENENERGY DOES NOT EXIST");
     }
-    (void)fscanf(fd, "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" SCNd32 " ",
+    (void)fscanf(fd, "MAXIMAL PRINCIPAL QUANTUM NUMBER: %" SCNd32 " ",
                  &nmax);
     if (nmax < n) {
         ERROR("REQUESTED EIGENENERGY NOT AVAILABLE");
@@ -968,9 +968,9 @@ static void nextrm(const char *species, int32_t *nmin, int32_t *nmax, int32_t l,
     }
 
     /* Extract information */
-    move(fd, 9);
+    move(fd, 3);
     (void)fscanf(fd, "MINIMAL PRINCIPAL QUANTUM NUMBER: %" SCNd32 " ", nmin);
-    (void)fscanf(fd, "MAXIMAL PRINCIPAL QUANTUM NUMBER (N): %" SCNd32 " ",
+    (void)fscanf(fd, "MAXIMAL PRINCIPAL QUANTUM NUMBER: %" SCNd32 " ",
                  nmax);
 
     /* Clean up */
