@@ -8,7 +8,7 @@
                twoside=false,
                BCOR=0mm,
                DIV=14,
-               overfullrule=true, % SET 'TRUE' FOR OVERFULL BOX INDICATORS
+               overfullrule=false, % SET 'TRUE' FOR OVERFULL BOX INDICATORS
                %chapterprefix=false, % NOT NEEDED FOR SCRARTCL
                toc=bibliography,
                headinclude=true,
@@ -548,7 +548,7 @@
     where $R_{n,l,s,j}$ is the $n$-th radial eigenstate of $H_{l,s,j}$. The
     total eigenstate $\bm{\Psi}_{n,l,s,j,m_j}$ is then given by the product of
     the radial eigenstates and the spinors:
-    \begin{equation}
+    \begin{equation}\label{eq:TotalEigenstate}
         \bm{\Psi}_{n,l,s,j,m_j}(r,\vartheta,\varphi)
         =
         R_{n,l,s,j}(r)
@@ -1283,7 +1283,7 @@
     \label{sec:Manual}
 
     Reference manual for the library functions of \alkcalc. Prototypes for the
-    following functions are defined in the header `interface/alkcalc.h'.
+    following functions are defined in the header \texttt{interface/alkcalc.h}.
 
     There is always a decision to be made when dealing with half-integer quantum
     numbers numerically. Here, the following agreement is made: say $q$ is a
@@ -1307,7 +1307,8 @@
         alkcalc\tus{Enlsj}
     }{
         Eigenenergies in units of Hartree. The requested eigenenergy is read
-        from the corresponding data file in the directory `data' and returned.
+        from the corresponding data file in the directory \texttt{data} and
+        returned.
     }
         \sdocarg{char *species}{
             String to specify atom/ion species, e.g., \texttt{1H} for Hydrogen,
@@ -1333,23 +1334,22 @@
         }
     \end{sdocfun}
 
-    {\color{blue}
     \begin{sdocfun}
     {
         alkcalc\tus{fnlsj}
     }{
-        Numerical equivalent to $f_{n,l,s,j}$ in Eq.~\eqref{eq:fRconversion}.
-        The data is read from the file containing the requested state. This data
-        is stored at a user specified location. The location where \alkcalc will
-        search for the data can be set in the file `interface/alkcalc.h'. The
-        result is owned by the caller and should be freed with
+        Numerical representation $\bm{f}_{n,l,s,j}$ of the radial eigenstate
+        $R_{n,l,s,j}$ from Eq.~\eqref{eq:TotalEigenstate}. $R_{n,l,s,j}$ is
+        recovered via Eq.~\eqref{eq:ExpansionOfEigenfunctions} and the
+        parametrisation \eqref{eq:DimensionlessEigenfunctions}. The result is
+        owned by the caller and should be freed with
         \texttt{alkcalc\tus{state}\tus{free}}.
     }
         \sdocarg{char result}{
-            Character for deciding if discretisation data is returned; see
-            RETURN down below. If \texttt{result} is \texttt{f} (full), the full
-            result is returned, and if \texttt{result} is \texttt{p} (partial),
-            the discretisation data is not returned.
+            Character for deciding if knotdata is returned; see RETURN down
+            below. If \texttt{result} is \texttt{f} (full), the full result is
+            returned, and if \texttt{result} is \texttt{p} (partial), the
+            knotdata is not returned.
         }
         \sdocarg{char *species}{
             String to specify atom/ion species, e.g., \texttt{1H} for Hydrogen,
@@ -1370,26 +1370,29 @@
             $j=\abs*{l-1\slash{2}},l+1\slash{2}$.
         }
         \sdocret{alkcalc\tus{state} *f}{
-            \texttt{f} contains eight members: \texttt{N}, \texttt{dim},
-            \texttt{t}, \texttt{h}, and \texttt{fnlsj}.\par%
-            \texttt{int32\tus{t} N}: Number of points, $N$, to discretise the
-            interval $[0,t_\mathrm{max}]$ (see Sec.~\ref{sec:Theory}).\par%
-            \texttt{int32\tus{t} n}: Principal quantum number.\par%
-            \texttt{int32\tus{t} l}: Orbital angular momentum quantum
-            number.\par%
-            \texttt{double j}: Total angular momentum quantum number.\par%
-            \texttt{int32\tus{t} dim}: Dimension of eigenproblem, i.e.,
-            $\text{\texttt{dim}}=N-2$ [see
-            Eq.~\eqref{eq:expansionOfState}].\par%
-            \texttt{double *t}: Array of length $N$, containing the mesh
-            $(t_k)_{k=0,\dots,N-1}$ (see Sec.~\ref{sec:Theory}).\par%
-            \texttt{double *h}: Array of length $N-1$, containing the steps
-            $(h_k)_{k=1,\dots,N-1}$ (see Sec.~\ref{sec:Theory}).\par%
-            \texttt{double *fnlsj}: \texttt{dim}-dimensional eigenvector
-            $\bm{f}$ [see Eq.~\eqref{eq:expansionOfState}].
+            \texttt{f} contains ten members: \texttt{n}, \texttt{l},
+            \texttt{j}, \texttt{k}, \texttt{Nks}, \texttt{N}, \texttt{Nbs},
+            \texttt{t}, \texttt{h}, \texttt{fnlsj}.\par%
+            \texttt{int32\tus{t} n}: Principal quantum number, $n$.\par%
+            \texttt{int32\tus{t} l}: Orbital angular momentum quantum number,
+            $l$.\par%
+            \texttt{double j}: Total angular momentum quantum number, $j$.\par%
+            \texttt{int32\tus{t} k}: Order of B-splines, $k=d+1$ ($d$ polynomial
+            degree of B-splines).\par%
+            \texttt{int32\tus{t} Nks}: Total number of knots,
+            $N_\mathrm{ks}$.\par%
+            \texttt{int32\tus{t} N}: Number of knots (no multiplicities),
+            $N$.\par%
+            \texttt{int32\tus{t} Nbs}: Number of B-splines,
+            $N_\mathrm{bs}$.\par%
+            \texttt{double *t}: Array of length $N_\mathrm{ks}$ containing the
+            knots $(t_i)_{i=0,\dots,N_\mathrm{ks}-1}$.\par%
+            \texttt{double *h}: Array of length $N-1$ containing
+            $h_i=t_{i+k}-t_{i+k-1}$, $i=0,\dots,N-2$.\par%
+            \texttt{double *fnlsj}: Array of length $N_\mathrm{bs}$ containing
+            the components of $\bm{f}_{n,l,s,j}$.
         }
     \end{sdocfun}
-    }
 
     \begin{sdocfun}
     {

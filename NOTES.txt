@@ -4,8 +4,6 @@ chnaging k.
 
 Stop marking variable with '...' and file names with '...'
 
-Fix fnlsj-entry in reference manual in theory
-
 Stop using "we" in code (including FORTRAN package READMEs), and READMEs
 
 Fix References in READMEs + code and align them with theory
@@ -22,9 +20,6 @@ Add constraint nl > 0
 
 Check if it is a problem to hand to FOURTRAN routine int32_t?
 
-Check why there can be unhysical increadibly negative eigenvalues. Also, think
-of a way to treat them consistently.
-
 Update Python interface
 
 OpenBLAS is required (C version) for dsbmv (MAYBE WRITE OWN INTERFACE, remove
@@ -37,11 +32,6 @@ For Hydrgen and k=3 and N=4 something goes wrong (probably someting to do with
 nl and maybe m is negative or il is negative)
 
 Make sign of radial eigenstates consistent
-
-Comiling is weird, I need to put the path to all libraries instead of just
-putting -lalkcalc and be done with it.
-
-Python state function segfaults.
 
 Compute condition of matrix to check for numerical stability. Print condition
 just before the eigenproblem is solved. Expalin in README and theory.
