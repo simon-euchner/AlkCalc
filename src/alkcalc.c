@@ -4,7 +4,29 @@
  * Author of this file: Simon Euchner                                         *
  * -------------------------------------------------------------------------- */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <float.h>
+#include <cblas.h>
 #include "../interface/alkcalc.h"
+#include "../GAUSSQ/inc/gaussq.h"
+#include "../BSPLINES/inc/bsplines.h"
+
+#define PI 3.141592653589793238462643383279502884 /* Pi */
+
+#define CONVERT(X) (int32_t)floor(2. * (X) + .5)
+#define INTEGER_ABS(X) (((X) > 0) ? (X): -(X))
+#define MAX(X, Y) (((X) > (Y)) ? (X): (Y)) /* Careful with X++ and alike! */
+#define MIN(X, Y) (((X) > (Y)) ? (Y): (X))
+#define COMPLEX(X, Y) ((X) + (Y) * I)
+#define ERROR(...) do { \
+    fprintf(stderr, "ERROR (%s:%d): ", __FILE__, __LINE__); \
+    fprintf(stderr, __VA_ARGS__); \
+    fprintf(stderr, "\n"); \
+    exit(EXIT_FAILURE); \
+} while (0)
 
 static void move(FILE *, int32_t);
 static inline double parse(const char *, int32_t);

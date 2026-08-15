@@ -19,7 +19,7 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#include <stdint.h>
+#include <inttypes.h>
 
 /* -------------------------------------------------------------------------- *
  * Absolute path to location where radial eigenstates shall be stored (Always *

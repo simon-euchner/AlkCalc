@@ -7,6 +7,7 @@
  * Author of this file: Simon Euchner                                         *
  * -------------------------------------------------------------------------- */
 
+#include <stdio.h>
 #include "../interface/alkcalc.h"
 
 int main(int argc, char **argv)
