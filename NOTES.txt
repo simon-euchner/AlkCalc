@@ -6,8 +6,6 @@ Fix References in READMEs + code and align them with theory
 
 Update READMEs (j behaviour was unified with library functions)
 
-Check if dim > 0 always, if not, add a constraint
-
 Add constraint that nmax <= dim
 
 Add constraint that the iu - il + 1 >= 1
