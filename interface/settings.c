@@ -40,7 +40,7 @@ const alkcalc_settings settings = {
     .k       =                                                          8      ,
     .N       =                                                       2000      ,
     .nmax    =                                                        120      ,
-    .l       =                                                          2      ,
-    .j       =                                                          2.5    ,
+    .l       =                                                          0      ,
+    .j       =                                                           .5    ,
     .rmax    =                                                      20000.
 };
