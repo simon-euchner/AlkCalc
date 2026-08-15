@@ -300,7 +300,9 @@ static void eigensolver_data_free(eigensolver_data *data) {
 /* Solve generalised eigenvalue problem (result owned by caller)              */
 static void solve(eigensolver_data *data) {
 
-    int32_t n, ka, kb, ldab, ldbb, ldq, il, iu, ldz, m, *iwork, *ifail, info, i;
+    int8_t phase;
+    int32_t n, ka, kb, ldab, ldbb, ldq, il, iu, ldz, m, *iwork, *ifail, info, i,
+            j;
     double *ab, *bb, *q, *w, *z, *work, iC;
     clock_t tstart, tend;
 
@@ -346,6 +348,15 @@ static void solve(eigensolver_data *data) {
     iC = 1. / data->rpar[7];
     for (i = 0; i < m; i++) { w[i] = iC * w[i]; }
     save_energies(data, w);
+
+    /* Set phase of radial eigenstates */
+    for (i = 0; i < m; i++) {
+        phase = (z[n * i] < 0.) ? -1: 1;
+        if (phase == 1) { continue; }
+        for (j = 0; j < n; j++) {
+            z[n * i + j] *= phase;
+        }
+    }
 
     /* Save radial eigenstates */
     save_states(data, z);
