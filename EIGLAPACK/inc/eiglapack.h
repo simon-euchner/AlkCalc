@@ -13,9 +13,10 @@
  * default in FORTRAN.                                                        */
 
 /* DSGBVX */
-void dsbgvx_c(int32_t *, int32_t *, int32_t *, double *, int32_t *, double *,
-              int32_t *, double *, int32_t *, int32_t *, int32_t *, int32_t *,
-              double *, double *, int32_t *, double *, int32_t *, int32_t *,
-              int32_t *);
+void dsbgvx_c(const int32_t *, const int32_t *, const int32_t *, double *,
+              const int32_t *, double *, const int32_t *, double *,
+              const int32_t *, const int32_t *, const int32_t *, int32_t *,
+              double *, double *, const int32_t *, double *, int32_t *,
+              int32_t *, int32_t *);
 
 #endif

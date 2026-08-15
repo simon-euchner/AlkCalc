@@ -13,6 +13,6 @@
  * default in FORTRAN.                                                        */
 
 /* GAUSSQ */
-void gaussq_c(int32_t *, double *, double *);
+void gaussq_c(const int32_t *, double *, double *);
 
 #endif

@@ -12,11 +12,8 @@
 /* Note: Pass all arguments by reference, because, opposed to C, this is      *
  * default in FORTRAN.                                                        */
 
-/* DINTRV */
-void dintrv_c(double *, int32_t *, double *, int32_t *, int32_t *, int32_t *);
-
 /* DBSPVD */
-void dbspvd_c(double *, int32_t *, int32_t *, double *, int32_t *, double *,
-              double *);
+void dbspvd_c(const double *, const int32_t *, const int32_t *, const double *,
+              const int32_t *, double *, double *);
 
 #endif
