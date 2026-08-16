@@ -1,9 +1,13 @@
 Compute condition of matrix to check for numerical stability. Print condition
-just before the eigenproblem is solved. Expalin in README and theory.
+just before the eigenproblem is solved.
+
+Add offset in settings.c
 
 Update main READMEs
     - Stop marking variable and file names with '...' in main READMEs
     - Stop using "we" in main READMEs
     - j behaviour was unified with library functions)
+    - Explain what offset is for in settings and how to use it
+    - Explain printing of condition number
 
 Fix References in READMEs + code and align them with theory
