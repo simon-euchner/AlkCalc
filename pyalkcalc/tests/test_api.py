@@ -65,7 +65,7 @@ def test_state_eval():
     """
     Test the state evaluation function.
     """
-    tevals = np.linspace(0, 10, 11)
+    tevals = np.linspace(0, .1, 11)
     ftevals = state_eval(TEST_SPECIES, 4, 0, .5, tevals)
 
 def test_radial_matrix_element_data():

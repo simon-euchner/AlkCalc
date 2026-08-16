@@ -19,7 +19,7 @@ from ._core import (
         _fitof_core,
 )
 from dataclasses import dataclass
-from numpy import sqrt, ndarray, float64, array
+from numpy import sqrt, array, float64
 from numpy.typing import NDArray
 
 
@@ -247,7 +247,8 @@ def state_eval(
     j : float
         Total angular momentum quantum number j = |l - 1 / 2|, |l + 1 / 2|.
     tevals : NDArray[float64]
-        Array with points `t` in `[0, tmax)' at which to evaluate `fnlsj`.
+        Array with points `t` in `[0, tmax)` at which to evaluate `fnlsj`. This
+        array must have shape `(*,)`.
 
     Returns
     -------
@@ -256,8 +257,8 @@ def state_eval(
     """
     assert tevals.ndim == 1, print(f"Expected shape (*,0), not {tevals.shape}")
     species_ascii = species.encode("ascii")
-    ftevals = array(tevals, copy=True)
     ltevals = tevals.shape[0]
+    ftevals = array(tevals, dtype=float64, copy=True)
     _fnlsj_eval_core(species_ascii, n, l, j, ftevals, ltevals)
     return ftevals
 
