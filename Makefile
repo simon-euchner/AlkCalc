@@ -13,7 +13,7 @@ TMSTMP := $(shell date +"%d%m%Y%H%M%S%9N")
 # Compiler and Linker (GNU C compiler and linker)
 CC = gcc
 LD = gcc
-FLAGS = -Wall -pedantic -Wextra -Ofast -std=c99
+FLAGS = -Wall -pedantic -Wextra -O2 -std=c99
 
 # Paths
 SRC = ./src
@@ -53,8 +53,8 @@ solve: ${TMP}/slv${TMSTMP}
 	@rm -f ${TMP}/slv${TMSTMP}
 ${TMP}/slv${TMSTMP}: ${OBJ}/${F0}.o ${OBJ}/${F1}.o ${OBJ}/${F2}.o ${OBJ}/${F3}.o
 	@${LD} -o ${TMP}/slv${TMSTMP} -L${GAQ}/ -L${BSP}/ -L${ELA}/ \
-	${OBJ}/${F0}.o ${OBJ}/${F1}.o ${OBJ}/${F2}.o ${OBJ}/${F3}.o -lm -lblas \
-	-lgaussq -lbsplines -leiglapack -Wl,-rpath,{${GAQ}/,${BSP}/,${ELA}/}
+	${OBJ}/${F0}.o ${OBJ}/${F1}.o ${OBJ}/${F2}.o ${OBJ}/${F3}.o -lm -lgaussq \
+	-lbsplines -leiglapack -Wl,-rpath,{${GAQ}/,${BSP}/,${ELA}/}
 
 
 ### Compile
