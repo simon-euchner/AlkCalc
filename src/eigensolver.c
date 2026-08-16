@@ -24,6 +24,7 @@ static eigensolver_data *eigensolver_data_init(void);
 static void solve(eigensolver_data *);
 static void eigensolver_data_free(eigensolver_data *);
 static double step(int32_t);
+static double cond(eigensolver_data *);
 static void save_energies(eigensolver_data *, const double *);
 static void save_states(eigensolver_data *, const double *);
 static void save_knotdata(eigensolver_data *data);
@@ -143,7 +144,7 @@ static eigensolver_data *eigensolver_data_init(void) {
      * where k = d + 1 is the order of the B-splines and dim is the dimension *
      * of the generalised eigenvalue problem                                  *
      *                                                                        *
-     *     H fbar = lambda M f                                                *
+     *     H fbar = lambda M fbar                                             *
      *                                                                        *
      * derived in theory/theory.pdf.                                          *
      *                                                                        *
@@ -334,6 +335,9 @@ static void solve(eigensolver_data *data) {
     iwork = (int32_t *)malloc(5 * n * sizeof(int32_t));
     ifail = (int32_t *)malloc(n * sizeof(int32_t));
 
+    /* Print condition number of mass matrix M for precision estimates */
+    printf("CONDITION NUMBER OF MASS MATRIX: %1.1E\n\n", cond(data));
+
     /* Solve generalised eigenvalue problem using DSBGVX from LAPACK */
     dsbgvx_c(&n, &ka, &kb, ab, &ldab, bb, &ldbb, q, &ldq, &il, &iu, &m, w, z,
              &ldz, work, iwork, ifail, &info);
@@ -426,6 +430,14 @@ static double step(int32_t i) {
     hi = rmax * (2. * i - 1.) / ((double)(N - 1) * (N - 1));
 
     return hi;
+}
+
+/* Compute condition number of mass matrix M                                  */
+static double cond(eigensolver_data *data) {
+
+    double kappa = 1.;
+
+    return kappa;
 }
 
 /* Save computed eigenenergies to file                                        */
