@@ -62,6 +62,10 @@ cdef extern from "alkcalc.h":
             alkcalc_state *
     )
 
+    alkcalc_state *alkcalc_fnlsj_eval(
+            const char *, int32_t, int32_t, double, double *, int32_t
+    )
+
     double alkcalc_rp(
             const char *,
             int32_t,

@@ -10,6 +10,7 @@ Public Python API for AlkCalc.
 from ._core import (
         _enlsj_core,
         _StateCore,
+        _fnlsj_eval_core,
         _rp_core,
         _CGCore,
         _SpinorUncoupledBasis,
@@ -18,7 +19,7 @@ from ._core import (
         _fitof_core,
 )
 from dataclasses import dataclass
-from numpy import sqrt, ndarray, float64
+from numpy import sqrt, ndarray, float64, array
 from numpy.typing import NDArray
 
 
@@ -219,6 +220,46 @@ def state(species: str, n: int, l: int, j: float, result: str = "f") -> State:
             h=core.h,
             fnlsj=core.fnlsj,
     )
+
+def state_eval(
+        species: str,
+        n: int,
+        l: int,
+        j: float,
+        tevals: NDArray[float64]
+) -> NDArray[float64]:
+    """
+    Evaluate radial eigenfunction fnlsj
+
+    Function to evaluate the radial eigenfunction fnlsj at the points specified
+    in the array `tevals`. The array `tevals` is not overwritten by the functon
+    call.
+
+    Parameters
+    ----------
+    species : str
+        String to specify atom/ion species, e.g., 1H for Hydrogen, or 88SR+ for
+        the 88Sr+ ion.
+    n : int
+        Principal quantum number.
+    l : int
+        Orbital angular momentum quantum number l = 0, 1, ..., n - 1.
+    j : float
+        Total angular momentum quantum number j = |l - 1 / 2|, |l + 1 / 2|.
+    tevals : NDArray[float64]
+        Array with points `t` in `[0, tmax)' at which to evaluate `fnlsj`.
+
+    Returns
+    -------
+    NDArray[float64]
+        Array containing the values `fnlsj(t)` for each `t` in `tevals`.
+    """
+    assert tevals.ndim == 1, print(f"Expected shape (*,0), not {tevals.shape}")
+    species_ascii = species.encode("ascii")
+    ftevals = array(tevals, copy=True)
+    ltevals = tevals.shape[0]
+    _fnlsj_eval_core(species_ascii, n, l, j, ftevals, ltevals)
+    return ftevals
 
 def radial_matrix_element(
         species: str,
