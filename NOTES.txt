@@ -1,5 +1,3 @@
-Update Python interface
-
 OpenBLAS is required (C version) for dsbmv (MAYBE WRITE OWN INTERFACE, remove
 unnessecary headers then of course and be careful to update README's, also
 update Makefile to linke not against stuff I do not need, somehow, I can compile
@@ -15,4 +13,3 @@ Update main READMEs
     - j behaviour was unified with library functions)
 
 Fix References in READMEs + code and align them with theory
-
