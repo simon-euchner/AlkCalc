@@ -17,10 +17,11 @@ int main(int argc, char **argv)
 
     /* Define initial and final state */
     int ni, li, nf, lf;
-    double ji, jf;
+    double ji, jf, fitof;
     ni = 5; li = 0; ji = .5;
     nf = ni; lf = 1; jf = .5;
-    printf("fitof = %1.8lf\n\n", alkcalc_fitof("85RB", ni, li, ji, nf, lf, jf));
+    fitof = alkcalc_fitof("40CA+", ni, li, ji, nf, lf, jf);
+    printf("fitof = %1.8lf\n\n", fitof);
 
     printf("%s\n", "--- End");
 
