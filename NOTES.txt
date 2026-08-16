@@ -1,9 +1,3 @@
-OpenBLAS is required (C version) for dsbmv (MAYBE WRITE OWN INTERFACE, remove
-unnessecary headers then of course and be careful to update README's, also
-update Makefile to linke not against stuff I do not need, somehow, I can compile
-the library without the header cblas.h?, seems I also do not need to link
-against lcblas when creating the lakcalc library file.)
-
 Compute condition of matrix to check for numerical stability. Print condition
 just before the eigenproblem is solved. Expalin in README and theory.
 
