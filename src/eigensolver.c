@@ -318,12 +318,12 @@ static void solve(eigensolver_data *data) {
     bb = data->M;
     ldbb = settings.k;
     ldq = n;
-    il = 1;
-    iu = settings.nmax - 0 * data->ipar[3];
+    il = data->ipar[3];
+    iu = settings.nmax;
     ldz = n;
 
-    /* Number of requested eigenvalues */
-    m = iu - il + 1;
+    /* Number of requested eigenvalues m = nmax - nl + 1 */
+    m = iu - il + 1; /* m = nmax - nl + 1 >= nl - nl + 1 = 1 */
 
     /* Allocate memory */
     q = (double *)malloc(ldq * n * sizeof(double));
