@@ -318,8 +318,9 @@ static void solve(eigensolver_data *data) {
     bb = data->M;
     ldbb = settings.k;
     ldq = n;
-    il = data->ipar[3];
-    iu = settings.nmax;
+    int offset = -2;
+    il = data->ipar[3] + offset;
+    iu = settings.nmax + offset;
     ldz = n;
 
     /* Number of requested eigenvalues m = nmax - nl + 1 */
