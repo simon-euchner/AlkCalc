@@ -435,6 +435,8 @@ static double step(int32_t i) {
 /* Compute condition number of mass matrix M                                  */
 static double cond(eigensolver_data *data) {
 
+
+
     double kappa = 1.;
 
     return kappa;

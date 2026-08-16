@@ -70,6 +70,10 @@ F44 = ILAENV
 F45 = IPARMQ
 F46 = LSAME
 F47 = XERBLA
+# Files needed for DSBEVX. This eigensolver is exclusively used to compute the
+# condition number of the mass matrix M.
+F48 = DSBEVX
+F49 = DLANSB
 
 # Object code
 OBJ_FILENAMES = ${F00}.O ${F01}.O ${F02}.O ${F03}.O ${F04}.O ${F05}.O ${F06}.O\
@@ -78,7 +82,8 @@ OBJ_FILENAMES = ${F00}.O ${F01}.O ${F02}.O ${F03}.O ${F04}.O ${F05}.O ${F06}.O\
 				${F21}.O ${F22}.O ${F23}.O ${F24}.O ${F25}.O ${F26}.O ${F27}.O\
 				${F28}.O ${F29}.o ${F30}.O ${F31}.O ${F32}.O ${F33}.O ${F34}.O\
 				${F35}.O ${F36}.O ${F37}.O ${F38}.O ${F39}.O ${F40}.O ${F41}.O\
-				${F42}.O ${F43}.O ${F44}.O ${F45}.O ${F46}.O ${F47}.O
+				${F42}.O ${F43}.O ${F44}.O ${F45}.O ${F46}.O ${F47}.O ${F48}.O\
+				${F49}.O
 OBJ_FILES = ${foreach file, ${OBJ_FILENAMES}, ${OBJ}/${file}}
 
 
@@ -285,6 +290,15 @@ ${OBJ}/${F46}.O: ${SRC}/${F46}.F
 # XERBLA.F
 ${OBJ}/${F47}.O: ${SRC}/${F47}.F
 	${GF} ${FLAGS} -fPIC -o ${OBJ}/${F47}.O -c ${SRC}/${F47}.F
+
+# DSBEVX.F
+${OBJ}/${F48}.O: ${SRC}/${F48}.F
+	${GF} ${FLAGS} -fPIC -o ${OBJ}/${F48}.O -c ${SRC}/${F48}.F
+
+# DLANB.F
+${OBJ}/${F49}.O: ${SRC}/${F49}.F
+	${GF} ${FLAGS} -fPIC -o ${OBJ}/${F49}.O -c ${SRC}/${F49}.F
+
 
 ### Cleanup
 
