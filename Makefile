@@ -47,12 +47,12 @@ ${LIB}/libalkcalc.so: ${OBJ}/${F4}.o
 	-Wl,-rpath,'$$ORIGIN/../${BSP}/'
 
 ### Eigenenergies and radial eigenstates
-solve: ${TMP}/e${TMSTMP}
+solve: ${TMP}/slv${TMSTMP}
 	@echo -e "\nCOMPUTING EIGENENERGIES AND RADIAL EIGENSTATES\n"
-	- @${TMP}/solve${TMSTMP}
-	@rm -f ${TMP}/solve${TMSTMP}
-${TMP}/e${TMSTMP}: ${OBJ}/${F0}.o ${OBJ}/${F1}.o ${OBJ}/${F2}.o ${OBJ}/${F3}.o
-	@${LD} -o ${TMP}/solve${TMSTMP} -L${GAQ}/ -L${BSP}/ -L${ELA}/ \
+	- @${TMP}/slv${TMSTMP}
+	@rm -f ${TMP}/slv${TMSTMP}
+${TMP}/slv${TMSTMP}: ${OBJ}/${F0}.o ${OBJ}/${F1}.o ${OBJ}/${F2}.o ${OBJ}/${F3}.o
+	@${LD} -o ${TMP}/slv${TMSTMP} -L${GAQ}/ -L${BSP}/ -L${ELA}/ \
 	${OBJ}/${F0}.o ${OBJ}/${F1}.o ${OBJ}/${F2}.o ${OBJ}/${F3}.o -lm -lblas \
 	-lgaussq -lbsplines -leiglapack -Wl,-rpath,{${GAQ}/,${BSP}/,${ELA}/}
 
@@ -85,6 +85,6 @@ ${OBJ}/${F4}.o: ${SRC}/${F4}.c
 clean:
 	- rm -f ${OBJ}/*.o
 	- rm -f ${LIB}/*.so
-	- rm -f ./tmp/solve*
+	- rm -f ./tmp/slv*
 
 .PHONY: clean

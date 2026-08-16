@@ -43,7 +43,7 @@ static void nextrm(const char *, int32_t *, int32_t *, int32_t, double);
 
 /* -------------------------------------------------------------------------- *
  * Eigenenergy in units of Hartree (27.211386245981(30) eV Ref. [5])          *
- * (see 'theory/theory.pdf', section 'Manual')                                *
+ * (see theory/theory.pdf, section Manual)                                    *
  *                                                                            *
  * species : String specifying atom/ion species                               *
  * n       : Principal quantum number n = 1, 2, 3, ...                        *
@@ -92,10 +92,10 @@ double alkcalc_Enlsj(const char *species, int32_t n, int32_t l, double j) {
 
 /* -------------------------------------------------------------------------- *
  * Radial eigenstate times radius                                             *
- * Result owned by caller, destroy with 'alkcalc_state_free' after usage      *
- * (see 'theory/theory.pdf', section 'Manual')                                *
+ * Result owned by caller, destroy with alkcalc_state_free after usage        *
+ * (see theory/theory.pdf, section Manual)                                    *
  *                                                                            *
- * result  : 'f': full result; 'p': partial result (only 'fnlsj' not NULL)    *
+ * result  : 'f': full result; 'p': partial result (only fnlsj is not NULL)   *
  * species : String specifying atom/ion species                               *
  * n       : Principal quantum number n = 1, 2, 3, ...                        *
  * l       : Orbital angular momentum l = 0, 1, ..., n - 1                    *
@@ -203,7 +203,7 @@ alkcalc_state *alkcalc_fnlsj(char result, const char *species, int32_t n,
 }
 
 /* -------------------------------------------------------------------------- *
- * Free for data type 'alkcalc_state'                                         *
+ * Free for data type alkcalc_state                                           *
  * -------------------------------------------------------------------------- */
 void alkcalc_state_free(alkcalc_state *state) {
     free(state->t); state->t = NULL;
@@ -214,7 +214,7 @@ void alkcalc_state_free(alkcalc_state *state) {
 
 /* -------------------------------------------------------------------------- *
  * Radial matrix element <n,l,s,j|r^p|n',l',s',j'> (s = s' = 1 / 2)           *
- * (see 'theory/theory.pdf', section 'Manual')                                *
+ * (see theory/theory.pdf, section Manual)                                    *
  *                                                                            *
  * species : String specifying atom/ion species                               *
  * nb      : Principal quantum number of bra                                  *
@@ -350,7 +350,7 @@ double alkcalc_rp(const char *species, int32_t nb, int32_t lb, double jb,
 }
 
 /* -------------------------------------------------------------------------- *
- * Clebsch-Gordan coefficients (see 'theory/theory.pdf', section 'Manual')    *
+ * Clebsch-Gordan coefficients (see theory/theory.pdf, section Manual)        *
  * -------------------------------------------------------------------------- */
 alkcalc_cg alkcalc_cj1m1j2m2jmj(double j1, double m1, double j2, double m2,
                                 double j, double mj) {
@@ -379,7 +379,7 @@ alkcalc_cg alkcalc_cj1m1j2m2jmj(double j1, double m1, double j2, double m2,
 
 /* -------------------------------------------------------------------------- *
  * Angular eigenstate in uncoupled basis (dimensionless)                      *
- * (see 'theory/theory.pdf', section 'Manual')                                *
+ * (see theory/theory.pdf, section Manual)                                    *
  *                                                                            *
  * l       : Orbital angular momentum l = 0, 1, ..., n - 1                    *
  * ml      : Magnetic quantum number, ml = -l, ..., l                         *
@@ -420,7 +420,7 @@ alkcalc_spinor alkcalc_YlmlXsms(int32_t l, int32_t ml, double ms, double theta,
 
 /* -------------------------------------------------------------------------- *
  * Angular eigenstate in coupled basis (dimensionless)                        *
- * (see 'theory/theory.pdf', section 'Manual')                                *
+ * (see theory/theory.pdf, section Manual)                                    *
  *                                                                            *
  * l       : Orbital angular momentum l = 0, 1, ..., n - 1                    *
  * s       : Spin (Not an argument, since s = 1 / 2!)                         *
@@ -471,7 +471,7 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
 
 /* -------------------------------------------------------------------------- *
  * Oscillator strength between fine-structure states (dimensionless)          *
- * (see 'theory/theory.pdf', section 'Manual')                                *
+ * (see theory/theory.pdf, section Manual)                                    *
  *                                                                            *
  * species : String specifying atom/ion species                               *
  * ni      : Principal quantum number of initial state (i)                    *
@@ -539,7 +539,7 @@ double alkcalc_fitof(const char *species, int32_t ni, int32_t li, double ji,
 
 /* -------------------------------------------------------------------------- *
  * Lifetime of fine-structure state (nanoseconds)                             *
- * (see 'theory/theory.pdf', section 'Manual')                                *
+ * (see theory/theory.pdf, section Manual)                                    *
  *                                                                            *
  * T       : Temperature of black-body excitation spectrum in Kelvin (K)      *
  * species : String specifying atom/ion species                               *
@@ -603,7 +603,7 @@ SkipedSState:
         /* Emission: l' = l - 1 */
         for (k = nlm1 - 1; k >= nmnlm1; k--) {
 
-            /* j'=l-s */
+            /* j' = l - s */
             hnu = En - alkcalc_Enlsj(species, k, lm, jm);
             fftoi = -alkcalc_fitof(species, n, l, j, k, lm, jm);
             nocc = thermal_photon_occupation(hnu, T);
@@ -613,13 +613,13 @@ SkipedSState:
         /* Absorption: l' = l + 1 */
         for (k = nlp1; k < nlp1 + dn; k++) {
 
-            /* j'=l+s */
+            /* j' = l + s */
             hnu = alkcalc_Enlsj(species, k, lp, jp) - En;
             fftoi = alkcalc_fitof(species, n, l, j, k, lp, jp);
             nocc = thermal_photon_occupation(hnu, T);
             Gamma += hnu * hnu * fftoi * nocc;
 
-            /* j'=l+3s */
+            /* j' = l + 3 * s */
             hnu = alkcalc_Enlsj(species, k, lp, jp + 1.) - En;
             fftoi = alkcalc_fitof(species, n, l, j, k, lp, jp + 1.);
             nocc = thermal_photon_occupation(hnu, T);
@@ -630,7 +630,7 @@ SkipedSState:
         if (l) {
             for (k = nlm1; k < nlm1 + dn; k++) {
 
-                /* j'=l-s */
+                /* j' = l - s */
                 hnu = alkcalc_Enlsj(species, k, lm, jm) - En;
                 fftoi = alkcalc_fitof(species, n, l, j, k, lm, jm);
                 nocc = thermal_photon_occupation(hnu, T);
@@ -642,7 +642,7 @@ SkipedSState:
         /* Emission: l' = l + 1 */
         for (k = nlp1 - 1; k >= nmnlp1; k--) {
 
-            /* j'=l+s */
+            /* j' = l + s */
             hnu = En - alkcalc_Enlsj(species, k, lp, jp);
             fftoi = -alkcalc_fitof(species, n, l, j, k, lp, jp);
             nocc = thermal_photon_occupation(hnu, T);
@@ -652,14 +652,14 @@ SkipedSState:
         /* Emission: l = l - 1 */
         for (k = nlm1 - 1; k >= nmnlm1; k--) {
 
-            /* j'=l-s */
+            /* j' = l - s */
             hnu = En - alkcalc_Enlsj(species, k, lm, jm);
             fftoi = -alkcalc_fitof(species, n, l, j, k, lm, jm);
             nocc = thermal_photon_occupation(hnu, T);
             Gamma += hnu * hnu * fftoi * (1. + nocc);
 
             /* j' = l - 3s */
-            if (l > 1) { /* P(j=1/2) -> S(j'=-1/2) is not possible */
+            if (l > 1) { /* P(j = 1 / 2) -> S(j' = -1 / 2) is not possible */
                 hnu = En - alkcalc_Enlsj(species, k, lm, jm - 1.);
                 fftoi = -alkcalc_fitof(species, n, l, j, k, lm, jm - 1.);
                 nocc = thermal_photon_occupation(hnu, T);
@@ -670,7 +670,7 @@ SkipedSState:
         /* Absorption: l' = l + 1 */
         for (k = nlp1; k < nlp1 + dn; k++) {
 
-            /* j'=l+s */
+            /* j' = l + s */
             hnu = alkcalc_Enlsj(species, k, lp, jp) - En;
             fftoi = alkcalc_fitof(species, n, l, j, k, lp, jp);
             nocc = thermal_photon_occupation(hnu, T);
@@ -687,7 +687,7 @@ SkipedSState:
                 nocc = thermal_photon_occupation(hnu, T);
                 Gamma += hnu * hnu * fftoi * nocc;
 
-                /* j'=l-3s */
+                /* j' = l - 3 * s */
                 if (l > 1) { /* P(j = 1 / 2) -> S(j' = -1 / 2) not possible */
                     hnu = alkcalc_Enlsj(species, k, lm, jm - 1.) - En;
                     fftoi = alkcalc_fitof(species, n, l, j, k, lm, jm - 1.);
@@ -712,7 +712,7 @@ SkipedSState:
  * Helper functions                                                           *
  * -------------------------------------------------------------------------- */
 
-/* Move file descriptor down by 'nlines' lines                                */
+/* Move file descriptor down by nlines many lines                             */
 static void move(FILE *fd, int32_t nlines) {
     int c;
     int32_t k;
@@ -760,7 +760,7 @@ static alkcalc_cg w3jm(int32_t j1, int32_t m1, int32_t j2, int32_t m2,
 
     /* IMPORTANT: The arguments j1, m1, j2, m2, j3, and m3 must be TWICE the  *
      * desired argument, i.e., the following equality between Wigner's 3jm    *
-     * symbols and the function 'w3jm' holds:                                 *
+     * symbols and the function w3jm holds:                                   *
      *                                                                        *
      *   / j1 j2 j3  \                                                        *
      *  |            | = w3jm(2 * j1, 2 * m1, 2 * j2, 2 * m2, 2 * j3, 2 * m3) *
@@ -864,7 +864,7 @@ static int64_t ns64imul(int32_t n, const int64_t *a) {
 /* Secure 64-bit integer addition                                             */
 static int64_t s64iadd(int64_t a, int64_t b) {
 
-    /* It might look dangerous to do 'INT64_MIN-a' when 'a' can be equal to   *
+    /* It might look dangerous to do INT64_MIN - a when a can be equal to     *
      * INT64_MIN. However, in the particular order the subtraction is         *
      * performed, the C99 standard guarantees that the expression evaluates   *
      * to zero (see Sec. 6.5.5 in Ref. [11]).                                 */
@@ -889,7 +889,7 @@ static int64_t euclid(int64_t a, int64_t b) {
     return a;
 }
 
-/* Spherical harmonics (see definition in 'theory/theory.pdf')                */
+/* Spherical harmonics (see definition in theory/theory.pdf)                  */
 static double complex Ylml(int32_t l, int32_t ml, double theta, double phi) {
 
     int8_t sml, phase;
@@ -911,13 +911,13 @@ static double complex Ylml(int32_t l, int32_t ml, double theta, double phi) {
      *                                                                        *
      * The associated Legendre polynomial's value is computed for the         *
      * absolute value of ml. The conversion formula, described in             *
-     * 'theory/theory.pdf', allows to obtain the value for negative ml, and   *
-     * the conversion factor is not just a phase. Please note that this       *
-     * factor is not missing here, but included in the prefactor, pf,         *
-     * already, because at the point where pf is computed, ml is already      *
-     * rendered non-negative. This means automatically everything (up to a    *
-     * phase included later) is correct. It is probably vital to view         *
-     * 'theory/theory.pdf' to understand this part.                           */
+     * theory/theory.pdf, allows to obtain the value for negative ml, and the *
+     * conversion factor is not just a phase. Please note that this factor is *
+     * not missing here, but included in the prefactor, pf, already, because  *
+     * at the point where pf is computed, ml is already rendered              *
+     * non-negative. This means automatically everything (up to a phase       *
+     * included later) is correct. It is probably vital to view               *
+     * theory/theory.pdf to understand this part.                             */
     phase = (ml & 1) ? -1 : 1; x = cos(theta);
     if (l == ml) {
         Pk = phase * fac(2 * ml) / fac(ml) * pow(.25 * (1. - x * x), .5 * ml);

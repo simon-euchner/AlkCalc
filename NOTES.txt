@@ -9,10 +9,10 @@ against lcblas when creating the lakcalc library file.)
 Compute condition of matrix to check for numerical stability. Print condition
 just before the eigenproblem is solved. Expalin in README and theory.
 
-Stop marking variable with '...' and file names with '...'
-
-Stop using "we" in code READMEs
+Update main READMEs
+    - Stop marking variable and file names with '...' in main READMEs
+    - Stop using "we" in main READMEs
+    - j behaviour was unified with library functions)
 
 Fix References in READMEs + code and align them with theory
 
-Update READMEs (j behaviour was unified with library functions)

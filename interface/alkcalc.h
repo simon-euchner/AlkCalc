@@ -11,7 +11,7 @@
 #include <complex.h>
 
 /* -------------------------------------------------------------------------- *
- * Absolute path to 'AlkCalc' (Always put '/' at the end!)                    *
+ * Absolute path to AlkCalc (Always put '/' at the end!)                      *
  * -------------------------------------------------------------------------- */
 #define PATH_TO_ALKCALC "/home/simon/Files/GitHub/AlkCalc/"
 #define LEN_PATH_TO_ALKCALC 33
@@ -60,7 +60,7 @@ typedef struct alkcalc_spinor_s {
 
 /* -------------------------------------------------------------------------- *
  * Eigenenergy in units of Hartree (27.211386245981(30) eV Ref. [5])          *
- * (see 'theory/theory.pdf', section 'Manual')                                *
+ * (see theory/theory.pdf, section Manual)                                    *
  *                                                                            *
  * species : String specifying atom/ion species                               *
  * n       : Principal quantum number n = 1, 2, 3, ...                        *
@@ -72,10 +72,10 @@ double alkcalc_Enlsj(const char *species, int32_t n, int32_t l, double j);
 
 /* -------------------------------------------------------------------------- *
  * Radial eigenstate times radius                                             *
- * Result owned by caller, destroy with 'alkcalc_state_free' after usage      *
- * (see 'theory/theory.pdf', section 'Manual')                                *
+ * Result owned by caller, destroy with alkcalc_state_free after usage        *
+ * (see theory/theory.pdf, section Manual)                                    *
  *                                                                            *
- * result  : 'f': full result; 'p': partial result (only 'fnlsj' not NULL)    *
+ * result  : 'f': full result; 'p': partial result (only fnlsj is not NULL)   *
  * species : String specifying atom/ion species                               *
  * n       : Principal quantum number n = 1, 2, 3, ...                        *
  * l       : Orbital angular momentum l = 0, 1, ..., n - 1                    *
@@ -86,13 +86,13 @@ alkcalc_state *alkcalc_fnlsj(char result, const char *species, int32_t n,
                              int32_t l, double j);
 
 /* -------------------------------------------------------------------------- *
- * Free for data type 'alkcalc_state'                                         *
+ * Free for data type alkcalc_state                                           *
  * -------------------------------------------------------------------------- */
 void alkcalc_state_free(alkcalc_state *state);
 
 /* -------------------------------------------------------------------------- *
  * Radial matrix element <n,l,s,j|r^p|n',l',s',j'> (s = s' = 1 / 2)           *
- * (see 'theory/theory.pdf', section 'Manual')                                *
+ * (see theory/theory.pdf, section Manual)                                    *
  *                                                                            *
  * species : String specifying atom/ion species                               *
  * nb      : Principal quantum number of bra                                  *
@@ -111,14 +111,14 @@ double alkcalc_rp(const char *species, int32_t nb, int32_t lb, double jb,
                   double p, int32_t nk, int32_t lk, double jk);
 
 /* -------------------------------------------------------------------------- *
- * Clebsch-Gordan coefficients (see 'theory/theory.pdf', section 'Manual')    *
+ * Clebsch-Gordan coefficients (see theory/theory.pdf, section Manual)        *
  * -------------------------------------------------------------------------- */
 alkcalc_cg alkcalc_cj1m1j2m2jmj(double j1, double m1, double j2, double m2,
                                 double j, double mj);
 
 /* -------------------------------------------------------------------------- *
  * Angular eigenstate in uncoupled basis (dimensionless)                      *
- * (see 'theory/theory.pdf', section 'Manual')                                *
+ * (see theory/theory.pdf, section Manual)                                    *
  *                                                                            *
  * l       : Orbital angular momentum l = 0, 1, ..., n - 1                    *
  * ml      : Magnetic quantum number, ml = -l, ..., l                         *
@@ -132,7 +132,7 @@ alkcalc_spinor alkcalc_YlmlXsms(int32_t l, int32_t ml, double ms, double theta,
 
 /* -------------------------------------------------------------------------- *
  * Angular eigenstate in coupled basis (dimensionless)                        *
- * (see 'theory/theory.pdf', section 'Manual')                                *
+ * (see theory/theory.pdf, section Manual)                                    *
  *                                                                            *
  * l       : Orbital angular momentum l = 0, 1, ..., n - 1                    *
  * s       : Spin (Not an argument, since s = 1 / 2!)                         *
@@ -146,7 +146,7 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
 
 /* -------------------------------------------------------------------------- *
  * Oscillator strength between fine-structure states (dimensionless)          *
- * (see 'theory/theory.pdf', section 'Manual')                                *
+ * (see theory/theory.pdf, section Manual)                                    *
  *                                                                            *
  * species : String specifying atom/ion species                               *
  * ni      : Principal quantum number of initial state (i)                    *
@@ -165,7 +165,7 @@ double alkcalc_fitof(const char *species, int32_t ni, int32_t li, double ji,
 
 /* -------------------------------------------------------------------------- *
  * Lifetime of fine-structure state (nanoseconds)                             *
- * (see 'theory/theory.pdf', section 'Manual')                                *
+ * (see theory/theory.pdf, section Manual)                                    *
  *                                                                            *
  * T       : Temperature of black-body excitation spectrum in Kelvin (K)      *
  * species : String specifying atom/ion species                               *
