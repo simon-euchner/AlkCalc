@@ -17,7 +17,7 @@
  * error in case a constraint is not met.                                     */
 void validate_settings(int32_t nl) {
 
-    int32_t k, N, nmax, l, J, Jlower, Jupper;
+    int32_t k, N, nmax, l, dim, J, Jlower, Jupper;
     double j, rmax;
 
     /* Extract parameters from settings */
@@ -27,6 +27,7 @@ void validate_settings(int32_t nl) {
     l = settings.l;
     j = settings.j;
     rmax = settings.rmax;
+    dim = N + k - 4;
 
     /* B-spline order (k)                                                     *
      *                                                                        *
@@ -69,6 +70,19 @@ void validate_settings(int32_t nl) {
      *                 nmax < nl there does not exist an eigenstate.          */
     if (nmax < nl) {
         ERROR("INVALID NMAX: NMAX(%" PRId32 ") < NL(%" PRId32 ")", nmax, nl);
+    }
+
+    /* Dimension of generalised eigenvalue problem (dim)                      *
+     *                                                                        *
+     * Constraint(s) : Dimension of generalised eigenvalue problem must be at *
+     *                 least nmax                                             *
+     * Information   : To make sure that at least nmax eigenvalues exist, the *
+     *                 dimension of the generalised eigenvalue problem should *
+     *                 be at least nmax. In practice, however, the dimension  *
+     *                 should be at least on the order of twice nmax, to      *
+     *                 ensure numerically converged eigenvalues.              */
+    if (dim < nmax) {
+        ERROR("INVALID NMAX: NMAX(%" PRId32 ") < DIM(%" PRId32 ")", nmax, dim);
     }
 
     /* Orbital angular momentum quantum number (l)                            *

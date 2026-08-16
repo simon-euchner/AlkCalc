@@ -319,7 +319,7 @@ static void solve(eigensolver_data *data) {
     ldbb = settings.k;
     ldq = n;
     il = 1;
-    iu = settings.nmax - data->ipar[3];
+    iu = settings.nmax - 0 * data->ipar[3];
     ldz = n;
 
     /* Number of requested eigenvalues */

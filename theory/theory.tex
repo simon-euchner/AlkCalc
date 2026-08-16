@@ -693,9 +693,10 @@
     \end{equation}
     There are $N$ different knots. The first and the last one are repeated
     $k=d+1$ times, where $k$ is called the \emph{order} of the B-splines. On the
-    knots $(t_i)_{i=0,\dots,N-1+2d}$ the $N_\mathrm{bs}=N+d-1$ many B-splines
-    $u^{(d)}_i$ of degree $d$ (or order $k$) are defined via de Boor's recursion
-    formula \cite{deboor2001} ($q=1,\dots,d$, $i=0,\dots,N_\mathrm{bs}-1$):
+    knots $(t_i)_{i=0,\dots,N_\mathrm{ks}-1}$ the $N_\mathrm{bs}=N+d-1$ many
+    B-splines $u^{(d)}_i$ of degree $d$ (or order $k$) are defined via de Boor's
+    recursion formula \cite{deboor2001} ($q=1,\dots,d$,
+    $i=0,\dots,N_\mathrm{bs}-1$):
     \begin{equation}\label{eq:DeBoorsRecursion}
         u^{(q)}_i(t)
         =
@@ -734,10 +735,11 @@
         \big)
     \end{equation}
     is a partition of unity. With this normalisation the B-spline basis is
-    uniquely defined for the choice of knots $(t_i)_{i=0,\dots,N-1+2d}$. To
-    numerically evaluate the B-splines \alkcalc employs the double precision
-    version of de Boor's algorithm which is implemented by the \emph{FORTRAN}
-    routine \texttt{DBSPVD} \cite{amos1993} taken from \emph{Netlib}
+    uniquely defined for the choice of knots
+    $(t_i)_{i=0,\dots,N_\mathrm{ks}-1}$. To numerically evaluate the B-splines
+    \alkcalc employs the double precision version of de Boor's algorithm which
+    is implemented by the \emph{FORTRAN} routine \texttt{DBSPVD} \cite{amos1993}
+    taken from \emph{Netlib}
     \cite{dongarra1987}.
 
     With the B-spline basis at hand, the next step is to express the eigenvalue
