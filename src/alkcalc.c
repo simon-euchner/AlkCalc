@@ -213,6 +213,65 @@ void alkcalc_state_free(alkcalc_state *state) {
 }
 
 /* -------------------------------------------------------------------------- *
+ * Evaluate radial eigenfunction fnlsj                                        *
+ * (see theory/theory.pdf, section Manual)                                    *
+ *                                                                            *
+ * species : String specifying atom/ion species                               *
+ * n       : Principal quantum number n = 1, 2, 3, ...                        *
+ * l       : Orbital angular momentum l = 0, 1, ..., n - 1                    *
+ * s       : Spin (Not an argument, since s = 1 / 2!)                         *
+ * j       : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
+ * tevals  : Array containing points where to evaulate fnlsj                  *
+ * ltevals : Length of array tevals                                           */
+void alkcalc_fnslj_eval(char *species, int32_t n, int32_t l, double j,
+                        double *tevals, int32_t ltevals) {
+
+    int32_t k, Nks, nderiv, i, ilo, ileft, mflag, a;
+    double *ts, *fnlsj, *vnikx, *work, teval;
+    alkcalc_state *state;
+
+    /* Load requested radial eigenfunction */
+    state = alkcalc_fnlsj('f', species, n, l, j);
+
+    /* Extract data */
+    k = state->k; Nks = state->Nks; ts = state->t; fnlsj = state->fnlsj;
+
+    /* Allocate memory */
+    nderiv = 1; /* No derivatives of B-splines are needed (see DBSPVD) */
+    vnikx = (double *)malloc(k * nderiv * sizeof(double));
+    work = (double *)malloc(((k + 1) * (k + 2)) / 2 * sizeof(double));
+
+    /* Overwrite entries of tevals with fnlsj(tevals) */
+    ilo = 1;
+    for (i = 0; i < ltevals; i++) {
+
+        /* Point at which to evaluate fnlsj */
+        teval = tevals[i];
+
+        /* Find largest integer satisfying ts[ileft] <= teval */
+        dintrv_c(ts, &Nks, &teval, &ilo, &ileft, &mflag);
+
+        /* Evaluate B-splines at teval */
+        dbspvd_c(ts, &k, &nderiv, &teval, &ileft, vnikx, work);
+
+        /* Compute fnlsj(teval) and store the result in tevals[i]             *
+         *                                                                    *
+         * On the interval [ts[ileft], ts[ileft + 1]] only the B-splines with *
+         * indices a = ileft - d, ..., ileft are non-zero, where d = k - 1 is *
+         * the polynomial degree of the B-splines.                            */
+        tevals[i] = 0.;
+        for (a = 0; a < k; a++) {
+            tevals[i] += fnlsj[ileft - 1 - (k - 1) + a] * vnikx[a];
+        }
+    }
+
+    /* Clean up */
+    alkcalc_state_free(state); state = NULL;
+    free(vnikx); vnikx = NULL;
+    free(work); work = NULL;
+}
+
+/* -------------------------------------------------------------------------- *
  * Radial matrix element <n,l,s,j|r^p|n',l',s',j'> (s = s' = 1 / 2)           *
  * (see theory/theory.pdf, section Manual)                                    *
  *                                                                            *
@@ -302,7 +361,7 @@ double alkcalc_rp(const char *species, int32_t nb, int32_t lb, double jb,
             /* Largest integer satisfying ts[ileft] <= t */
             ileft = k - 1 + i - 1; /* ts[ileft] = trs[i - 1] */
 
-            /* Evaluate B-splines and derivatives at quadrature point t */
+            /* Evaluate B-splines at quadrature point t */
             ileft += 1; /* Add one, because in FORTRAN counting starts at ONE */
             dbspvd_c(ts, &k, &nderiv, &t, &ileft, vnikx, work);
 

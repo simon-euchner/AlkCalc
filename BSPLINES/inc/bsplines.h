@@ -16,4 +16,8 @@
 void dbspvd_c(const double *, const int32_t *, const int32_t *, const double *,
               const int32_t *, double *, double *);
 
+/* DINTRV */
+void dintrv_c(const double *, const int32_t *, const double *, int32_t *,
+              int32_t *, int32_t *);
+
 #endif

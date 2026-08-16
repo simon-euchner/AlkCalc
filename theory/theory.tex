@@ -1398,6 +1398,48 @@
 
     \begin{sdocfun}
     {
+        alkcalc\tus{fnlsj}\tus{eval}
+    }{
+        Function to evaluate the radial eigenfunction $f_{n,l,s,j}$ defined in
+        Eq.~\eqref{eq:ExpansionOfEigenfunctions} at the points specified in the
+        array \texttt{tevals}. Note that via the parametrisation
+        \eqref{eq:DimensionlessEigenfunctions} this function directly allows to
+        evaluate the radial eigenstates $R_{n,l,s,j}(r)$ at any $r$. The result
+        is stored in the array \texttt{tevals}, i.e., the function
+        \texttt{alkcalc\tus{fnlsj}\tus{eval}} overwrites each element $t$ in
+        \texttt{tevals} with $f_{n,l,s,j}(t)$.
+    }
+        \sdocarg{char *species}{
+            String to specify atom/ion species, e.g., \texttt{1H} for Hydrogen,
+            or \texttt{88SR+} for the $\mathrm{^{88}Sr^+}$ ion.
+        }
+        \sdocarg{int32\tus{t} n}{
+            Principal quantum number.
+        }
+        \sdocarg{int32\tus{t} l}{
+            Orbital angular momentum quantum number $l=0,1,\dots,n-1$.
+        }
+        \sdocarg{double s}{
+            Electron spin quantum number. Not an argument, as $s=1\slash{2}$ is
+            always assumed.
+        }
+        \sdocarg{double j}{
+            Total angular momentum quantum number
+            $j=\abs*{l-1\slash{2}},l+1\slash{2}$.
+        }
+        \sdocarg{double *tevals}{
+            Array containing the points $t\in[0,t_\mathrm{max})$ at which to
+            evaluate the function $f_{n,l,s,j}$. After the function call, the
+            entries $t$ of the array \texttt{tevals} are overwritten with the
+            associated function values $f_{n,l,s,j}(t)$.
+        }
+        \sdocarg{int32\tus{t} ltevals}{
+            Length of the array \texttt{tevals}.
+        }
+    \end{sdocfun}
+
+    \begin{sdocfun}
+    {
         alkcalc\tus{rp}
     }{
         Radial matrix element of $r^p$, $p\in\mathbb{R}$ [see
