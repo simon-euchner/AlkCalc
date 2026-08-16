@@ -34,6 +34,7 @@
  * l         : Orbital angular momentum quantum number                        *
  * j         : Total angular momentum quantum number                          *
  * rmax      : Maximal radius in units of Bohr's radius, aB                   *
+ * offset    : Integer offset to select correct lowest eigenvalue             *
  * -------------------------------------------------------------------------- */
 const alkcalc_settings settings = {
     .species =                                                     "1H"        ,
@@ -42,5 +43,6 @@ const alkcalc_settings settings = {
     .nmax    =                                                        120      ,
     .l       =                                                          1      ,
     .j       =                                                           .5    ,
-    .rmax    =                                                      20000.
+    .rmax    =                                                      20000.     ,
+    .offset  =                                                         -1
 };

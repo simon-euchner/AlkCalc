@@ -56,7 +56,7 @@
 /* Data type for settings */
 typedef struct alkcalc_settings_s {
     char *species;
-    int32_t k, N, nmax, l;
+    int32_t k, N, nmax, l, offset;
     double j, rmax;
 } alkcalc_settings;
 
@@ -70,6 +70,7 @@ typedef struct alkcalc_settings_s {
  * l         : Orbital angular momentum quantum number                        *
  * j         : Total angular momentum quantum number                          *
  * rmax      : Maximal radius in units of Bohr's radius, aB                   *
+ * offset    : Integer offset to select correct lowest eigenvalue             *
  * -------------------------------------------------------------------------- */
 extern const alkcalc_settings settings;
 

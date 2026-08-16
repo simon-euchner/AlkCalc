@@ -17,7 +17,7 @@
  * error in case a constraint is not met.                                     */
 void validate_settings(int32_t nl) {
 
-    int32_t k, N, nmax, l, dim, J, Jlower, Jupper;
+    int32_t k, N, nmax, l, dim, offset, J, Jlower, Jupper;
     double j, rmax;
 
     /* Extract parameters from settings */
@@ -28,6 +28,7 @@ void validate_settings(int32_t nl) {
     j = settings.j;
     rmax = settings.rmax;
     dim = N + k - 4;
+    offset = settings.offset;
 
     /* B-spline order (k)                                                     *
      *                                                                        *
@@ -116,5 +117,16 @@ void validate_settings(int32_t nl) {
      *                 choose rmax <= 0.                                      */
     if (!(rmax > 0)) {
         ERROR("MAXIMAL RADIUS RMAX MUST BE LARGER THAN ZERO");
+    }
+
+    /* Integer offset to select correct lowest eigenvalue (offset)            *
+     *                                                                        *
+     * Constraint(s) : offset > -nl                                           *
+     * Information   : For offset = -nl + 1, the lowest possible eigenvalue   *
+     *                 is associated with n = nl. There cannot be an          *
+     *                 eigenvalue associated with n < nl.                     */
+    if (settings.offset <= -nl) {
+        ERROR("INVALID OFFSET: OFFSET(%" PRId32 ") > -NL(-%" PRId32 ")",
+              offset, nl);
     }
 }
