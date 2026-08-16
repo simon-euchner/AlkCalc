@@ -1,10 +1,4 @@
-Stop marking variable with '...' and file names with '...'
-
-Stop using "we" in code (including FORTRAN package READMEs), and READMEs
-
-Fix References in READMEs + code and align them with theory
-
-Update READMEs (j behaviour was unified with library functions)
+Update Python interface
 
 Add constraint that nmax <= dim
 
@@ -12,9 +6,8 @@ Add constraint that the iu - il + 1 >= 1
 
 Add constraint nl > 0
 
-Check if it is a problem to hand to FOURTRAN routine int32_t?
-
-Update Python interface
+For Hydrgen and k=3 and N=4 something goes wrong (probably someting to do with
+nl and maybe m is negative or il is negative)
 
 OpenBLAS is required (C version) for dsbmv (MAYBE WRITE OWN INTERFACE, remove
 unnessecary headers then of course and be careful to update README's, also
@@ -22,8 +15,13 @@ update Makefile to linke not against stuff I do not need, somehow, I can compile
 the library without the header cblas.h?, seems I also do not need to link
 against lcblas when creating the lakcalc library file.)
 
-For Hydrgen and k=3 and N=4 something goes wrong (probably someting to do with
-nl and maybe m is negative or il is negative)
-
 Compute condition of matrix to check for numerical stability. Print condition
 just before the eigenproblem is solved. Expalin in README and theory.
+
+Stop marking variable with '...' and file names with '...'
+
+Stop using "we" in code (including FORTRAN package READMEs), and READMEs
+
+Fix References in READMEs + code and align them with theory
+
+Update READMEs (j behaviour was unified with library functions)
