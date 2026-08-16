@@ -435,9 +435,37 @@ static double step(int32_t i) {
 /* Compute condition number of mass matrix M                                  */
 static double cond(eigensolver_data *data) {
 
+    int32_t n, kd, ldab, *ifail, *iwork, i, m, info;
+    double *M, *ab, *w, *work, kappa;
 
+    /* Constants */
+    n = data->dim;
+    kd = settings.k - 1;
+    ldab = settings.k;
+    M = data->M;
 
-    double kappa = 1.;
+    /* Allocate memory */
+    ab = (double *)malloc(ldab * n * sizeof(double));
+    w = (double *)malloc(n * sizeof(double));
+    work = (double *)malloc(7 * n * sizeof(double));
+    iwork = (int32_t *)malloc(5 * n * sizeof(int32_t));
+    ifail = (int32_t *)malloc(n * sizeof(int32_t));
+
+    /* Copy bands of mass matrix M into ab */
+    for (i = 0; i < ldab * n; i++) { ab[i] = M[i]; }
+
+    /* Compute eigenvalues of mass matrix M */
+    dsbevx_c(&n, &kd, ab, &ldab, &m, w, work, iwork, ifail, &info);
+
+    /* Compute condition number of mass matrix M */
+    kappa = w[n - 1] / w[0];
+
+    /* Clean up */
+    free(ab); ab = NULL;
+    free(w); w = NULL;
+    free(work); work = NULL;
+    free(iwork); iwork = NULL;
+    free(ifail); ifail = NULL;
 
     return kappa;
 }

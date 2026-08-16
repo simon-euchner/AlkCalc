@@ -20,7 +20,6 @@ void dsbgvx_c(const int32_t *, const int32_t *, const int32_t *, double *,
               int32_t *, int32_t *);
 
 void dsbevx_c(const int32_t *, const int32_t *, double *, const int32_t *,
-              const int32_t *, const int32_t *, int32_t *, double *, double *,
-              int32_t *, int32_t *)
+              int32_t *, double *, double *, int32_t *, int32_t *, int32_t *);
 
 #endif
