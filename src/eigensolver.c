@@ -318,7 +318,7 @@ static void solve(eigensolver_data *data) {
     bb = data->M;
     ldbb = settings.k;
     ldq = n;
-    int offset = -2;
+    int offset = -1;
     il = data->ipar[3] + offset;
     iu = settings.nmax + offset;
     ldz = n;

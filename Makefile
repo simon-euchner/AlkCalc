@@ -24,6 +24,7 @@ TMP = ./tmp
 GAQ = ./GAUSSQ/lib
 BSP = ./BSPLINES/lib
 ELA = ./EIGLAPACK/lib
+MVB = ./MVMBLAS/lib
 
 # File names
 F0 = settings
@@ -42,9 +43,11 @@ all:
 lib: ${LIB}/libalkcalc.so
 	@echo -e "\nBUILDING LIBRARY ALKCALC\n"
 ${LIB}/libalkcalc.so: ${OBJ}/${F4}.o
-	${LD} -shared -o ${LIB}/libalkcalc.so -L${GAQ}/ -L${BSP}/ ${OBJ}/${F4}.o \
-	-lm -lcblas -lgaussq -lbsplines -Wl,-rpath,$(abspath ${GAQ}/) \
-	-Wl,-rpath,$(abspath ${BSP})
+	${LD} -shared -o ${LIB}/libalkcalc.so -L${GAQ}/ -L${BSP}/ -L${MVB} \
+	${OBJ}/${F4}.o -lm -lgaussq -lbsplines -lmvmblas \
+	-Wl,-rpath,$(abspath ${GAQ}/) -Wl,-rpath,$(abspath ${BSP}) \
+	-Wl,-rpath,$(abspath ${MVB}/)
+
 
 ### Eigenenergies and radial eigenstates
 solve: ${TMP}/slv${TMSTMP}

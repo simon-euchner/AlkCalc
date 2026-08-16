@@ -13,6 +13,7 @@
 #include "../interface/alkcalc.h"
 #include "../GAUSSQ/inc/gaussq.h"
 #include "../BSPLINES/inc/bsplines.h"
+#include "../MVMBLAS/inc/mvmblas.h"
 
 #define PI 3.141592653589793238462643383279502884 /* Pi */
 
@@ -292,7 +293,7 @@ double alkcalc_rp(const char *species, int32_t nb, int32_t lb, double jb,
                   double p, int32_t nk, int32_t lk, double jk) {
 
     int32_t k, N, Nbs, dim, nRp, ip, i, imin, j, ileft, nderiv, a, ia, b, ib,
-            iarr, d, ldRp, incX, incY;
+            iarr, d, ldRp;
     double *ts, *trs, *hs, *brafnlsj, *ketfnlsj, *ketfnlsj_cpy, *Rp, *wRp, *xRp,
            *vnikx, *work, w, t, alpha, beta, rp;
     alkcalc_state *bra, *ket;
@@ -384,10 +385,9 @@ double alkcalc_rp(const char *species, int32_t nb, int32_t lb, double jb,
     }
 
     /* Compute action of Rp on bra; dsbmv: y -> y = alpha * A * x + beta * y */
-    d = k - 1; alpha = 1.; ldRp = k; beta = 0.; incX = incY = 1;
+    d = k - 1; alpha = 1.; ldRp = k; beta = 0.;
     for (i = 0; i < dim; i++) { ketfnlsj_cpy[i] = ketfnlsj[1 + i]; }
-    cblas_dsbmv(CblasColMajor, CblasUpper, dim, d, alpha, Rp, ldRp,
-                ketfnlsj_cpy, incX, beta, ketfnlsj + 1, incY);
+    dsbmv_c(&dim, &d, &alpha, Rp, &ldRp, ketfnlsj_cpy, &beta, ketfnlsj + 1);
 
     /* Compute radial matrix element */
     rp = 0.;
