@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 
     /* Clebsch-Gordan coefficient for j1=j2=1/2, m1=1/2, m2=-1/2, j=0, mj=0 */
     c = alkcalc_cj1m1j2m2jmj(1.5, -.5, 1., 1., 1.5, .5);
-    printf("Should be: -1*sqrt(8/15)\n"
+    printf("Should be: -1 * sqrt(8 / 15)\n"
            "Is: %d * sqrt(%ld / %ld)\n", c.sign, c.numerator, c.denominator);
 
     printf("\n%s\n", "--- End");
