@@ -16,7 +16,6 @@ int main(int argc, char **argv)
     printf("%s\n", "--- Example: Evaluate radial eigenfunction fnslj\n");
 
     /* Compute radial eigenfunction fnlsj at t = 0, 1, 2, 3, 4, 5 */
-    char *species = "40CA+";
     int i, ltevals, n, l;
     double j, tevals_cpy[6], tevals[] = {0., 1., 2., 3., 4., 5.};
 
@@ -25,7 +24,7 @@ int main(int argc, char **argv)
 
     /* Evaluate fnlsj at t in tevals */
     n = 4, l = 0, j = .5; ltevals = 6;
-    alkcalc_fnslj_eval(species, n, l, j, tevals, ltevals);
+    alkcalc_fnslj_eval("40CA+", n, l, j, tevals, ltevals);
 
     /* Print result */
     printf("%s\n", "t    fnlsj(t)");
