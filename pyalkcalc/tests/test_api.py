@@ -12,6 +12,7 @@ import numpy as np
 from pyalkcalc import (
         energy,
         state,
+        state_eval,
         radial_matrix_element,
         clebsch_gordan_coefficient,
         spinor_uncoupled_basis,
@@ -59,6 +60,13 @@ def test_state_data():
     assert s.j == .5
     assert s.t.size > 0
     assert s.fnlsj.size > 0
+
+def test_state_eval():
+    """
+    Test the state evaluation function.
+    """
+    tevals = np.linspace(0, 10, 11)
+    ftevals = state_eval(TEST_SPECIES, 4, 0, .5, tevals)
 
 def test_radial_matrix_element_data():
     """
