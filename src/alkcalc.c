@@ -48,7 +48,7 @@ static void nextrm(const char *, int32_t *, int32_t *, int32_t, double);
  * species : String specifying atom/ion species                               *
  * n       : Principal quantum number n = 1, 2, 3, ...                        *
  * l       : Orbital angular momentum l = 0, 1, ..., n - 1                    *
- * s       : Spin (Not an argument, since we always have s = 1 / 2!)          *
+ * s       : Spin (Not an argument, since s = 1 / 2!)                         *
  * j       : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  * -------------------------------------------------------------------------- */
 double alkcalc_Enlsj(const char *species, int32_t n, int32_t l, double j) {
@@ -99,7 +99,7 @@ double alkcalc_Enlsj(const char *species, int32_t n, int32_t l, double j) {
  * species : String specifying atom/ion species                               *
  * n       : Principal quantum number n = 1, 2, 3, ...                        *
  * l       : Orbital angular momentum l = 0, 1, ..., n - 1                    *
- * s       : Spin (Not an argument, since we always have s = 1 / 2!)          *
+ * s       : Spin (Not an argument, since s = 1 / 2!)                         *
  * j       : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  * -------------------------------------------------------------------------- */
 alkcalc_state *alkcalc_fnlsj(char result, const char *species, int32_t n,
@@ -219,13 +219,13 @@ void alkcalc_state_free(alkcalc_state *state) {
  * species : String specifying atom/ion species                               *
  * nb      : Principal quantum number of bra                                  *
  * lb      : Orbital angular momentum l = 0, 1, ..., n - 1 of bra             *
- * sb      : Spin of bra (Not an argument, since we always have s = 1 / 2!)   *
+ * sb      : Spin of bra (Not an argument, since s = 1 / 2!)                  *
  * jb      : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  *           of bra                                                           *
  * p       : Power of radius operator in matrix element                       *
  * nk      : Principal quantum number of ket                                  *
  * lk      : Orbital angular momentum l = 0, 1, ..., n - 1 of ket             *
- * sk      : Spin of ket (Not an argument, since we always have s = 1 / 2!)   *
+ * sk      : Spin of ket (Not an argument, since s = 1 / 2!)                  *
  * jk      : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  *           of ket                                                           *
  * -------------------------------------------------------------------------- */
@@ -383,7 +383,7 @@ alkcalc_cg alkcalc_cj1m1j2m2jmj(double j1, double m1, double j2, double m2,
  *                                                                            *
  * l       : Orbital angular momentum l = 0, 1, ..., n - 1                    *
  * ml      : Magnetic quantum number, ml = -l, ..., l                         *
- * s       : Spin (Not an argument, since we always have s = 1 / 2!)          *
+ * s       : Spin (Not an argument, since s = 1 / 2!)                         *
  * ms      : Spin-projection quantum number ms = -1 / 2, 1 / 2                *
  * theta   : Polar angle (Zenitwinkel), theta in [0, pi]                      *
  * phi     : Azimuthal angle (Azimut), phi in [0, 2pi]                        *
@@ -423,7 +423,7 @@ alkcalc_spinor alkcalc_YlmlXsms(int32_t l, int32_t ml, double ms, double theta,
  * (see 'theory/theory.pdf', section 'Manual')                                *
  *                                                                            *
  * l       : Orbital angular momentum l = 0, 1, ..., n - 1                    *
- * s       : Spin (Not an argument, since we always have s = 1 / 2!)          *
+ * s       : Spin (Not an argument, since s = 1 / 2!)                         *
  * j       : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  * mj      : Total magnetic quantum number, mj = -j, ..., j                   *
  * theta   : Polar angle (Zenitwinkel), theta in [0, pi]                      *
@@ -476,12 +476,12 @@ alkcalc_spinor alkcalc_Philsjmj(int32_t l, double j, double mj, double theta,
  * species : String specifying atom/ion species                               *
  * ni      : Principal quantum number of initial state (i)                    *
  * li      : Orbital angular momentum l = 0, 1, ..., n - 1, of (i)            *
- * si      : Spin of (i) (Not an argument, since we always have s = 1 / 2!)   *
+ * si      : Spin of (i) (Not an argument, since s = 1 / 2!)                  *
  * ji      : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  *           of (i)                                                           *
  * nf      : Principal quantum number of final state (f)                      *
  * lf      : Orbital angular momentum l = 0, 1, ..., n - 1 of (f)             *
- * sf      : Spin of (f) (Not an argument, since we always have s = 1 / 2!)   *
+ * sf      : Spin of (f) (Not an argument, since s = 1 / 2!)                  *
  * jf      : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  *           of (f)                                                           *
  * -------------------------------------------------------------------------- */
@@ -546,7 +546,7 @@ double alkcalc_fitof(const char *species, int32_t ni, int32_t li, double ji,
  * n       : Principal quantum number n = 1, 2, 3, ...                        *
  * dn      : Consider up to (including) n+dn for absorption                   *
  * l       : Orbital angular momentum l = 0, 1, ..., n - 1                    *
- * s       : Spin (Not an argument, since we always have s = 1 / 2!)          *
+ * s       : Spin (Not an argument, since s = 1 / 2!)                         *
  * j       : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
  * -------------------------------------------------------------------------- */
 double alkcalc_tau(double T, const char *species, int32_t n, int32_t dn,
@@ -865,8 +865,8 @@ static int64_t ns64imul(int32_t n, const int64_t *a) {
 static int64_t s64iadd(int64_t a, int64_t b) {
 
     /* It might look dangerous to do 'INT64_MIN-a' when 'a' can be equal to   *
-     * INT64_MIN. However, in the particular order we perform the             *
-     * subtraction, the C99 standard guarantees that the expression evaluates *
+     * INT64_MIN. However, in the particular order the subtraction is         *
+     * performed, the C99 standard guarantees that the expression evaluates   *
      * to zero (see Sec. 6.5.5 in Ref. [11]).                                 */
 
     if (a >= 0 && b <= INT64_MAX - a) { return a + b; }
@@ -897,7 +897,7 @@ static double complex Ylml(int32_t l, int32_t ml, double theta, double phi) {
     double pf, x, Pk, Pkm1, Pkm2;
     double complex ac, y;
 
-    /* Azimuthal contribution (here we still need the sign of ml) */
+    /* Azimuthal contribution (here, the sign of ml is still need) */
     ac = COMPLEX(cos(ml * phi), sin(ml * phi));
 
     /* Check input regime and react accordingly */
@@ -934,8 +934,8 @@ static double complex Ylml(int32_t l, int32_t ml, double theta, double phi) {
         } while (k++ < l);
     }
 
-    /* Assemble result (here we also include the phase, as noted above) */
-    y = (sml < 0) ? phase : 1.; /* Phase from 'ml -> -ml' conversion */
+    /* Assemble result (here, the phase is included, as noted above) */
+    y = (sml < 0) ? phase : 1.; /* Phase from conversion: ml -> -ml */
     y *= pf * Pk * ac;
 
     return y;

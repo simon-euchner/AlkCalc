@@ -11,7 +11,7 @@ just before the eigenproblem is solved. Expalin in README and theory.
 
 Stop marking variable with '...' and file names with '...'
 
-Stop using "we" in code (including FORTRAN package READMEs), and READMEs
+Stop using "we" in code READMEs
 
 Fix References in READMEs + code and align them with theory
 
