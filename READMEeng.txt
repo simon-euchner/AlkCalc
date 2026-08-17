@@ -324,7 +324,8 @@ Important additional information.
 
 References.
 
-    Note that also the references from the source code are listed here.
+    Note that also the references from the remaining files of AlkCalc are listed
+    here.
 
     [Mar2994] M. Marinescu, H. R. Sadeghpour, and A. Dalgarno, 'Dispersion
               coefficients for alkali-metal dimers', Phys. Rev. A 49, 982 (1994)
@@ -368,19 +369,15 @@ References.
               Applied Mathematics, Philadelphia, PA, 1999) 3rd ed.,
               ISBN: 0-89871-447-8
 
-    Additional references which appear in code, other README's, and data files
+    References which appear in the code, the other README's, and the data files
     of AlkCalc.
 
     [NISTcuu] 'The NIST Reference on Constants, Units, and Uncertainty',
-               URL: https://physics.nist.gov/cuu/Constants/
+              URL: https://physics.nist.gov/cuu/Constants/
 
+    [NISTaw]  'Atomic Weights and Isotopic Compositions with Relative Atomic
+              Masses', URL: https://www.nist.gov/pml/atomic-weights-and-isotopic
+              -compositions-relative-atomic-masses
 
-
-
-
-    [4] J. W. P. Wilkinson, K. Bolsmann, T. L. M. Guedes, M. M\"uller, and
-        I. Lesanovsky, New J. Phys. 27, 064502 (2025)
-    [5] 'NIST: National Institute of Standards and Technology (NIST)',
-        URL: https://www.nist.gov
-    [9] 'Commission on isotopic abundances and atomic weights (CIAAW)',
-        URL: https://www.ciaaw.org/lithium.htm
+    [NISTie]  'NIST Atomic Spectra Database Ionization Energies Data',
+              URL: https://physics.nist.gov/PhysRefData/ASD/ionEnergy.html

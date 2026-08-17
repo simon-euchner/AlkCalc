@@ -24,7 +24,7 @@ UNITS.
 
 $
 ID 1H
-DATA FROM REF. [5]
+DATA FROM REF. [NISTAW,NISTIE]
 ===
 L     K1           K2            K3           K4           RC           NL
 000   +000.0000    +000.0000     +000.0000    +000.0000    +001.0000    1
@@ -33,13 +33,12 @@ Z 1
 ZC 1
 ALPHAD 0.0
 M 1.00782503223(9)
-EGS -0.4997332541892
-
+EGS -0.4997332541892(7)
 
 
 $
 ID 4HE+
-DATA FROM REF. [5]
+DATA FROM REF. [NISTCUU,NISTAW,NISTIE]
 ===
 L     K1           K2            K3           K4           RC           NL
 000   +000.0000    +000.0000     +000.0000    +000.0000    +001.0000    1
@@ -47,14 +46,14 @@ L     K1           K2            K3           K4           RC           NL
 Z 2
 ZC 2
 ALPHAD 0.0
-M 3.99711745504(6)
-EGS -1.99981599748
+M 4.00205467422(6)
+EGS -1.99981599748(4)
 
 
 
 $
 ID 6LI
-DATA FROM REFS. [5,8,9]
+DATA FROM REFS. [MAR1994,NISTAW,NISTIE]
 ===
 L     K1           K2            K3           K4           RC           NL
 000   +2.47718079  +0.02169712   +1.84150932  -0.11988362  +0.61340824  2
@@ -65,13 +64,13 @@ Z 3
 ZC 1
 ALPHAD 0.1923
 M 6.0151228874(16)
-EGS -0.1981418715
+EGS -0.1981418715(8)
 
 
 
 $
 ID 39K
-DATA FROM REFS. [4-6]
+DATA FROM REFS. [MAR1994,NISTAW,NISTIE]
 ===
 L     K1           K2            K3           K4           RC           NL
 000   +3.56079437  +1.74701102   +1.83909642  -1.03237313  +0.83167545  4
@@ -82,14 +81,14 @@ L     K1           K2            K3           K4           RC           NL
 Z 19
 ZC 1
 ALPHAD 5.3310
-M 38.96370649(3)
-EGS -0.15951645
+M 38.9637064864(49)
+EGS -0.159516450(3)
 
 
 
 $
 ID 40CA+
-DATA FROM REFS. [4-6]
+DATA FROM REFS. [AYM1996,NISTUCC,NISTAW,NISTIE]
 ===
 L     K1           K2            K3           K4           RC           NL
 000   +004.0616    +0013.4912    +002.1539    +000.0000    +001.5736    4
@@ -100,14 +99,12 @@ L     K1           K2            K3           K4           RC           NL
 Z 20
 ZC 2
 ALPHAD 3.5
-M 39.957105064(22)
-EGS -0.43627762
-
-
+M 39.962042283(22)
+EGS -0.43627762(14)
 
 $
 ID 85RB
-DATA FROM REFS. [5,8]
+DATA FROM REFS. [MAR1994,NISTAW,NISTIE]
 ===
 L     K1           K2            K3           K4           RC           NL
 000   +3.69628474  +9.86069196   +1.64915255  +0.19579987  +1.66242117  5
@@ -118,14 +115,14 @@ L     K1           K2            K3           K4           RC           NL
 Z 37
 ZC 1
 ALPHAD 9.0760
-M 84.9117897360(54)
-EGS -0.15350663
+M 84.9117897379(54)
+EGS -0.15350663(5)
 
 
 
 $
 ID 88SR+
-DATA FROM REFS. [4-6]
+DATA FROM REFS. [AYM1996,NISTUCC,NISTAW,NISTIE]
 ===
 L     K1           K2            K3           K4           RC           NL
 000   +003.4187    +004.7332     +001.5915    +000.0000    +001.7965    5
@@ -136,14 +133,14 @@ L     K1           K2            K3           K4           RC           NL
 Z 38
 ZC 2
 ALPHAD 7.5
-M 87.9001267(12)
-EGS -0.40535519
+M 87.9050639(12)
+EGS -0.40535519(9)
 
 
 
 $
 ID 138BA+
-DATA FROM REFS. [4-6]
+DATA FROM REFS. [AYM1996,NISTUCC,NISTAW,NISTIE]
 ===
 L     K1           K2            K3           K4           RC           NL
 000   +003.0751    +002.6107     +001.2026    +000.0000    +002.6004    6
@@ -154,14 +151,14 @@ L     K1           K2            K3           K4           RC           NL
 Z 56
 ZC 2
 ALPHAD 11.4
-M 137.89976120(31)
-EGS -0.3676338
+M 137.90469842(31)
+EGS -0.3676338(5)
 
 
 
 $
 ID 226RA+
-DATA FROM REFS. [4-6]
+DATA FROM REFS. [AYM1996,NISTUCC,NISTAW,NISTIE]
 ===
 L     K1           K2            K3           K4           RC           NL
 000   +003.7702    +004.9928     +001.5179    +000.0000    +001.3691    7
@@ -173,5 +170,5 @@ L     K1           K2            K3           K4           RC           NL
 Z 88
 ZC 2
 ALPHAD 18.0
-M 226.0199245(25)
-EGS -0.3729019
+M 226.0248617(25)
+EGS -0.3729019(23)

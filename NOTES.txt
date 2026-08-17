@@ -1,10 +1,5 @@
 Update main READMEs
-    - Stop marking variable and file names with '...' in main READMEs
-    - Stop using "we" in main READMEs
     - j behaviour was unified with library functions)
-    - Explain what offset is for in settings and how to use it
     - Explain printing of condition number
 
-Fix References in main README's, rest of AlkCalc is done!
-
-Fix References in species.dat
+Write german README.
