@@ -72,7 +72,7 @@ Introduction.
     over the data underlying their research. More broadly, AlkCalc is for anyone
     who values transparent software: nothing is 'hidden', everything is laid out
     plainly, no unnecessarily complicated data formats are used (plain text
-    files only ), and the software remains simple and lightweight while still
+    files only), and the software remains simple and lightweight while still
     being complete --- complete in the sense that the eigenenergies and
     eigenstates can indeed be computed, so the problem is actually solved.
     AlkCalc is fully open source, and users are explicitly encouraged to inspect
@@ -128,7 +128,7 @@ Software requirements.
 
 Installation.
 
-    The installation process is split into seven steps.
+    The installation process is split into eight steps.
 
     1. Navigate to the directory GAUSSQ and run the Makefile. This builds the
        program GAUSSQ [Gol1969] (source code taken from Netlib [Don1987]), which
@@ -167,12 +167,12 @@ Installation.
        they could be stored on an external drive. On modern hardware, of course,
        disk space is usually not a concern.
 
-    6. Run the Makefile in the top-level directory of AlkCalc with the argument
+    7. Run the Makefile in the top-level directory of AlkCalc with the argument
        'lib'. This builds AlkCalc's library functions, which are the ones meant
        for end-user interaction. For a comprehensive reference manual of the
        library functions see theory/theory.pdf.
 
-    7. Before the library functions can be used, the associated data (i.e. the
+    8. Before the library functions can be used, the associated data (i.e. the
        eigenenergies and the radial eigenstates) must be computed. This process
        is described in the next section.
 
@@ -240,8 +240,8 @@ Data generation.
        associates the lowest possible eigenvalue hosted by the potential,
        physical or not, with nl (check data/energies-X-...). If the energy
        associated with nl is not the correct one, increment offset by one
-       (offset += 1) and run again 'make solve' (see point 3.). Do this until
-       all unphysical eigenvalues have been cut off. In practice, the unphysical
+       (offset += 1) and run again 'make solve' (see point 3). Do this until all
+       unphysical eigenvalues have been cut off. In practice, the unphysical
        eigenvalues are typically far off and easy to identify.
 
     3. Run the Makefile in the top-level directory AlkCalc with the argument
@@ -254,12 +254,12 @@ Data generation.
        mathematical bound, of the potential loss of precision, assuming that the
        Hamiltonian itself is well conditioned. Even so, it is useful for
        choosing the order of the B-splines, k, and the number of knots without
-       multiplicities, N. As a rule of thumb, one looses log10(kappa) many
+       multiplicities, N. As a rule of thumb, one looses roughly log10(kappa)
        digits, where kappa is the condition number of the mass matrix M (see
        theory/theory.pdf). For 64-bit floating-point arithmetic, one should try
-       to keep the condition number kappa less than ~1e6, so roughtly 10 digits
+       to keep the condition number kappa less than ~1e6, so roughly 10 digits
        of precision are left. Note that all of this is assuming H is
-       well-conditoned. Therefore, this calculation is more a rough estimate
+       well-conditioned. Therefore, this calculation is more a rough estimate
        than an exact estimation of the numerical error. In general, all numbers
        should be chosen within reason, so the results can be trusted.
 
