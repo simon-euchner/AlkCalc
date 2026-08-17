@@ -227,7 +227,7 @@ void alkcalc_fnlsj_eval(char *species, int32_t n, int32_t l, double j,
                         double *tevals, int32_t ltevals) {
 
     int32_t k, Nks, nderiv, i, ilo, ileft, mflag, a;
-    double *ts, *fnlsj, *vnikx, *work, teval;
+    double *ts, *fnlsj, *vnikx, *work, tmax, teval;
     alkcalc_state *state;
 
     /* Load requested radial eigenfunction */
@@ -242,26 +242,35 @@ void alkcalc_fnlsj_eval(char *species, int32_t n, int32_t l, double j,
     work = (double *)malloc(((k + 1) * (k + 2)) / 2 * sizeof(double));
 
     /* Overwrite entries of tevals with fnlsj(tevals) */
-    ilo = 1;
+    tmax = state->t[Nks - 1]; ilo = 1;
     for (i = 0; i < ltevals; i++) {
 
         /* Point at which to evaluate fnlsj */
         teval = tevals[i];
 
-        /* Find largest integer satisfying ts[ileft] <= teval */
-        dintrv_c(ts, &Nks, &teval, &ilo, &ileft, &mflag);
+        /* Check if tevel in [0, tmax] */
+        if (teval < 0 || teval > tmax) { /* Case where teval outside [0 tmax] */
+            ERROR("POINT TEVALS[I = %" PRId32 "] OUTSIDE OF [0, TMAX]", i);
+        } else
+        if (teval < tmax) { /* Case where teval < tmax */
 
-        /* Evaluate B-splines at teval */
-        dbspvd_c(ts, &k, &nderiv, &teval, &ileft, vnikx, work);
+            /* Find largest integer satisfying ts[ileft] <= teval */
+            dintrv_c(ts, &Nks, &teval, &ilo, &ileft, &mflag);
 
-        /* Compute fnlsj(teval) and store the result in tevals[i]             *
-         *                                                                    *
-         * On the interval [ts[ileft], ts[ileft + 1]] only the B-splines with *
-         * indices a = ileft - d, ..., ileft are non-zero, where d = k - 1 is *
-         * the polynomial degree of the B-splines.                            */
-        tevals[i] = 0.;
-        for (a = 0; a < k; a++) {
-            tevals[i] += fnlsj[ileft - 1 - (k - 1) + a] * vnikx[a];
+            /* Evaluate B-splines at teval */
+            dbspvd_c(ts, &k, &nderiv, &teval, &ileft, vnikx, work);
+
+            /* Compute fnlsj(teval) and store the result in tevals[i]         *
+             *                                                                *
+             * On the interval [ts[ileft], ts[ileft + 1]] only the B-splines  *
+             * with indices a = ileft - d, ..., ileft are non-zero, where     *
+             * d = k - 1 is the polynomial degree of the B-splines.           */
+            tevals[i] = 0.;
+            for (a = 0; a < k; a++) {
+                tevals[i] += fnlsj[ileft - 1 - (k - 1) + a] * vnikx[a];
+            }
+        } else { /* Case where teval = tmax */
+            tevals[i] = 0.;
         }
     }
 

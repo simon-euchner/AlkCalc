@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 
     /* Evaluate fnlsj at t in tevals */
     n = 4, l = 0, j = .5; ltevals = 6;
-    alkcalc_fnslj_eval("40CA+", n, l, j, tevals, ltevals);
+    alkcalc_fnlsj_eval("40CA+", n, l, j, tevals, ltevals);
 
     /* Print result */
     printf("%s\n", "t    fnlsj(t)");

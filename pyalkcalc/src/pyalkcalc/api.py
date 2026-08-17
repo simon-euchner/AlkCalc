@@ -247,7 +247,7 @@ def state_eval(
     j : float
         Total angular momentum quantum number j = |l - 1 / 2|, |l + 1 / 2|.
     tevals : NDArray[float64]
-        Array with points `t` in `[0, tmax)` at which to evaluate `fnlsj`. This
+        Array with points t in [0, `tmax`] at which to evaluate `fnlsj`. This
         array must have shape `(*,)`.
 
     Returns
