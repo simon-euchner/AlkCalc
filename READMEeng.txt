@@ -9,8 +9,8 @@
 
 Contact.
 
-    With doubts, questions, and/or suggestions, do not hesitate to contact the
-    author.
+    If you have doubts, questions, and/or suggestions, please do not hesitate
+    to contact the author.
 
         Simon Euchner
         Electronic mail: <euchner.se@gmail.com>
@@ -19,85 +19,85 @@ Contact.
 Introduction.
 
         Bound single-electron eigenfunctions of alkali-metal atoms and
-    alkaline-earth metal ions are of significant relevance in quantum computing,
+    alkaline-earth-metal ions are of significant relevance in quantum computing,
     quantum information processing, quantum simulation, Rydberg physics, quantum
-    optics, …. However, except for the special case of the Hydrogen atom and
-    hydrogenic ions, it is not possible to solve the time-independent
-    Schrödinger equation analytically. Because of this, there is the need to
-    obtain eigenenergies and eigenstates numerically. The library AlkCalc is
-    designed for exactly this purpose: it allows the user to compute the
-    relevant part of the bound-state energy spectrum as well as the associated
-    eigenstates.
+    optics, and more. However, except for the special case of the Hydrogen atom
+    and Hydrogenic ions, the time-independent Schrödinger equation cannot be
+    solved analytically. For this reason, eigenenergies and eigenstates must be
+    obtained numerically. The library AlkCalc is designed for exactly this
+    purpose: it allows the user to compute the relevant part of the bound-state
+    energy spectrum together with the associated eigenstates.
 
-        The software AlkCalc itself is split into two parts: the first part is
-    used to compute the eigenenergies and eigenstates once and store the
-    resulting data. The second part are the library functions. These functions
-    implement useful functionality for reading and processing the precomputed
-    atomic structure data. For instance, there are functions to compute radial
-    transition matrix elements and oscillator strengths.
+        AlkCalc itself is split into two parts. The first part computes the
+    eigenenergies and eigenstates once and stores the resulting data. The second
+    part consists of the library functions, which implement useful functionality
+    for reading and processing the precomputed atomic structure data. For
+    instance, these functions can compute radial transition matrix elements and
+    oscillator strengths.
 
-        AlkCalc is very much 'hands-on' in the sense that it is simple enough to
-    directly interact with the source code. Further, because it is written in a
-    low-level language conforming strictly to the C99 standard, it is virtually
-    platform independent. Importantly, since high-level languages typically come
-    with easy-to-use protocols to call C code (e.g. ctypes or Cython for
-    Python), it is straight-forward to write an interface to the high-level
-    language of choice (for instance Python, Julia, Matlab, etc. --- whatever is
-    popular these days). Therefore, AlkCalc shall not solely be viewed as a
-    ready-to-use software package, but further as the basis for the development
-    of other software packages written in high-level languages.
+        AlkCalc is very much 'hands-on', in the sense that it is simple enough
+    to interact directly with the source code. Furthermore, because it is
+    written in a low-level language conforming strictly to the C99 standard, it
+    is virtually platform-independent. Since high-level languages typically
+    offer easy-to-use protocols for calling C code (e.g. ctypes or Cython for
+    Python), it is straightforward to write an interface to the high-level
+    language of one's choice (for instance Python, Julia, MATLAB, etc. ---
+    whatever is popular these days). AlkCalc should therefore not be seen solely
+    as a ready-to-use software package, but also as a basis for developing other
+    software packages written in high-level languages. An interface for Python
+    is already provided by AlkCalc (see AlkCalc/pyalkcalc).
 
         To model the atoms and ions, AlkCalc employs so-called parametric model
-    potentials, in particular those introduced in 1994 by Marinescu et al. in
-    Ref. [Mar1994] and 1996 by Aymar et al. in Ref. [Aym1996]. These parametric
-    model potentials are described in detail in theory/theory.pdf. AlkCalc does
-    not require quantum defect
-    theory, as is the case for typical packages treating Rydberg atoms, such as
-    ARC [Sib2017] or PairInteraction [Web2017]. AlkCalc computes everyting
-    self-consistently
-    from the parametric model potentials. This has the big advantage that
-    AlkCalc is not restricted to high principal quantum numbers, where quantum
-    defect theory becomes accurate, but is just as well allows to work with
-    low-lying states. To keep the interface clean and simple, all parameters
-    associated with the parametric model potentials are included in a single
-    text file. In this context, note that all data associated with AlkCalc is
-    stored in simple text files as well. This has the advantage of not
-    introducing additional software requirements to read binary data formats and
-    alike.
+    potentials, in particular those introduced in 1994 by Marinescu et
+    al. in Ref. [Mar1994] and in 1996 by Aymar et al. in Ref. [Aym1996]. These
+    parametric model potentials are described in detail in theory/theory.pdf.
+    Unlike typical packages for treating Rydberg atoms, such as ARC [Sib2017]
+    or PairInteraction [Web2017], AlkCalc does not rely on quantum defect
+    theory. Instead, AlkCalc computes everything self-consistently from the
+    parametric model potentials. This has the major advantage that AlkCalc is
+    not restricted to high principal quantum numbers, where quantum defect
+    theory becomes accurate, but works equally well for low-lying states.
+    Further it has the advantage that AlkCalc is essentially able to solve and
+    problem with radial symmetry, because it does not rely on quantum defects.
+    AlkCalc natively included both Rydberg states in neutral and AND ions,
+    unlike ARC and PairInteraction. To keep the interface clean and simple, all
+    parameters associated with the parametric model potentials are collected in
+    a single text file. In fact, all data associated with AlkCalc is stored in
+    plain text files, which has the advantage of not introducing additional
+    software requirements for reading binary data formats and the like.
 
-        Ultimately, the software AlkCalc is designed for researchers who value
-    full control over the data for their research. More broadly, AlkCalc is for
-    everyone who values transparent software: nothing is 'hidden', everything is
-    laid out, no unnecessarily complicated data formats are used (all text
-    files), and the software is simple and lightweight while retaining
-    completeness; that is, the eigenenergies and eigenstates can be computed,
-    i.e., the problem is solved! AlkCalc is completely open source and the user
-    is definitely encouraged to look at and interact with the source code.
-    Finally, AlkCalc virtually does not come with dependencies, expect for a C
-    and a FORTRAN compiler and a C library. This is because all other external
-    software is built directly into AlkCalc itself, using decade-long tested
-    code from Netlib [Don1987].
+        Ultimately, AlkCalc is designed for researchers who value full control
+    over the data underlying their research. More broadly, AlkCalc is for
+    anyone who values transparent software: nothing is 'hidden', everything is
+    laid out plainly, no unnecessarily complicated data formats are used (all
+    text files), and the software remains simple and lightweight while still
+    being complete --- that is, the eigenenergies and eigenstates can indeed
+    be computed, so the problem is actually solved. AlkCalc is fully open
+    source, and users are explicitly encouraged to inspect and interact with
+    the source code. Finally, AlkCalc comes with virtually no external
+    dependencies beyond a C compiler, a FORTRAN compiler, and a C library.
+    This is because all other required software is built directly into
+    AlkCalc itself, using decades-tested code from Netlib [Don1987].
 
-        In addition to this README, the file theory/theory.pdf provides an
+        In addition to this README, the file theory/theory.pdf provides a
     thorough introduction to the physics of the single-atom and single-ion
-    Hamiltonians which AlkCalc is designed to diagonalise. Further, it constains
-    a full description of the numerical (B-spline) method employed by AlkCalc to
+    Hamiltonians that AlkCalc is designed to diagonalise. It also contains a
+    full description of the numerical (B-spline) method AlkCalc uses to
     reduce the radial eigenvalue problem to a generalised matrix eigenvalue
     problem. Finally, theory/theory.pdf includes a comprehensive reference
-    manual for the library functions of AlkCalc, including all the information
-    the user may need.
+    manual for AlkCalc's library functions, covering all the information a
+    user may need.
 
 
 Structure of this README.
 
-        This README file is organised into the following sections. In the
-    section 'Software requirements' the required external software is listed. In
-    the section 'Installation' instructions are provided on how to correctly
-    install and set up AlkCalc. In the section 'Data generation' it is explained
-    how the eigenenergies and radial eigenstates are computed and stored with
-    AlkCalc. Finally, in the section 'Important additional information'
-    tehcnical aspects are discussed, which should be taken into consideration
-    before employing AlkCalc.
+        This README is organised into the following sections. The section
+    'Software requirements' lists the required external software. The section
+    'Installation' provides instructions for correctly installing and setting
+    up AlkCalc. The section 'Data generation' explains how the eigenenergies
+    and radial eigenstates are computed and stored with AlkCalc. Finally, the
+    section 'Important additional information' discusses technical aspects
+    that should be taken into consideration before using AlkCalc.
 
 
 Software requirements.
@@ -114,16 +114,16 @@ Software requirements.
     -----------------------------------------------------------------------
 
     - AlkCalc conforms to the C99 standard, Ref. [C99], with the additional
-      assumption that the fixed-width integer types, int8_t, int32_t, and
-      int64_t are defined. The C99 standard defines these types as optional (see
-      Sec. 7.18.1.1 in Ref. [C99]). However, most modern C libraries (e.g. GNU's
-      C library) define these types, and the C99 standard ensures that, if these
-      types are defined, they are two's-complement represented and come without
-      padding (see Sec. 7.18.1.1 in Ref. [C99]). AlkCalc makes use of these types
-      and their properties for definiteness and to simplify overflow checks in
-      integer arithmetic. If the fixed-width integer types are not defined on
-      the system (with a C library conforming to C99 standard), the compiler
-      throws an error.
+      requirement that the fixed-width integer types int8_t, int32_t, and
+      int64_t be defined. The C99 standard treats these types as optional
+      (see Sec. 7.18.1.1 in Ref. [C99]). However, most modern C libraries
+      (e.g. GNU's C library) define them, and the C99 standard guarantees
+      that, where these types are defined, they use two's-complement
+      representation without padding bits (see Sec. 7.18.1.1 in Ref. [C99]).
+      AlkCalc relies on these types and their properties for definiteness and
+      to simplify overflow checks in integer arithmetic. If the fixed-width
+      integer types are not defined on your system the compiler will raise an
+      error.
 
 
 Installation.
@@ -131,209 +131,204 @@ Installation.
     The installation process is split into seven steps.
 
     1. Navigate to the directory GAUSSQ and run the Makefile. This builds the
-       program GAUSSQ [Gol1969] (source code taken from Netlib [Don1987]), which
-       is used to compute Gaußian quadratures. The Makefile is written for GNU
-       make. If GNU make is not available on your system, just adjust the
-       Makefile accordingly, or manually execute the steps of the Makefile.
+       program GAUSSQ [Gol1969] (source code taken from Netlib [Don1987]),
+       which is used to compute Gaussian quadratures. The Makefile is written
+       for GNU make. If GNU make is not available on your system, simply
+       adjust the Makefile accordingly, or manually carry out the steps it
+       performs.
 
-    2. Navigate to the directory BSPLINES and run the Makefile (regarding the
-       Makefile, the same conditions apply as in step 1). This builds the
-       a version of de Boor's algorith [dBo2001] written by D. E. Amos
-       [Amo1993].
+    2. Navigate to the directory BSPLINES and run the Makefile (the same
+       conditions as in step 1 apply to the Makefile). This builds a version
+       of de Boor's algorithm [dBo2001] written by D. E. Amos [Amo1993].
 
-    3. Navigate to the directory EIGLAPACK and run the Makefile (regarding the
-       Makefile, the same conditions apply as in step 1). This builds the
-       eigensolvers DSBGVX and DSBEVX, which are part of LAPACK [And1999]
-       (source code taken from Netlib [Don1987]).
+    3. Navigate to the directory EIGLAPACK and run the Makefile (again, the
+       same conditions as in step 1 apply). This builds the eigensolvers
+       DSBGVX and DSBEVX, which are part of LAPACK [And1999] (source code
+       taken from Netlib [Don1987]).
 
-    4. Navigate to the directory interface and set the variable PATH_TO_STATES,
-       which defines the location to which the data for the radial eigenstates
-       will be written. Typically, it is fine to store the data in AlkCalc's
-       data directory directly.
+    4. Navigate to the directory AlkCalc/interface and set the variable
+       PATH_TO_STATES, which defines the location to which the data for the
+       radial eigenstates will be written. Typically, it is fine to store
+       this data directly in AlkCalc's data directory.
 
 --- Note (*)
 
-    5. Navigate to the directory MVMBLAS and run the Makefile (regarding the
-       Makefile, the same conditions apply as in step 1). This builds the
-       routine DSBMV, which is a BLAS level-2 routine. This routine is included
-       in LAPACK [And1999,Don1987] and allows to compute matrix-vector products
-       effeiciently.
+    5. Navigate to the directory MVMBLAS and run the Makefile (the same
+       conditions as in step 1 apply). This builds the routine DSBMV, a BLAS
+       level-2 routine. This routine is part of LAPACK [And1999,Don1987] and
+       allows matrix-vector products to be computed efficiently.
 
-    6. Navigate to the directory AlkCalc/interface and set the relevant paths in
-       the file alkcalk.h. The variable PATH_TO_ALKCALC must be the absolute
-       path to the place where the directory AlkCalc is located. The variable
+    6. Navigate to the directory AlkCalc/interface and set the relevant paths
+       in the file alkcalk.h. The variable PATH_TO_ALKCALC must be the absolute
+       path to the location of the AlkCalc directory. The variable
        PATH_TO_STATES defines where the radial eigenstates will be read from.
-       The radial eigenstates may take some disk space (~5 GB), which, on legacy
-       hardware can be problematic. The freedom to choose the location where the
-       radial eigenstates are stored allows for more flexibility; for example,
-       one could store the radial eigenstates on an external drive. Of course,
-       on modern hardware, disk-space is usually not an issue anymore.
+       The radial eigenstates can take up a fair amount of disk space (~5 GB),
+       which may be an issue on legacy hardware. Being free to choose where the
+       radial eigenstates are stored gives more flexibility here; for example,
+       they could be stored on an external drive. On modern hardware, of course,
+       disk space is usually not a concern.
 
-    6. Run the Makefile in the directory AlkCalc with the argument lib. This
-       builds the library functions of AlkCalc, which are the ones meant for
-       end-user interaction. For a comprehensive reference manual of the library
-       functions see theory/theory.pdf.
+    6. Run the Makefile in the top-level AlkCalc directory with the argument
+       'lib'. This builds AlkCalc's library functions, which are the ones
+       meant for end-user interaction. For a comprehensive reference manual
+       of the library functions, see theory/theory.pdf.
 
-    7. To use the library functions, the associated data, i.e., eigenenergies
-       and radial eigenstates, must be computed first. This process is described
-       in the next section.
+    7. Before the library functions can be used, the associated data (i.e.
+       the eigenenergies and radial eigenstates) must first be computed. This
+       process is described in the next section.
 
-(*) This marks the point at which the eigenenergies and radial eigenstates can
-    be computed. The following steps are only required if the library functions
-    of AlkCalc (see theory/theory.pdf for a comprehensive documentation of the
-    library functions) are desired.
+(*) This marks the point at which the eigenenergies and radial eigenstates
+    can already be computed. The steps that follow are only required if
+    AlkCalc's library functions (see theory/theory.pdf for comprehensive
+    documentation of the library functions) are also needed.
 
 
 Data generation.
 
-        In this section it is described how AlkCalc is used to (partially)
-    diagonalise the full single-atom or single-ion Hamiltonian presented in the
-    theory part in theory/theory.pdf. This part of AlkCalc is intended for
-    data generation (eigenenergies and radial eigenstates) which the library
-    functions (see Sec. Installation) call. In the following the focus is on
-    the atom or ion species X. The four steps below describe how the data, i.e.,
-    the eigenenergies and radial eigenstates, for X are generated using
-    AlkCalc.
+        This section describes how AlkCalc is used to diagonalise the full
+    single-atom or single-ion Hamiltonian presented in theory/theory.pdf. This
+    part of AlkCalc is intended for generating the data (eigenenergies and
+    radial eigenstates) that the library functions (see Sec. Installation) rely
+    on. In what follows, the focus is on a generic atom or ion species X. The
+    four steps below describe how the data for X is generated using AlkCalc.
 
     1. Navigate to the directory AlkCalc/interface and open the file
-       species.dat. Make sure that this file contains the necessary data for the
+       species.dat. Make sure this file contains the necessary data for the
        species X. When adding a new species, make sure to keep the formatting
-       correct (cf. the already available entries). For adding new species,
-       please note the following rules and assumptions:
+       consistent with the existing entries. When adding new species, please
+       observe the following rules and assumptions:
 
-          (1) Make sure that the entries are sorted in ascending order of the
-              orbital angular momentum quantum number, e.g., placing data for P
-              states before data for F states.
+          (1) Make sure entries are sorted in ascending order in the orbital
+              angular momentum quantum number, e.g., data for P states must
+              be placed before data for F states.
 
-          (2) Data for some orbital angular momentum quantum numbers can be
-              skipped, e.g., it is valid to have data only for P, D, and G
-              states. This can be useful when, for instance, only P states or
+          (2) Data for some orbital angular momentum quantum numbers may be
+              omitted, e.g., it is valid to provide data only for P, D, and G
+              states. This is useful when, for instance, only P states or
               specific circular states are of interest.
 
           (3) There must be data for at least one orbital angular momentum
               quantum number in species.dat.
 
-          (4) Suppose an orbital angular momentum quantum number, l, is
-              requested in settings.c, which is larger than the largest one, l0,
-              specified in species.dat. For l > l0, AlkCalc internally uses l
-              but with the data in species.dat associated with l0. Note that
-              this behaviour is aligned with Refs. [Mar1994,Aym1996].
+          (4) Suppose an orbital angular momentum quantum number l is
+              requested in settings.c that is larger than the largest one, l0,
+              specified in species.dat. For l > l0, AlkCalc internally uses l,
+              but with the data associated with l0 in species.dat. Note that
+              this behaviour is consistent with Refs. [Mar1994,Aym1996].
 
           (5) In species.dat, a minimum principal quantum number, nl, is
               specified for each l. There are two possibilities: either nl
-              follows the Hydrogenic law (i.e., nl = l + 1) or nl is anomalous
-              in the sense that nl > l + 1. The correct nl can be extracted
+              follows the hydrogenic law (i.e., nl = l + 1), or nl is anomalous
+              in the sense that nl > l + 1. The correct nl can be read off
               directly from the configuration of the atom or ion species. For
               example, Rubidium has the configuration [Kr]5s1, meaning that for
               S states (l = 0), nl = n0 = 5 > 0 + 1. This is the anomalous case
-              and must be specified in species.dat explicitly. When data for a
+              and must be specified explicitly in species.dat. When data for a
               requested orbital angular momentum quantum number is not supplied
               explicitly in species.dat, AlkCalc internally assumes the
               Hydrogenic law (i.e., nl = l + 1).
 
     2. Open the file settings.c and set the parameters. The species identifier
-       which refers to the species X is defined in species.dat. There is one
-       important parameter, offset, which must be chosen manually with some
-       care. This parameter controls the eigenenergy which is associated with
-       the minimal principal quantum number nl. It is needed because for
-       anomalous nl it can be the case that the lowest computed eigenergy is not
-       the correct one. It can happen that the potenial hosts eigenenergies
-       which are lower than the actualy ground-state energy. It can also happen
-       that when the generalised eigenvalue problem is badly conditioned,
-       extremely negative unphysical eigenvalue emerge. To cut off these
-       eigenvalues the procedure is as follows: choose offset = -nl. In this
-       case, the lowest possible eigenvalue is shown. If this result is not the
-       correct one (in practice, the unphysical eigenvalue are typically far off
-       and easiy to identify), then increment offset += 1 by one until all
-       unphysical eigenvalue are cut off and the correct eigenvalue for nl is
-       reached.
+       referring to species X is defined in species.dat. One particularly
+       important parameter, offset, must be chosen manually and with some care.
+       It controls which eigenenergy is associated with the minimal principal
+       quantum number nl. This is necessary because, for anomalous nl, the
+       lowest computed eigenenergy is not always the correct one: the potential
+       can host eigenenergies lower than the actual ground-state energy, and if
+       the generalised eigenvalue problem is badly conditioned, extremely
+       negative, unphysical eigenvalues can also appear. To eliminate these
+       unwanted eigenvalues, proceed as follows: start with offset = -nl. This
+       shows the lowest possible eigenvalue. If the result is not the correct
+       one (in practice, the unphysical eigenvalues are typically far off and
+       easy to identify), increment offset by one (offset += 1) until all
+       unphysical eigenvalues have been cut off and the correct eigenvalue for
+       nl is reached.
 
     3. Run the Makefile in the top-level directory AlkCalc with the argument
-       'solve'. This will generate the eigenenergies and radial eigenstates. The
-       radial eigenstates are stored in a user-specified location (see
-       Sec. Installation) and the eigenenergies are stored in AlkCalc data
+       'solve'. This generates the eigenenergies and radial eigenstates. The
+       radial eigenstates are stored in the user-specified location (see
+       Sec. Installation), and the eigenenergies are stored in AlkCalc's data
        directory.
 
        IMPORTANT: Depending on the maximum desired principal quantum number,
-                  choose rmax large enough and keep in mind that larger core
-                  charges result in radial eigenstates with support at smaller
-                  distances, that is, typically, rmax must be larger for atoms
-                  compared to ions.
+                  choose rmax large enough, and keep in mind that larger core
+                  charges result in radial eigenstates with support at
+                  smaller distances --- that is, rmax typically needs to be
+                  larger for atoms than for ions.
 
-    4. From now on, KEEP THE PARAMETERS species, k, N, nmax, and rmax in
-       interface/settings.c FIXED, and only change the orbital (l) and total
-       angular momentum (j) quantum numbers. For each desired pair (l, j)
-       generate the eigenenergies and the radial eigenstates by running the
-       Makefile with the argument 'solve'. Importantly, note that it might be
-       necessary to adjust the offset parameter for each pair (l, j).
+    4. From this point on, keep the parameters species, k, N, nmax, and rmax
+       in interface/settings.c FIXED, and change only the orbital, l, and total
+       angular momentum quantu number, j. For each desired pair (l, j), generate
+       the eigenenergies and radial eigenstates by running the Makefile with the
+       argument 'solve'. Note that it may be necessary to adjust the offset
+       parameter for each pair (l, j) individually.
 
-       IMPORTANT: The knotdata (knot vector and step sizes; see
-                  theory/theory.pdf) is stored in AlkCalc data directly for each
-                  species exactly ONCE. Therefore, after testing different
+       IMPORTANT: The knot data (knot vector and step sizes; see
+                  theory/theory.pdf) is stored exactly ONCE per species in
+                  AlkCalc's data directory. Therefore, after testing different
                   settings for the associated parameters, delete this file
-                  manually. It will then be regenerated ONCE for the finally
-                  selected parameters. This might sound somewhat convoluted but
-                  can be summarized as follows:
+                  manually. It will then be regenerated exactly ONCE for the
+                  finally chosen parameters. This may sound somewhat convoluted,
+                  but can be summarised as follows:
 
-                  - Check if the eigenenergies are computed to reasonable
-                    precision by testing different parameters, k, N, and rmax,
-                    as described above (point 3).
+                  - Check whether the eigenenergies are computed to a reasonable
+                    precision by testing different values of the parameters k,
+                    N, and rmax.
 
-                  - Once finished, keep the parameters k, N, and rmax fixed for
-                    all pairs (l, j), and before generating the first set of
-                    eigenenergies and radial eigenstates, delete the file
-                    containing the knotdata data in AlkCalc/data. When the
-                    eigensolver is run for the next pair (l, j), the file
-                    containing the discretisation data is NOT overwritten --- it
-                    is only regenerated in case AlkCalc could not locate the
-                    data file with the knotdata, i.e., if it was deleted.
+                  - Once satisfied, keep the parameters k, N, and rmax fixed
+                    for all pairs (l, j), and, before generating the first
+                    set of eigenenergies and radial eigenstates, delete the
+                    file containing the knot data in AlkCalc/data. When the
+                    eigensolver is subsequently run for the next pair (l, j),
+                    the file containing the discretisation data is NOT
+                    overwritten --- it is only regenerated if AlkCalc cannot
+                    locate the knot-data file, i.e., if it was deleted
+                    beforehand.
 
 
 Important additional information.
 
     - By default, the mass correction factor C from theory/theory.pdf is set to
       unity in the source code in src/eigensolver.c, that is, the reduced mass
-      is approximated to be the electron's mass. This is due to the fact that
-      the parameters for the parametric model potential (see
-      Refs. [Mar1994,Aym1996]) have been computed without the mass correction.
-      This one concludes from the fact that the computed ground state energies
-      fit the ideal values for the ionisation energy better when the mass
-      correction is omitted. If model parameters obtained WITH the mass
-      correction are employed, one must include the mass correction in the
-      source code as well. This amounts to uncommenting one line (and commenting
-      out another one) in the file src/potential.c (please see also the
-      explanation in this file).
+      is approximated by the electron mass. This is because the parameters for
+      the parametric model potential (see Refs. [Mar1994,Aym1996]) were computed
+      without the mass correction: the computed ground-state energies fit the
+      ideal ionisation-energy values better when the mass correction is omitted.
+      If model parameters obtained WITH the mass correction are used instead,
+      the mass correction must also be included in the source code. This amounts
+      to uncommenting one line (and commenting out another) in the file
+      src/potential.c (see also the explanation given there).
 
-    - Alkcalc includes the Hydrogen atom (1H) and the Helium ion (4HE+). Both
-      including Russell-Saunders (LS) coupling and, by default, NO mass
-      correction. These species are provided to benchmark results for both atoms
-      and ions. Note that LS-coupling is weak, in particular for small orbital
-      angular momentum quantum numbers and small n, such that to test if the
-      settings for the eigensolver in interface/settings.c are reasonable, it is
-      usually sufficient to compare the eigenenergies to the analytical result
-      for 1H and 4HE+ without LS-coupling.
+    - AlkCalc includes the Hydrogen atom (1H) and the Helium ion (4HE+), both
+      with Russell-Saunders (LS) coupling and, by default, NO mass correction.
+      These species are provided to benchmark results for both atoms and ions.
+      Note that LS coupling is weak, in particular for small orbital angular
+      momentum quantum numbers and small n; consequently, to check whether the
+      eigensolver settings in interface/settings.c are reasonable, it is usually
+      sufficient to compare the eigenenergies to the analytical result for 1H
+      and 4HE+ without LS coupling.
 
     - By default, AlkCalc uses step sizes that increase linearly over the
-      interval [0, rmax]. However, this can be adjusted by altering the function
-      step in src/eigensolver.c. More information can be found directly in the
-      corresponding source code.
+      interval [0, rmax]. This can be adjusted by modifying the function
+      step in src/eigensolver.c; more information can be found directly in
+      the corresponding source code.
 
-    - All ion masses in the file interface/species.dat are the full atom's mass
-      MINUS the mass of the removed electrons.
+    - All ion masses given in the file interface/species.dat are the full
+      atom's mass MINUS the mass of the removed electron(s).
 
 
 References.
 
-    Note that also the references from the remaining files of AlkCalc are listed
+    Note that references from the remaining files of AlkCalc are also listed
     here.
 
-    [Mar2994] M. Marinescu, H. R. Sadeghpour, and A. Dalgarno, 'Dispersion
+    [Mar1994] M. Marinescu, H. R. Sadeghpour, and A. Dalgarno, 'Dispersion
               coefficients for alkali-metal dimers', Phys. Rev. A 49, 982 (1994)
 
     [Aym1996] M. Aymar, C. H. Greene, E. Luc-Koenig, 'Multichannel Rydberg
               spectroscopy of complex atoms', Rev. Mod. Phys. 68, 1015 (1996)
 
-    [Sib2017] N. Šibalić, J. D. Pritchard, C. S. Adams, and K. J. Weatherill,
+    [Sib2017] N. Šibalić, J. D. Pritchard, C. S. Adams, and K. J. Weatherill,
               'ARC: An open-source library for calculating properties of alkali
               Rydberg atoms', Comput. Phys. Commun. 220, 319–-331 (2017)
 
@@ -354,11 +349,11 @@ References.
     [C99]     'INTERNATIONAL STANDARD ISO/IEC 9899:1999(E)' (American National
               Standard Institute, New York, 1999) 2nd ed.
 
-    [Gol1969] G. H. Golub and J. H. Welsch, 'Calculation of Gauß Quadrature
+    [Gol1969] G. H. Golub and J. H. Welsch, 'Calculation of Gauss Quadrature
               Rules', Math. Comp. 23, 221--230 (1969)
 
     [dBo2001] C. de Boor, 'A Practical Guide to Splines' (Springer, New York,
-              2001) 1sr ed., ISBN: 978-0-387-95366-3
+              2001) 1st ed., ISBN: 978-0-387-95366-3
 
     [Amo1993] D. E. Amos, 'Implementation of de Boor's algorithm',
               URL: http://www.netlib.org/slatec/src/dbspvd.f
@@ -369,8 +364,8 @@ References.
               Applied Mathematics, Philadelphia, PA, 1999) 3rd ed.,
               ISBN: 0-89871-447-8
 
-    References which appear in the code, the other README's, and the data files
-    of AlkCalc.
+    References which appear in the code, the other READMEs, and the data
+    files of AlkCalc.
 
     [NISTcuu] 'The NIST Reference on Constants, Units, and Uncertainty',
               URL: https://physics.nist.gov/cuu/Constants/
