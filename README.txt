@@ -333,13 +333,13 @@ Important additional information.
       set. This quantum number takes half-integer values. There is always a
       decision to be made when dealing with half-integer quantum numbers
       numerically. Here, the following agreement is made: to 'clean up' the
-      numerical value it is understood that 2 * j is equivalent to
-      floor(2.0 * j + 0.5). The 'floor' function is defined as floor(x) = k in
-      the non-negative integers (x real number), where k is the unique integer
-      such that x lais within the half-open interval [k, k + 1). In practice,
-      this means that for any j in [0.25, 0.75) AlkCalc internally uses
-      j = 1 / 2, for any j in [1.25, 1.75) AlkCalc internally uses j = 3 / 2,
-      and so on.
+      numerical value it is understood that the integer 2 * j is taken to be
+      equal to floor(2.0 * j + 0.5). The floor function is defined as floor(x) =
+      k in the non-negative integers (x real number), where k is the unique
+      integer such that x lais within the half-open interval [k, k + 1). In
+      practice, this means that for any j in [0.25, 0.75) AlkCalc internally
+      uses j = 1 / 2, for any j in [1.25, 1.75) AlkCalc internally uses j =
+      3 / 2, and so on.
 
 
 References.
