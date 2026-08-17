@@ -42,7 +42,7 @@ static double thermal_photon_occupation(double, double);
 static void nextrm(const char *, int32_t *, int32_t *, int32_t, double);
 
 /* -------------------------------------------------------------------------- *
- * Eigenenergy in units of Hartree (27.211386245981(30) eV Ref. [5])          *
+ * Eigenenergy in units of Hartree (27.211386245981(30) eV Ref. [NISTcuu])    *
  * (see theory/theory.pdf, section Manual)                                    *
  *                                                                            *
  * species : String specifying atom/ion species                               *
@@ -760,7 +760,7 @@ SkipedSState:
      *                                                                        *
      * The conversion factor used below is 2 * alpha**3 * EH / hbar, where    *
      * alpha is the fine-structure constant, EH is the Hartree, and hbar is   *
-     * the reduced Planck constant; for their values, see Ref. [5].           */
+     * the reduced Planck constant; for their values, see Ref. [NISTcuu].     */
     tau = 1. / (32.1300103 * Gamma);
 
     return tau;
@@ -925,7 +925,7 @@ static int64_t s64iadd(int64_t a, int64_t b) {
     /* It might look dangerous to do INT64_MIN - a when a can be equal to     *
      * INT64_MIN. However, in the particular order the subtraction is         *
      * performed, the C99 standard guarantees that the expression evaluates   *
-     * to zero (see Sec. 6.5.5 in Ref. [11]).                                 */
+     * to zero (see Sec. 6.5.5 in Ref. [C99]).                                */
 
     if (a >= 0 && b <= INT64_MAX - a) { return a + b; }
     if (a < 0 && a >= INT64_MIN && b >= INT64_MIN - a) { return a + b; }
@@ -1016,7 +1016,7 @@ static double thermal_photon_occupation(double hnu, double T) {
      *                                                                        *
      * - Photon energy h x nu (hnu) in units of Hartree (EH)                  *
      * - Temperature T in units of Kelvin (K)                                 */
-    r = hnu / (3.166811e-6 * T); /* For Boltzmann's constant see Ref. [5] */
+    r = hnu / (3.166811e-6 * T); /* Boltzmann's constant, see Ref. [NISTcuu] */
 
     /* Compute photon occupation number according to Planck's law */
     if (r < cbrt(720. * DBL_EPSILON)) { /* High T */

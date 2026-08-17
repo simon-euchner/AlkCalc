@@ -59,7 +59,7 @@ typedef struct alkcalc_spinor_s {
 } alkcalc_spinor;
 
 /* -------------------------------------------------------------------------- *
- * Eigenenergy in units of Hartree (27.211386245981(30) eV Ref. [5])          *
+ * Eigenenergy in units of Hartree (27.211386245981(30) eV Ref. [NISTcuu])    *
  * (see theory/theory.pdf, section Manual)                                    *
  *                                                                            *
  * species : String specifying atom/ion species                               *

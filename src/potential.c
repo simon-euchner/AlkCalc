@@ -10,15 +10,15 @@
  *                                                                            *
  * Here, VC is a modified Coulomb potential, VP accounts for the              *
  * polarisability of the effective nucleus, and VR describes relativistic     *
- * spin-orbit coupling. For more information refer to Refs. [4,6,9,10].       *
+ * spin-orbit coupling. For more information refer to theory/theory.pdf.      *
  *                                                                            *
  * Units.                                                                     *
  *                                                                            *
  *     Charge : e > 0 (elementary charge)                                     *
  *     Mass   : me (electron's mass)                                          *
  *     Length : aB = hbar / (m * c * alpha) (Bohr's radius)                   *
- *     Energy : e**2 / (4 * pi * aB * varepsilon_0) = 27.211386245988(53) eV  *
- *              (Hartree), see Ref. [5].                                      *
+ *     Energy : e**2 / (4 * pi * aB * varepsilon_0) = 27.211386245981(30) eV  *
+ *              (Hartree), see Ref. [NISTcuu].                                *
  *                                                                            *
  * Each atom/ion species comes with a set of parameters (k1, k2, ...) that    *
  * fix the parametric model potential. In rpar the double precision and in    *
@@ -27,14 +27,14 @@
  * ipar : integer parameters                                                  *
  * rpar : (real) double precision parameters                                  *
  *                                                                            *
- * For a definition of the parameters see Refs. [6,9].                        *
+ * For a definition of the parameters see Refs. [Mar1994,Aym1996].            *
  * -------------------------------------------------------------------------- */
 
 #include "../inc/eigensolver.h"
 #include "../interface/settings.h"
 
-#define FC 0.0072973525643 /* Fine-strct. cnst., 0.0072973525643(11) Ref. [5] */
-#define ME 0.0005485799090441 /* me, 0.0005485799090441(97) u Ref. [5] */
+#define FC 0.0072973525643 /* Fine-str. cnst., 0.0072973525643(11) [NISTcuu] */
+#define ME 0.0005485799090441 /* me, 0.0005485799090441(97) u [NISTcuu] */
 #define SPECIES_DATA "./interface/species.dat"
 
 /* -------------------------------------------------------------------------- *
@@ -51,19 +51,19 @@
  *                       l-value from the global variable settings.)          *
  *     ipar[3], nl     : Minimal principal quantum number for series l (This  *
  *                       is the nl-value from the global variable settings.)  *
- *     rpar[0], k1     : Fitting parameter, see Ref. [1], units of 1 / aB     *
- *     rpar[1], k2     : Fitting parameter, see Ref. [1], units of 1 / aB     *
- *     rpar[2], k3     : Fitting parameter, see Ref. [1], units of 1 / aB     *
- *     rpar[3], k4     : Fitting parameter, see Ref. [1], units of 1 / aB**2  *
- *     rpar[4], rc     : Cut-off radius, see Ref. [1], units of aB            *
- *     rpar[5], alphaD : Polarisability, see Ref. [1], units of               *
+ *     rpar[0], k1     : Parameter, see theory/theory.pdf, units of 1 / aB    *
+ *     rpar[1], k2     : Parameter, see theory/theory.pdf, units of 1 / aB    *
+ *     rpar[2], k3     : Parameter, see theory/theory.pdf, units of 1 / aB    *
+ *     rpar[3], k4     : Parameter, see theory/theory.pdf, units of 1 / aB**2 *
+ *     rpar[4], rc     : Cut-off radius, see theory/theory.pdf, units of aB   *
+ *     rpar[5], alphaD : Polarisability, see theory/theory.pdf, units of      *
  *                       me * e**2 * aB**4 / hbar**2                          *
  *     rpar[6], M      : Total mass of atom/ion, units of me                  *
  *     rpar[7], C      : Mass correction, see theory/theory.pdf               *
  *     rpar[8], j      : Total angular momentum quantum number (This is the   *
  *                       j-value from the global variable settings, but       *
  *                       cleaned up to be an exact half integer.)             *
- *     rpar[9], EGS    : Ground state energy, see Ref. [5], units of Hartree  *
+ *     rpar[9], EGS    : Ground state energy in units of Hartree              *
  * -------------------------------------------------------------------------- */
 typedef struct potential_data_s {
     int32_t *ipar;
@@ -124,13 +124,14 @@ void potential_initpar(int32_t *ipar, double *rpar) {
     /* IMPORTANT: Here is the position in the code where the mass correction, *
      * i.e., the fact that the reduced mass is NOT the electron's mass, can   *
      * be accounted for. However, here the mass correction is not actually    *
-     * included because the employed model parameters (see Refs. [6,8]) are   *
-     * computed WITHOUT this correction. This is concluded from the fact that *
-     * the computed ground-state energies better fit the ideal ionisation     *
-     * energies when the mass correction is omitted. If one employs model     *
-     * parameters that include the mass correction, the currently             *
-     * commented-out version of the constant C, i.e., the value of rpar[7],   *
-     * should be employed. Everything else will be handled automatically.     */
+     * included because the employed model parameters (see                    *
+     * Refs. [Mar1994,Aym1996]) are computed WITHOUT this correction. This is *
+     * concluded from the fact that the computed ground-state energies better *
+     * fit the ideal ionisation energies when the mass correction is omitted. *
+     * If one employs model parameters that include the mass correction, the  *
+     * currently commented-out version of the constant C, i.e., the value of  *
+     * rpar[7], should be employed. Everything else will be handled           *
+     * automatically.                                                         */
     /* rpar[7] = 1. / (1. + ME / rpar[6]); */
     rpar[7] = 1.;
     ipar[2] = l;
@@ -147,7 +148,7 @@ void potential_initpar(int32_t *ipar, double *rpar) {
  * species, e.g., 85RB, one first initialises the associated parameters       *
  * stored in ipar and rpar for that species using the function                *
  * potential_initpar. With ipar and rpar initialised for the desired species, *
- * the potential V at distance r is computed by calling v(r, ipar, rpar).     */
+ * the potential V at distance r is computed by calling V(r, ipar, rpar).     */
 double V(double r, int32_t *ipar, double *rpar) {
 
     double vc, vp, vr, result;

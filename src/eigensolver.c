@@ -658,7 +658,7 @@ static void fmt_2d_exp(char *buffer, int32_t nd, double x) {
     double y;
 
     /* IMPORTANT: The C99 standard specifies (Sec. 7.19.6.1 and               *
-     * Sec. 7.19.6.6 in Ref. [11]):                                           *
+     * Sec. 7.19.6.6 in Ref. [C99]):                                          *
      *                                                                        *
      *     The sprintf function is equivalent to fprintf, ...                 *
      *                                                                        *

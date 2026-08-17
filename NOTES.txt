@@ -5,4 +5,6 @@ Update main READMEs
     - Explain what offset is for in settings and how to use it
     - Explain printing of condition number
 
-Fix References in READMEs + code and align them with theory
+Fix References in main README's, rest of AlkCalc is done!
+
+Fix References in species.dat

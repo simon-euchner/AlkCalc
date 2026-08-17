@@ -371,6 +371,13 @@ References.
     Additional references which appear in code, other README's, and data files
     of AlkCalc.
 
+    [NISTcuu] 'The NIST Reference on Constants, Units, and Uncertainty',
+               URL: https://physics.nist.gov/cuu/Constants/
+
+
+
+
+
     [4] J. W. P. Wilkinson, K. Bolsmann, T. L. M. Guedes, M. M\"uller, and
         I. Lesanovsky, New J. Phys. 27, 064502 (2025)
     [5] 'NIST: National Institute of Standards and Technology (NIST)',
