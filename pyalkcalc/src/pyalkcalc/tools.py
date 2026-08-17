@@ -46,7 +46,7 @@ def plot_state(
     j : float
         Total angular momentum quantum number j = |l - 1 / 2|, |l + 1 / 2|.
     tevals : NDArray[float64]
-        Array with points `t` in `[0,tmax)` at which `fnlsj` is evaluated for
+        Array with points `t` in `[0, tmax]` at which `fnlsj` is evaluated for
         the plot. This array must have shape `(*,)`.
     ax : matplotlib.axes.Axes, optional
         Axes to plot on. If `None`, a new figure is created.
