@@ -373,7 +373,7 @@ static void solve(eigensolver_data *data) {
     free(z); z = NULL;
     free(work); work = NULL;
 
-    /* Save knotdata: information on B-splines, knots, and step sizes */
+    /* Save knot data: information on B-splines, knots, and step sizes */
     save_knotdata(data);
 
     /* Print information */
@@ -618,10 +618,10 @@ static void save_knotdata(eigensolver_data *data) {
 
     /* Save metadata */
     if (!(fd = fopen(file, "w"))) {
-        ERROR("COULD NOT WRITE KNOTDATA");
+        ERROR("COULD NOT WRITE KNOT DATA");
     }
     (void)fprintf(fd,
-                  "KNOTDATA FOR SPECIES %s\n\n"
+                  "KNOT DATA FOR SPECIES %s\n\n"
                   "ORDER OF B-SPLINES (K): %" PRId32 "\n"
                   "TOTAL NUMBER OF KNOTS: %" PRId32 "\n"
                   "NUMBER OF KNOTS WITHOUT MULTIPLICITIES (N): %" PRId32 "\n"
@@ -630,7 +630,7 @@ static void save_knotdata(eigensolver_data *data) {
                   "I        T(I)                  H(I - K)\n\n",
                   species, k, Nks, N, rmax, dti, dtf);
 
-    /* Save knotdata */
+    /* Save knot data */
     fmt_2d_exp(buffer_ti, 15, 0.);
     for (i = 0; i < k; i++) {
         fprintf(fd, "%08" PRId32 " %s\n", i, buffer_ti);

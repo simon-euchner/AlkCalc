@@ -175,14 +175,14 @@ alkcalc_state *alkcalc_fnlsj(char result, const char *species, int32_t n,
     /* Add information on B-spline basis to result */
     state->k = k; state->Nks = Nks; state->N = N; state->Nbs = Nbs;
 
-    /* Read in knotdata (if requested, i.e., if result = 'f') */
+    /* Read in knot data (if requested, i.e., if result = 'f') */
     if (result == 'p') { return state; }
     file[0] = filename[0] = '\0';
     (void)sprintf(filename, "data/knotdata-%s.dat", species);
     (void)strcpy(file, PATH_TO_ALKCALC);
     (void)strcat(file, filename);
     if (!(fd = fopen(file, "r"))) {
-        ERROR("REQUESTED KNOTDATA DOES NOT EXIST");
+        ERROR("REQUESTED KNOT DATA DOES NOT EXIST");
     }
     move(fd, 12 + k);
     (void)fread(bfr = buffer = (char *)malloc(d), 1, d, fd);
