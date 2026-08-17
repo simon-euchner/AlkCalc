@@ -51,13 +51,13 @@ Verweise.
               URL: https://gcc.gnu.org/software/gcc/
 
     [C99]     "INTERNATIONAL STANDARD ISO/IEC 9899:1999(E)" (American National
-              Standard Institute, New York, 1999) 2. Ed.
+              Standard Institute, New York, 1999) 2. Aufl.
 
     [Gol1969] G. H. Golub and J. H. Welsch, "Calculation of Gauss Quadrature
               Rules", Math. Comp. 23, 221--230 (1969)
 
     [dBo2001] C. de Boor, "A Practical Guide to Splines" (Springer, New York,
-              2001) 1st ed., ISBN: 978-0-387-95366-3
+              2001) 1. Aufl., ISBN: 978-0-387-95366-3
 
     [Amo1993] D. E. Amos, "Implementation of de Boor's algorithm",
               URL: http://www.netlib.org/slatec/src/dbspvd.f
@@ -65,7 +65,7 @@ Verweise.
     [And1999] E. Anderson, Z. Bai, C. Bischof, S. Blackford, J. Demmel,
               J. Dongarra, J. Du Croz, A. Greenbaum, S. Hammarling, A. McKenney,
               and D. Sorensen, "LAPACK User's Guide" (Society for Industrial and
-              Applied Mathematics, Philadelphia, PA, 1999) 3rd ed.,
+              Applied Mathematics, Philadelphia, PA, 1999) 3. Aufl.,
               ISBN: 0-89871-447-8
 
     Verweise die ausschließlich im Kode, den restlichen READMEs und den
