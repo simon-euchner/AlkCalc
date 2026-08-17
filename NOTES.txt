@@ -1,5 +1,1 @@
-Update main READMEs
-    - j behaviour was unified with library functions)
-    - Explain printing of condition number
-
 Write german README.
