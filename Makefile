@@ -89,5 +89,6 @@ clean:
 	- rm -f ${OBJ}/*.o
 	- rm -f ${LIB}/*.so
 	- rm -f ./tmp/slv*
+	- rm -f ./examples/a.out
 
 .PHONY: clean
