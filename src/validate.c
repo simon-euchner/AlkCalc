@@ -48,9 +48,9 @@ void validate_settings(int32_t nl) {
      * Information   : The parameter N specifies the number of knots, not     *
      *                 counting multiplicities. The constraint ensures that   *
      *                 Gram-type matrices, such as the stiffness matrix or    *
-     *                 the mass matrix, host all d off-diagonal bands. In     *
-     *                 principle, the constraint is not strictly required and *
-     *                 is therefore not explicitly mentioned in               *
+     *                 the mass matrix, host all d = k - 1 off-diagonal       *
+     *                 bands. In principle, the constraint is not strictly    *
+     *                 required and is therefore not explicitly mentioned in  *
      *                 theory/theory.pdf. However, it is applied here because *
      *                 it simplifies the implementation. In practice, the     *
      *                 condition is easily met, as values of N (within        *

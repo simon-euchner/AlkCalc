@@ -99,7 +99,7 @@ void alkcalc_state_free(alkcalc_state *state);
  * l       : Orbital angular momentum l = 0, 1, ..., n - 1                    *
  * s       : Spin (Not an argument, since s = 1 / 2!)                         *
  * j       : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
- * tevals  : Array containing points where to evaulate fnlsj                  *
+ * tevals  : Array containing points where to evaluate fnlsj                  *
  * ltevals : Length of array tevals                                           */
 void alkcalc_fnlsj_eval(char *species, int32_t n, int32_t l, double j,
                         double *tevals, int32_t ltevals);

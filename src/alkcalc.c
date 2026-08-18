@@ -221,7 +221,7 @@ void alkcalc_state_free(alkcalc_state *state) {
  * l       : Orbital angular momentum l = 0, 1, ..., n - 1                    *
  * s       : Spin (Not an argument, since s = 1 / 2!)                         *
  * j       : Total angular momentum quantum number j = |l - 1 / 2|, l + 1 / 2 *
- * tevals  : Array containing points where to evaulate fnlsj                  *
+ * tevals  : Array containing points where to evaluate fnlsj                  *
  * ltevals : Length of array tevals                                           */
 void alkcalc_fnlsj_eval(char *species, int32_t n, int32_t l, double j,
                         double *tevals, int32_t ltevals) {
@@ -248,7 +248,7 @@ void alkcalc_fnlsj_eval(char *species, int32_t n, int32_t l, double j,
         /* Point at which to evaluate fnlsj */
         teval = tevals[i];
 
-        /* Check if tevel in [0, tmax] */
+        /* Check if teval in [0, tmax] and react accordingly */
         if (teval < 0 || teval > tmax) { /* Case where teval outside [0 tmax] */
             ERROR("POINT TEVALS[I = %" PRId32 "] OUTSIDE OF [0, TMAX]", i);
         } else
@@ -310,7 +310,7 @@ double alkcalc_rp(const char *species, int32_t nb, int32_t lb, double jb,
     bra = alkcalc_fnlsj('f', species, nb, lb, jb);
     ket = alkcalc_fnlsj('p', species, nk, lk, jk);
 
-    /* Extract data (trs: knot vector without mulitplicities) */
+    /* Extract data (trs: knot vector without multiplicities) */
     k = bra->k; N = bra->N; Nbs = bra->Nbs; dim = Nbs - 2;
     ts = bra->t; trs = bra->t + bra->k - 1; hs = bra->h;
     brafnlsj = bra->fnlsj; ketfnlsj = ket->fnlsj;
@@ -321,11 +321,10 @@ double alkcalc_rp(const char *species, int32_t nb, int32_t lb, double jb,
      * non-negative integer, the matrix component can be computed exactly up  *
      * to machine precision. In this case, nRp = k - 1 + p / 2 yields the     *
      * correct result for even p and nRp = k - 1 + (p - 1) / 2 yields the     *
-     * correct result for odd p. In all other cases, it is best to            *
-     * precision exact result for odd p. In all other cases the integral is   *
-     * approximated. For this is it best to choose a high quadrature order    *
+     * correct result for odd p. In all other cases the integral is           *
+     * approximated. For this it is best to choose a high quadrature order    *
      * nRp. This is the point in the code where this order is hard-coded. It  *
-     * be adjusted by the user, if necessary.                                 */
+     * can be adjusted by the user, if necessary.                             */
     if ((ip = (int32_t)round(p)) >= 0. && fabs(p - ip) < 1e-11) { /* Integer */
         if (ip & 1) { /* Odd */
             nRp = k - 1 + (ip - 1) / 2;
@@ -355,7 +354,7 @@ double alkcalc_rp(const char *species, int32_t nb, int32_t lb, double jb,
     /* Construct matrix Rp (see theory/theory.pdf) */
     for (i = 1; i < N; i++) { /* Loop over intervals [ts[i - 1], ts[i]] */
 
-        /* The interval [trs[i - 1], trs[i]] correpsonds to the interval      *
+        /* The interval [trs[i - 1], trs[i]] corresponds to the interval      *
          * [ts[i + k - 2], ts[i + k - 1]] in terms of the full knot           *
          * vector ts. On this interval only the B-splines with indices        *
          * imin = i - 1, ..., i + k - 2 are non-zero.                         */
@@ -634,7 +633,7 @@ double alkcalc_tau(double T, const char *species, int32_t n, int32_t dn,
     } else {
         while (alkcalc_Enlsj(species, ++nlp1, lp, lp + .5) < En);
     }
-    if (!l) { nlm1 = -1; nmnlm1 = 0; goto SkipedSState; } /* l' = l - 1 */
+    if (!l) { nlm1 = -1; nmnlm1 = 0; goto SkippedSState; } /* l' = l - 1 */
     nextrm(species, &nmnlm1, &nmxlm1, lm, lm + .5);
     nlm1 = (n < nmnlm1) ? nmnlm1 : n;
     if (alkcalc_Enlsj(species, nlm1, lm, lm + .5) > En) {
@@ -644,7 +643,7 @@ double alkcalc_tau(double T, const char *species, int32_t n, int32_t dn,
     } else {
         while (alkcalc_Enlsj(species, ++nlm1, lm, lm + .5) < En);
     }
-SkipedSState:
+SkippedSState:
 
     /* Compute decay rate Gamma */
     Gamma = 0.;

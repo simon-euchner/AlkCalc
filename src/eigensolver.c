@@ -58,10 +58,10 @@ static eigensolver_data *eigensolver_data_init(void) {
     clock_t tstart, tend;
     eigensolver_data *data;
 
-    /* Start measuremet of execution time */
+    /* Start measurement of execution time */
     tstart = clock();
 
-    /* Allocate memeory for result */
+    /* Allocate memory for result */
     data = (eigensolver_data *)malloc(sizeof(eigensolver_data));
 
     /* Constants                                                              *
@@ -70,7 +70,7 @@ static eigensolver_data *eigensolver_data_init(void) {
      * N        : Number of knots without counting multiplicities             *
      * rmax     : Maximal radius in units of Bohr's radius                    *
      * nW       : See code below.                                             *
-     * Nks      : Number of knots including mutiplicities                     *
+     * Nks      : Number of knots including multiplicities                    *
      * Nbs      : Number of B-splines                                         *
      * dim      : Dimension of generalised eigenvalue problem                 *
      * nderivKM : Control parameter for derivatives (see DBSPVD) for K, and M *
@@ -94,19 +94,19 @@ static eigensolver_data *eigensolver_data_init(void) {
      * components of the potential matrix W is not a polynomial. Therefore,   *
      * to compute the integral it is best to choose a high quadrature order   *
      * nW. This is the point in the code where this order is hard-coded. It   *
-     * be adjusted by the user, if necessary.                                 */
+     * can be adjusted by the user, if necessary.                             */
     nW = 1000;
 
     /* Allocate memory                                                        *
      *                                                                        *
      * ts    : Knots including multiplicities (k: knot vector)                *
      * trs   : Knots excluding mutliplicities (r: reduced knot vector)        *
-     * hs    : Steps h[i] = trs[i] - trs[i - 1], excluding mutliplicities     *
+     * hs    : Steps h[i] = trs[i] - trs[i - 1], excluding multiplicities     *
      * vnikx : Array to store values of B-splines and their derivatives       *
      * work  : Working space for DBSPVD                                       *
      * K     : Array to hold relevant components of the stiffness matrix K    *
      * M     : Array to hold relevant components of the stiffness matrix M    *
-     * W     : Array to hold relevant components of the potenial matrix W     *
+     * W     : Array to hold relevant components of the potential matrix W    *
      * H     : Array to hold relevant components of the matrix H = K + W      *
      * wKM   : Quadrature weights for computing components of K and M         *
      * xKM   : Quadrature points for computing components of K and M          *
@@ -187,7 +187,7 @@ static eigensolver_data *eigensolver_data_init(void) {
     /* Construct stiffness matrix K and mass matrix M */
     for (i = 1; i < N; i++) { /* Loop over intervals [ts[i - 1], ts[i]] */
 
-        /* The interval [trs[i - 1], trs[i]] correpsonds to the interval      *
+        /* The interval [trs[i - 1], trs[i]] corresponds to the interval      *
          * [ts[i + k - 2], ts[i + k - 1]] in terms of the full knot           *
          * vector ts. On this interval only the B-splines with indices        *
          * imin = i - 1, ..., i + k - 2 are non-zero.                         */
@@ -268,7 +268,7 @@ static eigensolver_data *eigensolver_data_init(void) {
         }
     }
 
-    /* Construct matrix H = K + M */
+    /* Construct matrix H = K + W */
     for (i = 0; i < k * dim; i++) { H[i] = K[i] + W[i]; }
 
     /* Clean up */
@@ -307,7 +307,7 @@ static void solve(eigensolver_data *data) {
     double *ab, *bb, *q, *w, *z, *work, iC;
     clock_t tstart, tend;
 
-    /* Start measuremet of execution time */
+    /* Start measurement of execution time */
     tstart = clock();
 
     /* Prepare arguments for the DSBGVX solver from LAPACK */
