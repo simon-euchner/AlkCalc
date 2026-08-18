@@ -266,7 +266,7 @@ Erzeugung der Daten.
        verallgemeinerte Eigenwertproblem schlecht konditioniert ist, dazu
        kommen, dass stark negative, unphysikalische Eigenwerte auftreten. Um
        diese unerwünschten Eigenwerte auszuschließen, gehen Sie wie folgt vor:
-       Beginnen Sie mit offset = -nl. Dies ordnet nl den niedrigsten vom
+       Beginnen Sie mit offset = -nl + 1. Dies ordnet nl den niedrigsten vom
        Potential beherbergten Eigenwert zu, ob physikalisch oder nicht (prüfen
        Sie data/energies-X-...). Ist die zu nl gehörige Eigenenergie nicht die
        richtige, erhöhen Sie offset um eins (offset += 1) und berechnen Sie die

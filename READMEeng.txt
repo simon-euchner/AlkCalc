@@ -236,8 +236,8 @@ Data generation.
        can host eigenenergies lower than the actual ground-state energy, and if
        the generalised eigenvalue problem is badly conditioned, extremely
        negative, unphysical eigenvalues can also appear. To eliminate these
-       unwanted eigenvalues, proceed as follows: start with offset = -nl. This
-       associates the lowest possible eigenvalue hosted by the potential,
+       unwanted eigenvalues, proceed as follows: start with offset = -nl + 1.
+       This associates the lowest possible eigenvalue hosted by the potential,
        physical or not, with nl (check data/energies-X-...). If the energy
        associated with nl is not the correct one, increment offset by one
        (offset += 1) and solve again for the eigenenergies (see point 3). Do
