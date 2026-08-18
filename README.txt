@@ -118,10 +118,10 @@ Software requirements.
       requirement that the fixed-width integer types int8_t, int32_t, and
       int64_t be defined. The C99 standard treats these types as optional (see
       Sec. 7.18.1.1 in Ref. [C99]). However, most modern C libraries (e.g. GNU's
-      C library) define them, and the C99 standard guarantees that, where these
-      types are defined, they use two's-complement representation without
-      padding bits (see Sec. 7.18.1.1 in Ref. [C99]). AlkCalc relies on these
-      types and their properties for definiteness and to simplify overflow
+      C library, Ref. [GLC]) define them, and the C99 standard guarantees that,
+      where these types are defined, they use two's-complement representation
+      without padding bits (see Sec. 7.18.1.1 in Ref. [C99]). AlkCalc relies on
+      these types and their properties for definiteness and to simplify overflow
       checks in integer arithmetic. If the fixed-width integer types are not
       defined on your system the compiler will raise an error.
 
@@ -240,9 +240,9 @@ Data generation.
        associates the lowest possible eigenvalue hosted by the potential,
        physical or not, with nl (check data/energies-X-...). If the energy
        associated with nl is not the correct one, increment offset by one
-       (offset += 1) and run again 'make solve' (see point 3). Do this until all
-       unphysical eigenvalues have been cut off. In practice, the unphysical
-       eigenvalues are typically far off and easy to identify.
+       (offset += 1) and solve again for the eigenenergies (see point 3). Do
+       this until all unphysical eigenvalues have been cut off. In practice, the
+       unphysical eigenvalues are typically far off and easy to identify.
 
     3. Run the Makefile in the top-level directory AlkCalc with the argument
        'solve'. This generates the eigenenergies and radial eigenstates. The
@@ -264,10 +264,10 @@ Data generation.
        should be chosen within reason, so the results can be trusted.
 
        IMPORTANT: Depending on the maximum desired principal quantum number,
-                  choose rmax large enough, and keep in mind that larger core
-                  charges result in radial eigenstates with support at smaller
-                  distances --- that is, rmax typically needs to be larger for
-                  atoms than for ions.
+                  choose rmax large enough, and keep in mind that larger
+                  effective core charges result in radial eigenstates with
+                  support at smaller distances --- that is, rmax typically needs
+                  to be larger for atoms than for ions.
 
     4. From this point on, KEEP THE PARAMETERS species, k, N, nmax, and rmax in
        interface/settings.c FIXED, and change only the orbital, l, and total
