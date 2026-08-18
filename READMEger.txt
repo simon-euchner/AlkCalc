@@ -4,12 +4,12 @@
  * Autor dieser Datei: Simon Euchner                                          *
  * -------------------------------------------------------------------------- */
 
-(English version: 'READMEeng.txt')
+(Englische Version: 'READMEeng.txt')
 
 
 Kontakt.
 
-    Bei etwaigen Zweifeln, Fragen und/order Anregungen zögern Sie bitte nicht,
+    Bei etwaigen Zweifeln, Fragen und/oder Anregungen zögern Sie bitte nicht,
     den Autor zu kontaktieren.
 
         Simon Euchner
@@ -25,32 +25,32 @@ Einführung.
     Wasserstoffatoms und wasserstoffartiger Ionen lässt sich die
     zeitunabhängige Schrödingergleichung nicht in geschlossener Form lösen. Aus
     diesem Grund müssen Eigenenergien und Eigenzustände numerisch ermittelt
-    werden. Die Bibliothek AlkCalc ist genau zu diesem Zweck geschaffen: sie
+    werden. Die Bibliothek AlkCalc ist genau zu diesem Zweck geschaffen. Sie
     erlaubt es dem Anwender, den relevanten Teil des gebundenen Energiespektrums
     samt der zugehörigen Eigenzustände zu berechnen.
 
-        AlkCalc selbst is in zwei Teile aufgeteilt. Der erste Teil dient zur
-    Berechnung der Eigenenergien und Eigenzustände, welche ein einziges Mal
-    berechnet werden und dann auf der Festplatte abgelegt werden. Der zweite
-    Teil besteht aus den Bibliotheksfunktionen, welche nützliche Werkzeuge zum
-    Einlesen und Verarbeiten der vorab berechneten atomphysikalischen Daten
-    (Eigenenergien und Eigenzustände) darstellen. Mit diesen Funktionen lassen
-    sich zum Beispiel radiale Übergangsmatrixelemente und Oszillatorstärken
-    berechnen.
+        AlkCalc selbst ist in zwei Teile aufgeteilt. Der erste Teil berechnet
+    die Eigenenergien und Eigenzustände ein einziges Mal und legt sie auf der
+    Festplatte ab. Der zweite Teil besteht aus den Bibliotheksfunktionen, welche
+    nützliche Werkzeuge zum Einlesen und Verarbeiten der vorab berechneten
+    atomphysikalischen Daten (Eigenenergien und Eigenzustände) darstellen. Mit
+    diesen Funktionen lassen sich zum Beispiel radiale Übergangsmatrixelemente
+    und Oszillatorstärken berechnen.
 
         AlkCalc ist sehr "zum Anfassen" gehalten, in dem Sinne, dass es einfach
     genug ist, um unmittelbar mit dem Quellkode selbst zu arbeiten. Da es zudem
-    in einer maschinennahen Sprache geschrieben ist, die sich streng an den
-    C99-Standard hält, ist es nahezu plattformunabhängig. Da höhere Sprachen
-    üblicherweise leicht zu handhabende Wege bieten, um C-Code aufzurufen (z. B.
-    ctypes oder Cython für Python), ist es unkompliziert, eine Schnittstelle zur
-    höheren Sprache der eigenen Wahl zu schreiben (etwa Python, Julia, MATLAB
-    usw. --- was auch immer heutzutage Mode ist). AlkCalc sollte daher nicht
-    allein als fertiges, einsatzbereites Softwarepaket verstanden werden,
-    sondern weiter gefasst als Grundlage für die Entwicklung anderer, in höheren
-    Sprachen geschriebener Softwarepakete für die numerische Behandlung
-    radialsymmetrischer Potentiale. Eine Schnittstelle für Python wird von
-    AlkCalc bereits mitgeliefert (siehe AlkCalc/pyalkcalc).
+    in der maschinennahen Prorammiersprache C geschrieben ist, und sich streng
+    an den C99-Standard hält, ist es nahezu plattformunabhängig. Da höhere
+    Sprachen üblicherweise leicht zu handhabende Wege bieten, um C-Code
+    auszuführen (z. B. ctypes oder Cython für Python), ist es unkompliziert,
+    eine Schnittstelle zur höheren Sprache der eigenen Wahl zu schreiben
+    (etwa Python, Julia, MATLAB usw. --- was auch immer heutzutage Mode ist).
+    AlkCalc sollte daher nicht allein als fertiges, einsatzbereites
+    Softwarepaket verstanden werden, sondern weiter gefasst als Grundlage für
+    die Entwicklung anderer, in höheren Sprachen geschriebener, Softwarepakete
+    für die numerische Behandlung radialsymmetrischer Potentiale. Eine
+    Schnittstelle für Python wird mit AlkCalc bereits mitgeliefert (siehe
+    AlkCalc/pyalkcalc).
 
         Zur Modellierung der Atome und Ionen verwendet AlkCalc sogenannte
     parametrische Modellpotentiale, insbesondere jene, die 1994 von Marinescu u.
@@ -62,8 +62,8 @@ Einführung.
     Stattdessen berechnet AlkCalc alle Eigenenergien und Eigenzustände
     unmittelbar aus dem parametrischen Modellpotential. Dies bringt den Vorteil
     mit sich, dass AlkCalc keineswegs auf hohe Hauptquantenzahlen beschränkt
-    ist, bei denen die Quantendefekttheorie genau wird, sondern von natur aus
-    ebenso gut für niedrigliegende elektronische Zustände ergebnisse liefert.
+    ist, bei denen die Quantendefekttheorie genau wird, sondern von Natur aus
+    ebenso gute Ergebnisse für niedrigliegende elektronische Zustände liefert.
     Zudem verleiht der Verzicht auf die Quantendefekttheorie AlkCalc die
     Fähigkeit, im Grunde jedes Problem mit radialer Symmetrie zu lösen. Unter
     anderem ist diese Anpassungsfähigkeit der Grund dafür, dass AlkCalc sowohl
@@ -72,46 +72,45 @@ Einführung.
     neutrale Rydbergatome ausgelegt sind. Um die Schnittstelle sauber und
     einfach zu halten, sind alle Parameter der parametrischen Modellpotentiale
     in einer einzigen Textdatei gesammelt. Tatsächlich werden sämtliche zu
-    AlkCalc gehörigen Daten in reinen Textdateien abgelegt, was den Vorzug hat,
+    AlkCalc gehörigen Daten in reinen Textdateien abgelegt, was den Vorteil hat,
     dass keine weiteren Softwarevoraussetzungen zum Lesen binärer Datenformate
     und dergleichen entstehen.
 
-        Letztlich ist AlkCalc für Forscher gedacht, denen die volle Kontrolle
+        Letztendlich ist AlkCalc für Forscher gedacht, denen die volle Kontrolle
     über die Daten hinter ihrer Forschung wichtig ist. Weiter gefasst ist
-    AlkCalc für jeden gedacht, dem durchsichtige Software wichtig ist:
-    nichts ist "versteckt", alles liegt offen, es werden keine unnötig
-    binären Datenformate verwendet (nur reine Textdateien), und die Software
-    bleibt einfach und leichtgewichtig, ohne dabei die Vollständig zu verlieren
-    --- vollständig is AlkCalc in dem Sinne, dass die Eigenenergien und
-    Eigenzustände berechnet werden können, sprich, das Problem also also gelöst
-    ist. Zudem ist AlkCalc völlig quelloffen, und Anwender sind ausdrücklich
-    dazu ermutigt, den Quellkode einzusehen und mit diesem zu arbeiten.
-    Außderdem kommt AlkCalc ohne Abhängigkeiten dritter Software aus, abgesehen
-    von einem C-Compiler, einem FORTRAN-Compiler und einer C-Bibliothek. Der
-    Grund dafür ist, dass alle sonstige Software dritter direkt in AlkCalc
-    selbst eingearbeitet ist, unter Verwendung von jahrzehntelang erprobtem Code
-    von Netlib [Don1987].
+    AlkCalc für jeden gedacht, dem durchsichtige Software wichtig ist: nichts
+    ist "versteckt", alles liegt offen, es werden keine unnötigen binären
+    Datenformate verwendet (nur reine Textdateien), und die Software bleibt
+    einfach und leichtgewichtig, ohne dabei die Vollständigkeit zu verlieren ---
+    vollständig ist AlkCalc in dem Sinne, dass die Eigenenergien und
+    Eigenzustände berechnet werden können, sprich, das Problem also gelöst ist.
+    Zudem ist AlkCalc völlig quelloffen, und Anwender sind ausdrücklich dazu
+    ermutigt, den Quellkode einzusehen und mit diesem zu arbeiten. Außerdem
+    kommt AlkCalc ohne Abhängigkeiten von Drittsoftware aus, abgesehen von einem
+    C-Compiler, einem FORTRAN-Compiler und einer C-Bibliothek. Der Grund dafür
+    ist, dass alle sonstige benötigte Software direkt in AlkCalc selbst
+    eingearbeitet ist. Die eingebaute Drittsoftware ist dabei jahrzehntelang
+    erprobter Code von Netlib [Don1987].
 
         Neben dieser README gibt die Datei theory/theory.pdf eine gründliche
     Einführung in die Physik der Hamiltonoperatoren einzelner Atome und Ionen,
     welche AlkCalc diagonalisiert. Die Datei enthält außerdem eine vollständige
-    Beschreibung des numerischen (B-Spline) Methode, mit der AlkCalc das radiale
-    Eigenwertproblem auf ein verallgemeinertes Matrixeigenwertproblem
-    rediziert. Schließlich enthält theory/theory.pdf ein vollständiges
-    Nachschlagewerk zu den Bibliotheksfunktionen von AlkCalc, das alle Angaben
-    umfasst, die ein Anwender braucht.
+    Beschreibung der numerischen (B-Spline-)Methode, mit der AlkCalc das radiale
+    Eigenwertproblem auf ein verallgemeinertes Matrixeigenwertproblem reduziert.
+    Schließlich enthält theory/theory.pdf ein vollständiges Nachschlagewerk zu
+    den Bibliotheksfunktionen von AlkCalc, das alle Angaben umfasst, die ein
+    Anwender benötigt.
 
 
 Aufbau dieses README.
 
-        Dieser README ist gliedert in die folgenden Abschnitte. Der Abschnitt
-    "Softwareanforderungen" führt die benötigte Software dritter auf. Der
-    Abschnitt "Installation" gibt Anweisungen zur richtigen Installation von
-    AlkCalc. Der Abschnitt "Erzeugung der Daten" erklärt, wie die Eigenenergien
-    und radialen Eigenzustände mit AlkCalc berechnet und auf der Festplatte
-    abgelegt werden. Schließlich behandelt der Abschnitt "Wichtige weitere
-    Hinweise" technische Gesichtspunkte, die vor der Verwendung von AlkCalc
-    zu beachten sind.
+        Diese README gliedert sich in die folgenden Abschnitte. Der Abschnitt
+    "Softwareanforderungen" führt die benötigte Drittsoftware auf. Der Abschnitt
+    "Installation" gibt Anweisungen zur richtigen Installation von AlkCalc. Der
+    Abschnitt "Erzeugung der Daten" erklärt, wie die Eigenenergien und radialen
+    Eigenzustände mit AlkCalc berechnet und auf der Festplatte abgelegt werden.
+    Schließlich behandelt der Abschnitt "Wichtige weitere Hinweise" technische
+    Gesichtspunkte, die vor der Verwendung von AlkCalc zu beachten sind.
 
 
 Softwareanforderungen.
@@ -136,13 +135,14 @@ Softwareanforderungen.
       Zweierkomplementdarstellung ohne Füllbits verwenden (siehe
       Abschn. 7.18.1.1 in Verw. [C99]). AlkCalc nutzt diese Typen und ihre
       Eigenschaften, um Eindeutigkeit zu gewährleisten und Überlaufprüfungen bei
-      der Ganzzahlrechnung zu vereinfachen. Sind die Ganzzahltypen fester Breite
-      auf Ihrem System nicht festgelegt, wird der Compiler einen Fehler melden.
+      der Ganzzahlarithmetik zu vereinfachen. Sind die Ganzzahltypen fester
+      Breite auf Ihrem System nicht festgelegt, meldet der Compiler einen
+      Fehler.
 
 
 Installation.
 
-    Der Installationsvorgang is in acht Schritte aufgeteilt.
+    Der Installationsvorgang ist in acht Schritte aufgeteilt.
 
     1. Wechseln Sie in den Ordner GAUSSQ und führen Sie die Makefile aus. Dies
        erstellt das Programm GAUSSQ [Gol1969] (Quellkode von Netlib [Don1987]),
@@ -163,34 +163,35 @@ Installation.
 
     4. Wechseln Sie in den Ordner AlkCalc/interface und setzen Sie die Variable
        PATH_TO_STATES, welche den Ort festlegt, an dem die Daten der radialen
-       Eigenzustände abgelegt werden. Üblicherweise ist es unbedenklich, diese
-       Daten unmittelbar im Datenverzeichnis von AlkCalc abzulegen.
+       Eigenzustände abgelegt werden. Üblicherweise ist es unbedenklich, die
+       radialen Eigenzustände unmittelbar im Datenverzeichnis von AlkCalc
+       abzulegen.
 
 --- Anmerkung (*)
 
     5. Wechseln Sie in den Ordner MVMBLAS und führen Sie die Makefile aus
        (dieselben Bedingungen wie in Schritt 1 gelten). Dies erstellt die
        Routine DSBMV, eine BLAS-Routine der Stufe 2. Diese Routine ist Teil von
-       LAPACK [And1999,Don1987] und erlaubt es, Produkte von Matrozen und
-       Vektoren effektiev numerisch zu berechnen.
+       LAPACK [And1999,Don1987] und erlaubt es, Produkte von Matrizen und
+       Vektoren effektiv numerisch zu berechnen.
 
     6. Wechseln Sie in den Ordner AlkCalc/interface und setzen Sie die
        relevanten Pfade in der Datei alkcalk.h. Die Variable PATH_TO_ALKCALC
-       muss der vollständige Pfad zum Ort des AlkCalc-Verzeichnisses sein. Die
-       Variable PATH_TO_STATES legt fest, von wo die radialen Eigenzustände
-       gelesen werden. Die radialen Eigenzustände können einen beachtlichen
-       Speicherplatzes einnehmen (~5 GB), was auf älterer Hardware zu einer
-       Einschränkung werden kann. Die freie Wahl des Speicherorts der radialen
-       Eigenzustände schafft hier Abhilfe; sie könnten zum Beispiel auf einer
-       weiteren Festplatte abgelegt werden. Auf neuerer Hardware ist der
-       Speicherplatz meist ausreichend (es stehen typischerweise >> 5 GB, ehere
+       muss der vollständige Pfad zum Ort des Ordners AlkCalc sein. Die Variable
+       PATH_TO_STATES legt fest, von wo auf der Festplatte die radialen
+       Eigenzustände gelesen werden. Die radialen Eigenzustände können einen
+       beachtlichen Speicherplatz einnehmen (~5 GB), was auf älterer Hardware zu
+       einer Einschränkung werden kann. Die freie Wahl des Speicherorts der
+       radialen Eigenzustände schafft hier Abhilfe; sie könnten zum Beispiel auf
+       einer weiteren Festplatte abgelegt werden. Auf neuerer Hardware ist der
+       Speicherplatz meist ausreichend (es stehen typischerweise >> 5 GB, eher
        ~1 TB, zur Verfügung).
 
-    7. Führen Sie die Makefile im Verzeichnis AlkCalc mit dem Argument "lib"
-       aus. Dies erstellt die Bibliotheksfunktionen von AlkCalc, welche für das
-       arbeiten mit den von AlkCalc berechneten Eigenenergien und
-       Eigenfunktionen dienen. Ein vollständiges Nachschlagewerk zu den
-       Bibliotheksfunktionen findet sich in theory/theory.pdf.
+    7. Führen Sie die Makefile im Ordner AlkCalc mit dem Argument "lib" aus.
+       Dies erstellt die Bibliotheksfunktionen von AlkCalc, welche zum Arbeiten
+       mit den von AlkCalc berechneten Eigenenergien und radialen Eigenzuständen
+       dienen. Ein vollständiges Nachschlagewerk zu den Bibliotheksfunktionen
+       befindet sich in theory/theory.pdf.
 
     8. Bevor die Bibliotheksfunktionen verwendet werden können, müssen die
        zugehörigen Daten (das heißt die Eigenenergien und die radialen
@@ -217,8 +218,8 @@ Erzeugung der Daten.
 
     1. Wechseln Sie in den Ordner AlkCalc/interface und öffnen Sie die Datei
        species.dat. Stellen Sie sicher, dass diese Datei die nötigen Daten für
-       die Art X enthält. Beim Hinzufügen einer neuen Art achten Sie darauf, die
-       das der Aufbau des Eintrags mit den vorhandenen Einträgen übereinstimmen.
+       die Art X enthält. Beim Hinzufügen einer neuen Art achten Sie darauf,
+       dass der Aufbau des Eintrags mit den vorhandenen Einträgen übereinstimmt.
        Beim Hinzufügen neuer Arten beachten Sie bitte die folgenden Regeln und
        Annahmen:
 
@@ -238,19 +239,19 @@ Erzeugung der Daten.
           (4) Angenommen, in settings.c wird eine Bahndrehimpulsquantenzahl l
               verlangt, die größer ist als die größte in species.dat angegebene,
               l0. Für l > l0 verwendet AlkCalc dann einfach l, jedoch mit den zu
-              l0 gehörigen Daten aus species.dat. Dieses Verhalten is in
-              Übereinstimmung mit Verw. [Mar1994,Aym1996].
+              l0 gehörigen Daten aus species.dat. Dieses Verhalten ist in
+              Übereinstimmung mit dem in den Verwweisen [Mar1994,Aym1996].
 
           (5) In species.dat wird für jedes l eine niedrigste Hauptquantenzahl,
               nl, angegeben. Dabei gibt es zwei Möglichkeiten: entweder folgt nl
               dem wasserstoffartigen Gesetz (das heißt nl = l + 1), oder nl ist
               anormal, in dem Sinne, dass nl > l + 1 gilt. Das richtige nl lässt
               sich unmittelbar aus der Elektronenanordnung der Atom- oder
-              Ionenart ablesen. Rubidium etwa besitzt die Elektronenanordnung
-              [Kr]5s1, das heißt für S-Zustände (l = 0) gilt nl = n0 = 5 > 0 +
-              1. Dies ist der anormale Fall und muss in species.dat ausdrücklich
+              Ionenart X ablesen. Rubidium etwa besitzt die Elektronenanordnung
+              [Kr]5s1, also für S-Zustände (l = 0) gilt nl = n0 = 5 > 0 + 1.
+              Dies ist der anormale Fall und muss in species.dat ausdrücklich
               angegeben werden. Wird für eine verlangte
-              Bahndrehimpulsquantenzahl keine Angabe in species.dat gefunden,
+              Bahndrehimpulsquantenzahl kein Eintrag in species.dat gefunden,
               so nimmt AlkCalc an, dass das wasserstoffartige Gesetz gilt (d. h.
               nl = l + 1).
 
@@ -258,58 +259,57 @@ Erzeugung der Daten.
        Kennung (z. B. RB für Rubidium) der Art X wird in species.dat festgelegt.
        Ein besonders wichtiger Parameter, offset, muss von Hand und mit etwas
        Sorgfalt gewählt werden. Er bestimmt, welche Eigenenergie der niedrigsten
-       Hauptquantenzahl nl zugeordnet wird. Dies ist nötig, weil bei anormalen
-       nl die niedrigste berechnete Eigenenergie nicht immer die richtige ist:
-       Das Potential kann Eigenenergien unterhalb der wahren
-       Grundzustandsenergie beherbergen. Weiter kann es im Falle wenn das
-       verallgemeinerte Eigenwertproblem schlecht Konditioniert ist dazu kommen,
-       dass stark negative, unphysikalische Eigenwerte auftreten. Um diese
-       unerwünschten Eigenwerte auszuschließen, gehen Sie wie folgt vor:
-       beginnen Sie mit offset = -nl. Dies ordnet nl den niedrigsten vom
+       Hauptquantenzahl nl zugeordnet wird. Dies ist nötig, weil zum Einen bei
+       anormalen nl die niedrigste berechnete Eigenenergie nicht immer die
+       richtige ist: Das Potential kann Eigenenergien unterhalb der wahren
+       Grundzustandsenergie beherbergen. Zum Anderen kann es, falls das
+       verallgemeinerte Eigenwertproblem schlecht konditioniert ist, dazu
+       kommen, dass stark negative, unphysikalische Eigenwerte auftreten. Um
+       diese unerwünschten Eigenwerte auszuschließen, gehen Sie wie folgt vor:
+       Beginnen Sie mit offset = -nl. Dies ordnet nl den niedrigsten vom
        Potential beherbergten Eigenwert zu, ob physikalisch oder nicht (prüfen
-       Sie data/energies-X-...). Ist die zu nl gehörige Energie nicht die
+       Sie data/energies-X-...). Ist die zu nl gehörige Eigenenergie nicht die
        richtige, erhöhen Sie offset um eins (offset += 1) und berechnen Sie die
-       Eigenenergies neu (siehe Punkt 3). Fahren Sie damit fort, bis alle
-       unphysikalischen Eigenwerte abgeschnitten sind. In der Praxis liegen
-       die unphysikalischen Eigenwerte meist weit von den physikalischen
-       entfernt und sind daher leicht auszumachen.
+       Eigenenergien neu (siehe Punkt 3). Fahren Sie damit fort, bis alle
+       unphysikalischen Eigenwerte abgeschnitten sind. In der Praxis liegen die
+       unphysikalischen Eigenwerte meist weit von den physikalischen entfernt
+       und sind daher leicht auszumachen.
 
     3. Führen Sie die Makefile im Ordner AlkCalc mit dem Argument "solve" aus.
        Dies erzeugt die Eigenenergien und radialen Eigenzustände. Die radialen
-       Eigenzustände werden am dem vom Anwender angegebenen Ort abgelegt (siehe
+       Eigenzustände werden an dem vom Anwender angegebenen Ort abgelegt (siehe
        Abschn. Installation), und die Eigenenergien werden im Datenverzeichnis
        von AlkCalc abgelegt. Beim Ausführen der Makefile mit dem Argument
        "solve" gibt AlkCalc außerdem die Konditionszahl der Massenmatrix des
        verallgemeinerten Eigenwertproblems aus (siehe theory/theory.pdf). Dies
        ist lediglich als Hinweis gedacht, nicht als genaue mathematische
        Schranke, auf den möglichen Verlust an Genauigkeit, unter der Annahme,
-       dass der Hamilton-Operator selbst gut Konditioniert ist. Gleichwohl ist
+       dass der Hamilton-Operator selbst gut konditioniert ist. Gleichwohl ist
        es nützlich für die Wahl der Ordnung der B-Splines, k, und der Anzahl der
        Knoten ohne Vielfachheit, N. Als Faustregel verliert man etwa
-       log10(kappa) Stellen and numerischer Genauigkeit, wobei kappa die
+       log10(kappa) Stellen an numerischer Genauigkeit, wobei kappa die
        Konditionszahl der Massenmatrix M ist (siehe theory/theory.pdf). Für
-       64-Bit Gleitkommarechnung sollte man versuchen, die Konditionszahl kappa
+       64-Bit Gleitkommazahlen sollte man versuchen, die Konditionszahl kappa
        unter ~1e6 zu halten, sodass etwa 10 Stellen an Genauigkeit übrig
-       bleiben. Man beachte, dass all dies voraussetzt, dass H gut Konditioniert
+       bleiben. Man beachte, dass all dies voraussetzt, dass H gut konditioniert
        ist. Diese Berechnung ist daher mehr eine grobe Abschätzung als eine
-       genaue Bestimmung des zahlenmäßigen Fehlers. Im Allgemeinen sollten alle
+       genaue Bestimmung des numerischen Fehlers. Im Allgemeinen sollten alle
        Zahlen in einem vernünftigen Rahmen gewählt werden, sodass den
        Ergebnissen zu trauen ist.
 
-       WICHTIG: Je nach dem wie die höchsten gewünschten Hauptquantenzahl
-                gewählt ist muss rmax groß genug gewählt sein. Man beachte
-                dabei, dass hohe effektive Kernladungszahlen zu radialen
-                Eigenzuständen mit Träger bei kleineren Abständen führen --- das
-                heißt, rmax muss für Atome in der Regel größer sein als für
-                Ionen.
+       WICHTIG: Je nachdem, wie die höchste gewünschte Hauptquantenzahl gewählt
+                ist, muss rmax groß genug gewählt werden. Man beachte dabei,
+                dass hohe effektive Kernladungszahlen zu radialen Eigenzuständen
+                mit Trägern bei kleineren Abständen führen --- das heißt, rmax
+                muss für Atome in der Regel größer sein als für Ionen.
 
     4. Halten Sie von hier an die Parameter species, k, N, nmax und rmax in
        interface/settings.c FEST, und ändern Sie nur die
        Bahndrehimpulsquantenzahl, l, und die Gesamtdrehimpulsquantenzahl, j.
        Erzeugen Sie für jedes gewünschte Paar (l, j) die Eigenenergien und
        radialen Eigenzustände, indem Sie die Makefile mit dem Argument "solve"
-       ausführen. Beachten Sie, dass es nötig sein kann, den offset Parameter
-       für jedes Paar (l, j) einzeln anzupassen.
+       ausführen. Beachten Sie, dass es typischerweise nötig sein wird, den
+       Parameter offset für jedes Paar (l, j) einzeln zu wählen.
 
        WICHTIG: Die Knotendaten (Knotenvektor und Schrittweiten; siehe
                 theory/theory.pdf) werden für jede Art X genau EINMAL im
@@ -320,10 +320,9 @@ Erzeugung der Daten.
                 erzeugt. Dies mag etwas kompliziert klingen, lässt sich aber wie
                 folgt zusammenfassen:
 
-                - Prüfen Sie, für welche Parameter k, N und rmax die
-                  Eigenenergien mit vernünftiger Genauigkeit berechnet werden,
-                  indem Sie verschiedene Werte der Parameter k, N und rmax
-                  ausproieren.
+                - Prüfen Sie, mit welcher Genauigkeit die Eigenenergien
+                  berechnet werden, indem Sie verschiedene Werte der Parameter
+                  k, N und rmax ausprobieren.
 
                 - Sind Sie einmal zufrieden, halten Sie die Parameter k, N und
                   rmax für alle Paare (l, j) fest, und löschen Sie, bevor Sie
@@ -339,24 +338,24 @@ Erzeugung der Daten.
 Wichtige weitere Hinweise.
 
     - In der Voreinstellung ist der Massenfaktor C aus theory/theory.pdf im
-      Quellkode in src/eigensolver.c auf eins gesetzt, das heißt, die
-      reduzierte Masse wird durch die Elektronenmasse angenähert. Der Grund
-      hierfür ist, dass die Parameter für das parametrische Modellpotential
-      (siehe Verw. [Mar1994,Aym1996]) mit C = 1 berechnet wurden: Die
-      berechneten Grundzustandsenergien passen besser zu den idealen
-      Ionisationsenergien wenn C = 1 ist. Werden stattdessen Modellparameter
-      verwendet, die MIT dem Massenfaktor C gewonnen wurden, muss die
-      der Massenfaktor auch im Quellkode verwendedt werden. Dies läuft darauf
-      hinaus, eine einzige Zeile in der Datei src/potential.c Einzukommentieren
-      (und eine andere Auszukommentieren). Bitte beachten Sie auch die im
-      Quellkode gegebene Erklärung.
+      Quellkode in src/eigensolver.c auf eins gesetzt, das heißt, die reduzierte
+      Masse wird durch die Elektronenmasse angenähert. Der Grund hierfür ist,
+      dass die Parameter für das parametrische Modellpotential (siehe Verwweise
+      [Mar1994,Aym1996]) mit C = 1 berechnet wurden: Die berechneten
+      Grundzustandsenergien passen besser zu den idealen Ionisationsenergien,
+      wenn C = 1 ist. Werden stattdessen Modellparameter verwendet, die MIT dem
+      Massenfaktor C gewonnen wurden, muss der Massenfaktor auch im Quellkode
+      verwendet werden. Dies läuft darauf hinaus, eine einzige Zeile in der
+      Datei src/potential.c einzukommentieren (und eine andere
+      auszukommentieren). Bitte beachten Sie dazu auch die im Quellkode gegebene
+      Erklärung.
 
     - AlkCalc enthält das Wasserstoffatom (1H) und das Heliumion (4HE+), beide
-      mit Russell-Saunders-Kopplung (LS) und, in der Voreinstellung, OHNE
-      Massenberichtigung. Diese beiden Arten dienen dazu, Ergebnisse sowohl für
+      mit Russell-Saunders-Kopplung (LS) und, in der Voreinstellung, mit
+      Massenfaktor C = 1. Diese beiden Arten dienen dazu, Ergebnisse sowohl für
       Atome als auch für Ionen zu prüfen. Man beachte, dass die LS-Kopplung
       schwach ist, besonders für kleine Bahndrehimpulsquantenzahlen und große
-      Hauptquantezahlen n. Um zu prüfen, ob die Einstellungen des
+      Hauptquantenzahlen n. Um zu prüfen, ob die Einstellungen des
       Eigenwertlösers in interface/settings.c vernünftig sind, genügt es daher
       meist, die Eigenenergien mit dem analytischen Ergebnis für 1H und 4HE+ zu
       vergleichen, selbst ohne die LS-Kopplung zu berücksichtigen.
@@ -373,15 +372,15 @@ Wichtige weitere Hinweise.
 
     - In interface/settings.c wird die Gesamtdrehimpulsquantenzahl, j,
       festgelegt. Diese Quantenzahl nimmt halbzahlige Werte an. Beim
-      rechnerischen Umgang mit halbzahligen Quantenzahlen ist immer eine
-      Entscheidung zu treffen. Hier wird die Folgende getroffen: um den
-      numerischen Wert zu "säubern", wird die ganze Zahl 2 * j gleich
+      numerischen Umgang mit halbzahligen Quantenzahlen ist dabei immer eine
+      Entscheidung zu treffen. Hier wird die folgende Übereinkunft getroffen: um
+      den numerischen Wert zu "säubern", wird die Ganzzahl 2 * j gleich
       floor(2.0 * j + 0.5) gesetzt. Die Funktion floor ist als floor(x) = k in
-      den nichtnegativen ganzen Zahlen definiert (x reelle Zahl), wobei k die
-      eindeutige ganze Zahl ist, für die x im halboffenen Intervall [k, k + 1)
-      liegt. In der Praxis bedeutet dies, dass AlkCalc für jedes j in [0.25,
-      0.75) den Wert j = 1 / 2 verwendet, für jedes j in [1.25, 1.75) den Wert
-      j = 3 / 2, und so fort.
+      den nichtnegativen Ganzzahlen definiert (x reelle Zahl), wobei k die
+      eindeutige Ganzzahl ist, für die x im halboffenen Intervall [k, k + 1)
+      liegt. In der Praxis bedeutet dies, dass AlkCalc für jedes j im Interval
+      [0.25, 0.75) den Wert j = 1 / 2 verwendet, für jedes j in [1.25, 1.75) den
+      Wert j = 3 / 2, und so fort.
 
 
 Verweise.

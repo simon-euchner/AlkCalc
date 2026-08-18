@@ -1,1 +1,1 @@
-Write german README.
+Check eigensolver.c, alkcalc.c, validate.c, potential.c for typos in comments
