@@ -54,19 +54,22 @@ Introduction.
     Unlike typical packages for treating Rydberg atoms, such as ARC [Sib2017] or
     PairInteraction [Web2017], AlkCalc does not rely on quantum defect theory.
     Instead, AlkCalc computes everything self-consistently from the parametric
-    model potential. This has the major advantage that AlkCalc is not at all
-    restricted to high principal quantum numbers, where quantum defect theory
-    becomes accurate, but automatically works equally well for low-lying
-    electronic states. Further, not relying on quantum defect theory grants
-    AlkCalc the power to solve essentially any problem with radial symmetry.
-    Besides other things, this flexibility allows AlkCalc to natively treat both
-    Rydberg states in neutral atoms and AND atomic ions --- note that ARC and
-    PairInteraction are designed for neutral Rydberg atoms. To keep the
-    interface clean and simple, all parameters associated with the parametric
-    model potentials are collected in a single text file. In fact, all data
-    associated with AlkCalc is stored in plain text files, which has the
-    advantage of not introducing additional software requirements for reading
-    binary data formats and alike.
+    model potential. This has the advantage that the radial eigenstates share
+    one consistent origin, and all derived quantities (oscillator strengths,
+    matrix elements, lifetimes, etc.) are computed on an internally consistent
+    basis. Another advantage is that low-energy eigenstates are treated
+    consistently as well, without the need to math the wave-functions inside the
+    effective nucleus to some Coulomb-Whittaker wave-functions in the
+    outside-core region, as is done in quantum defect theory. Finally, not
+    relying on quantum defect theory grants AlkCalc the power to solve
+    essentially any problem with radial symmetry. This flexibility is one reason
+    why it is so simple to employ AlkCalc for both Rydberg states in neutral
+    atoms AND atomic ions --- note that ARC and PairInteraction are designed for
+    neutral Rydberg atoms. To keep the interface clean and simple, all
+    parameters associated with the parametric model potentials are collected in
+    a single text file. In fact, all data associated with AlkCalc is stored in
+    plain text files, which has the advantage of not introducing additional
+    software requirements for reading binary data formats and alike.
 
         Ultimately, AlkCalc is designed for researchers who value full control
     over the data underlying their research. More broadly, AlkCalc is for anyone

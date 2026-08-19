@@ -60,21 +60,27 @@ Einführung.
     Behandlung von Rydbergatomen, wie ARC [Sib2017] oder PairInteraction
     [Web2017], stützt sich AlkCalc nicht auf die Quantendefekttheorie.
     Stattdessen berechnet AlkCalc alle Eigenenergien und Eigenzustände
-    unmittelbar aus dem parametrischen Modellpotential. Dies bringt den Vorteil
-    mit sich, dass AlkCalc keineswegs auf hohe Hauptquantenzahlen beschränkt
-    ist, bei denen die Quantendefekttheorie genau wird, sondern von Natur aus
-    ebenso gute Ergebnisse für niedrigliegende elektronische Zustände liefert.
-    Zudem verleiht der Verzicht auf die Quantendefekttheorie AlkCalc die
-    Fähigkeit, im Grunde jedes Problem mit radialer Symmetrie zu lösen. Unter
-    anderem ist diese Anpassungsfähigkeit der Grund dafür, dass AlkCalc sowohl
-    Rydbergzustände in neutralen Atomen als auch in Ionen von Haus aus zu
-    behandeln vermag --- man beachte, dass ARC und PairInteraction für
-    neutrale Rydbergatome ausgelegt sind. Um die Schnittstelle sauber und
-    einfach zu halten, sind alle Parameter der parametrischen Modellpotentiale
-    in einer einzigen Textdatei gesammelt. Tatsächlich werden sämtliche zu
-    AlkCalc gehörigen Daten in reinen Textdateien abgelegt, was den Vorteil hat,
-    dass keine weiteren Softwarevoraussetzungen zum Lesen binärer Datenformate
-    und dergleichen entstehen.
+    selbstkonsistent aus dem parametrischen Modellpotential. Dies bringt den
+    Vorteil mit sich, dass alle radialen Eigenzustände einem gemeinsamen
+    Ursprung entstammen, und daher alle abgeleiteten Größen (Oszillatorstärken,
+    Matrixelemente, Lebenszeiten, usw.) auf einer konsistenten Basis von wahren
+    Eigenzuständen des parameterischen Modellpotentials basieren. Ein weiterer
+    Vorteil ist, dass auch energetisch niedrig gelegene Zustände konsistent
+    berechnet werden können, ohne den Teil der Wellenfunktion die den effektiven
+    Kern durchdringt an eine Coulomb-Whittaker Wellenfunktion im äußeren Bereich
+    anpassen zu müssen, wie es üblich ist in der Quantendefekttheorie.
+    Schließlich verleiht der Verzicht auf die Quantendefekttheorie AlkCalc nicht
+    nur Konsistenz, sondern auch die Fähigkeit, im Grunde jedes Problem mit
+    radialer Symmetrie zu behandeln. Unter anderem ist diese Anpassungsfähigkeit
+    der Grund dafür, dass es mit AlkCalc so einfach ist sowohl Rydbergzustände
+    in neutralen Atomen, als auch in Ionen, von Haus aus zu behandeln --- man
+    beachte, dass ARC und PairInteraction für neutrale Rydbergatome ausgelegt
+    sind. Um die Schnittstelle sauber und einfach zu halten, sind alle Parameter
+    der parametrischen Modellpotentiale in einer einzigen Textdatei gesammelt.
+    Tatsächlich werden sämtliche zu AlkCalc gehörigen Daten in reinen
+    Textdateien abgelegt, was den Vorteil hat, dass keine weiteren
+    Softwarevoraussetzungen zum Lesen binärer Datenformate und dergleichen
+    entstehen.
 
         Letztendlich ist AlkCalc für Forscher gedacht, denen die volle Kontrolle
     über die Daten hinter ihrer Forschung wichtig ist. Weiter gefasst ist
