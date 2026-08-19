@@ -58,8 +58,8 @@ Introduction.
     one consistent origin, and all derived quantities (oscillator strengths,
     matrix elements, lifetimes, etc.) are computed on an internally consistent
     basis. Another advantage is that low-energy eigenstates are treated
-    consistently as well, without the need to math the wave-functions inside the
-    effective nucleus to some Coulomb-Whittaker wave-functions in the
+    consistently as well, without the need to match the wave-functions inside
+    the effective nucleus to some Coulomb-Whittaker wave-functions in the
     outside-core region, as is done in quantum defect theory. Finally, not
     relying on quantum defect theory grants AlkCalc the power to solve
     essentially any problem with radial symmetry. This flexibility is one reason
