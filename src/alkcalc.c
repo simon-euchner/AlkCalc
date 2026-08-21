@@ -375,14 +375,14 @@ double alkcalc_rp(const char *species, int32_t nb, int32_t lb, double jb,
 
             /* Accumulate matrix components of K and M (order: column-major) */
             for (a = 0; a < k; a++) {
-                ia = imin + a; /* Index of relevant B-spline */
+                ia = imin + a; /* Index of relevant B-spline (Column index) */
                 if (ia == 0 || ia == Nbs - 1) { continue; }
                 for (b = 0; b <= a; b++) {
-                    ib = imin + b; /* Index of relevant B-spline */
+                    ib = imin + b; /* Index of relevant B-spline (Row index) */
                     if (ib == 0 || ib == Nbs - 1) { continue; }
 
                     /* Array index for column-major upper (U) (see EIGLAPACK) */
-                    iarr = (ia - 1) * k + k - (a - b) - 1;
+                    iarr = (ia - 1) * k + b - a + k - 1;
 
                     /* Accumulate matrix components */
                     Rp[iarr] += w * vnikx[a] * pow(t, p) * vnikx[b];
