@@ -1,0 +1,158 @@
+/* -------------------------------------------------------------------------- *
+ * AlkCalc: Alkali-metal atom and alkaline-earth-metal ion calculator         *
+ *                                                                            *
+ * Author of this file: Simon Euchner                                         *
+ * -------------------------------------------------------------------------- */
+
+
+Contact.
+
+    If you have doubts, questions, and/or suggestions, please do not hesitate to
+    contact the author.
+
+        Simon Euchner
+        Electronic mail: <euchner.se@gmail.com>
+
+
+Introduction.
+
+        This file describes how to report problems with AlkCalc, how to obtain
+    support, and how to contribute code. Contributions are always very welcome.
+    AlkCalc is actively maintained, and the author intends to keep developing it
+    together with the researchers who use it.
+
+        Before contributing, it is worth reading the file README.txt, which
+    describes the requirements, the installation procedure, and the generation
+    of the eigenenergies and radial eigenstates. The file theory/theory.pdf
+    documents the physics AlkCalc implements, the numerical (B-spline) method it
+    employs, and the library functions it provides. Between these two documents,
+    essentially all information required for working on AlkCalc is available.
+
+
+Structure of this file.
+
+        This file is organised into the following sections. The section
+    'Obtaining support' explains how to ask for help. The section 'Reporting
+    problems' describes what a useful bug report contains. The section
+    'Contributing code' describes how to propose a change. The section 'Coding
+    conventions' lists the conventions that contributed code must respect. The
+    section 'Checking correctness' explains how to verify that a change has not
+    broken AlkCalc. The section 'Adding a new species' covers the most common
+    kind of contribution. Finally, the section 'Licence' states the terms under
+    which contributions are accepted.
+
+
+Obtaining support.
+
+        Questions about the use of AlkCalc are welcome and can be raised in two
+    ways. The first is to open an issue on AlkCalc's repository, which is
+    located at
+
+        https://github.com/simon-euchner/AlkCalc .
+
+    The second, more direct way, is to contact the author by electronic mail
+    (see the section 'Contact' above). Questions concerning the physics or the
+    numerical method are welcome. However, questions are usually already
+    answered in theory/theory.pdf and README.txt. So it is worth consulting
+    these documents first.
+
+
+Reporting problems.
+
+        Problems are best reported by opening an issue on AlkCalc's repository.
+    A report that allows the author to reproduce the problem is much more likely
+    to be resolved quickly. Please include the following information.
+
+    (1) The species and the settings used, i.e. the relevant entry of
+        interface/species.dat and the contents of interface/settings.c.
+
+    (2) The step at which the problem occurs, i.e. whether it arises while
+        building AlkCalc, while generating the data, or while calling the
+        library functions.
+
+    (3) The exact error message or the incorrect output, quoted verbatim rather
+        than paraphrased.
+
+    (4) The operating system, the C compiler, the FORTRAN compiler, and the C
+        library, including their version numbers (compare the section 'Software
+        requirements' in README.txt).
+
+
+Contributing code.
+
+        Code is contributed by forking AlkCalc's repository, committing the
+    change to a branch of the fork, and opening a pull request against the main
+    branch. For a change of any size it is advisable to open an issue first and
+    describe the intended change, so that the approach can be discussed before
+    the work is carried out. This avoids duplicated effort.
+
+        A pull request should be limited to one self-contained change and should
+    state what the change does and why it is needed. If the change affects the
+    physics, the numerical method, or the library functions, the corresponding
+    part of theory/theory.pdf must be updated as well. If it affects
+    installation or data generation, also README.txt must be updated.
+
+        Contributions that are particularly welcome are new species for
+    interface/species.dat, additional library functions, support for further
+    parametric model potentials, and improvements to the installation procedure.
+
+
+Coding conventions.
+
+        AlkCalc is written in C and deliberately kept simple and lightweight, so
+    that a user can interact with the source code directly. Contributed code is
+    expected to respect the following conventions.
+
+    (1) The code must conform to the C99 standard, Ref. [C99] in README.txt. No
+        compiler extensions and no features of later standards are to be used.
+
+    (2) The fixed-width integer types int8_t, int32_t, and int64_t are used for
+        integer arithmetic, for definiteness and to simplify overflow checks.
+        The C99 standard treats these types as optional, but AlkCalc requires
+        them.
+
+    (3) No external dependencies may be introduced. AlkCalc depends on a C
+        library, a C compiler, and a FORTRAN compiler only. All further,
+        third-party software is built into AlkCalc directly. A contribution that
+        adds a dependency is likely to be rejected, because portability is a
+        design goal.
+
+    (4) All data is stored in plain text files. No binary data formats are to be
+        introduced, since reading the output of AlkCalc must not require any
+        additional software to keep the software simple.
+
+    (5) The formatting of the existing source code is to be followed, in
+        particular the line width, the indentation, and the style of the
+        comments.
+
+    (6) Makefiles are written for GNU make and follow the structure of the
+        existing ones.
+
+        The same applies, with the obvious modifications, to the Python
+    interface in pyalkcalc and to the FORTRAN routines taken from Netlib. The
+    latter are third-party code and should not be modified. However, if a change
+    to them appears necessary, please open an issue and describe the situation.
+
+        For traceability, please add your name to the header of the files you
+    have performed work on.
+
+
+Adding a new species.
+
+        Adding a species is the most common contribution and requires no change
+    to the source code. The species is added as an entry in the file
+    interface/species.dat. The parameters of the parametric model potential are
+    taken from the literature, in particular from Refs. [Mar1994] and [Aym1996]
+    in README.txt, or determined by fitting to spectroscopic data.
+
+        A contribution of this kind should state the source of every parameter
+    it adds, so that the data remains traceable. Please also report the
+    eigenenergies obtained for the new species together with the experimental or
+    literature values they are compared against.
+
+
+Licence.
+
+        AlkCalc is distributed under the GNU General Public License, version 3.
+    By contributing code you agree that your contribution is distributed under
+    the same terms. The full text of the licence is given in the file LICENSE.
