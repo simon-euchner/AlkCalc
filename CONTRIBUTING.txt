@@ -36,10 +36,9 @@ Structure of this file.
     problems' describes what a useful bug report contains. The section
     'Contributing code' describes how to propose a change. The section 'Coding
     conventions' lists the conventions that contributed code must respect. The
-    section 'Checking correctness' explains how to verify that a change has not
-    broken AlkCalc. The section 'Adding a new species' covers the most common
-    kind of contribution. Finally, the section 'Licence' states the terms under
-    which contributions are accepted.
+    section 'Adding a new species' covers the most common kind of contribution.
+    Finally, the section 'Licence' states the terms under which contributions
+    are accepted.
 
 
 Obtaining support.
