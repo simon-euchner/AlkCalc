@@ -1,14 +1,11 @@
 # ---------------------------------------------------------------------------- #
-# Makefile for the tests of AlkCalc                                            #
+# Makefile for testing AlkCalc                                                 #
 #                                                                              #
 # Author of this file: Simon Euchner                                           #
 # ---------------------------------------------------------------------------- #
 
 
 ### Variables
-
-# Timestamp
-TMSTMP := $(shell date +"%d%m%Y%H%M%S%9N")
 
 # Compiler and Linker (GNU C compiler and linker)
 CC = gcc
@@ -29,13 +26,13 @@ all:
 	@echo -e "\nVALID ARGUMENTS: test\n"
 
 
-### Tests of the library functions (species 1H)
-test: ${TMP}/tst${TMSTMP}
-	@echo -e "\nRUNNING ALL TESTS FOR SPECIES 1H\n"
-	- @${TMP}/tst${TMSTMP}
-	@rm -f ${TMP}/tst${TMSTMP}
-${TMP}/tst${TMSTMP}: ${OBJ}/${F0}.o
-	@${LD} -o ${TMP}/tst${TMSTMP} -L${LIB}/ ${OBJ}/${F0}.o -lm -lalkcalc \
+### Testing of AlkCalc (species 1H)
+test: ${TMP}/${F0}
+	@echo -e "\nRUNNING TESTS\n"
+	- @${TMP}/${F0}
+	@rm -f ${TMP}/${F0}
+${TMP}/${F0}${TMSTMP}: ${OBJ}/${F0}.o
+	@${LD} -o ${TMP}/${F0} -L${LIB}/ ${OBJ}/${F0}.o -lm -lalkcalc \
 	-Wl,-rpath,$(abspath ${LIB}/)
 
 
@@ -50,6 +47,6 @@ ${OBJ}/${F0}.o: ${F0}.c
 
 clean:
 	- rm -f ${OBJ}/${F0}.o
-	- rm -f ${TMP}/tst*
+	- rm -f ${TMP}/${F0}
 
 .PHONY: clean
