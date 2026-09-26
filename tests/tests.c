@@ -112,7 +112,7 @@ int main(int argc, char **argv)
 {
     (void)argc; (void)argv;
 
-    printf("%s\n", "--- Tests for AlkCalc (species: " SPECIES ")");
+    printf("%s\n", "--- TESTS FOR ALKCALC");
 
     test_eigenenergies();
     test_radial_matrix_elements();
@@ -123,11 +123,11 @@ int main(int argc, char **argv)
     test_uncoupled_basis();
     test_coupled_basis();
 
-    printf("\n%s\n\n", "Summary");
+    printf("\n%s\n\n", "SUMMARY");
     printf("TESTS PERFORMED: %" PRId32 "\n", ntests);
     printf("TESTS PASSED   : %" PRId32 "\n", ntests - nfails);
     printf("TESTS FAILED   : %" PRId32 "\n", nfails);
-    printf("\n%s\n", nfails ? "--- End (FAILURE)" : "--- End (SUCCESS)");
+    printf("\n%s\n", nfails ? "--- END (FAILURE)" : "--- END (SUCCESS)");
 
     return nfails ? 1 : 0;
 }
@@ -147,27 +147,27 @@ static void test_eigenenergies(void) {
     int32_t n;
     char name[81];
 
-    section("Eigenenergies [Hartree]");
+    section("EIGENENERGIES [HARTREE]");
 
     /* S states */
     for (n = 1; n <= 10; n++) {
-        (void)sprintf(name, "E(n=%2" PRId32 ",l=0,j=1/2)", n);
+        (void)sprintf(name, "E(N=%2" PRId32 ",L=0,J=1/2)", n);
         check(name, alkcalc_Enlsj(SPECIES, n, 0, .5), Eex(n), TOL_E);
     }
 
     /* P states */
     for (n = 2; n <= 6; n++) {
-        (void)sprintf(name, "E(n=%2" PRId32 ",l=1,j=1/2)", n);
+        (void)sprintf(name, "E(N=%2" PRId32 ",L=1,J=1/2)", n);
         check(name, alkcalc_Enlsj(SPECIES, n, 1, .5), Eex(n), TOL_EFS);
-        (void)sprintf(name, "E(n=%2" PRId32 ",l=1,j=3/2)", n);
+        (void)sprintf(name, "E(N=%2" PRId32 ",L=1,J=3/2)", n);
         check(name, alkcalc_Enlsj(SPECIES, n, 1, 1.5), Eex(n), TOL_EFS);
     }
 
     /* D states */
     for (n = 3; n <= 6; n++) {
-        (void)sprintf(name, "E(n=%2" PRId32 ",l=2,j=3/2)", n);
+        (void)sprintf(name, "E(N=%2" PRId32 ",L=2,J=3/2)", n);
         check(name, alkcalc_Enlsj(SPECIES, n, 2, 1.5), Eex(n), TOL_EFS);
-        (void)sprintf(name, "E(n=%2" PRId32 ",l=2,j=5/2)", n);
+        (void)sprintf(name, "E(N=%2" PRId32 ",L=2,J=5/2)", n);
         check(name, alkcalc_Enlsj(SPECIES, n, 2, 2.5), Eex(n), TOL_EFS);
     }
 }
@@ -183,58 +183,58 @@ static void test_eigenenergies(void) {
  * is a well-defined quantity, and only the modulus is tested here.           */
 static void test_radial_matrix_elements(void) {
 
-    section("Radial matrix elements [Bohr's radius]");
+    section("RADIAL MATRIX ELEMENTS [BOHR'S RADIUS]");
 
     /* Norm of the radial eigenstates */
-    check("<1s|r^0|1s>", alkcalc_rp(SPECIES, 1, 0, .5, 0., 1, 0, .5),
+    check("<1S|R**(+0)|1S>", alkcalc_rp(SPECIES, 1, 0, .5, 0., 1, 0, .5),
           rpex(1, 0, 0), TOL_R);
-    check("<2s|r^0|2s>", alkcalc_rp(SPECIES, 2, 0, .5, 0., 2, 0, .5),
+    check("<2S|R**(+0)|2S>", alkcalc_rp(SPECIES, 2, 0, .5, 0., 2, 0, .5),
           rpex(2, 0, 0), TOL_R);
-    check("<2p|r^0|2p>", alkcalc_rp(SPECIES, 2, 1, 1.5, 0., 2, 1, 1.5),
+    check("<2P|R**(+0)|2P>", alkcalc_rp(SPECIES, 2, 1, 1.5, 0., 2, 1, 1.5),
           rpex(2, 1, 0), TOL_RFS);
-    check("<3d|r^0|3d>", alkcalc_rp(SPECIES, 3, 2, 2.5, 0., 3, 2, 2.5),
+    check("<3D|R**(+0)|3D>", alkcalc_rp(SPECIES, 3, 2, 2.5, 0., 3, 2, 2.5),
           rpex(3, 2, 0), TOL_RFS);
 
     /* Expectation value of the radius */
-    check("<1s|r^1|1s>", alkcalc_rp(SPECIES, 1, 0, .5, 1., 1, 0, .5),
+    check("<1S|R**(+1)|1S>", alkcalc_rp(SPECIES, 1, 0, .5, 1., 1, 0, .5),
           rpex(1, 0, 1), TOL_R);
-    check("<3s|r^1|3s>", alkcalc_rp(SPECIES, 3, 0, .5, 1., 3, 0, .5),
+    check("<3S|R**(+1)|3S>", alkcalc_rp(SPECIES, 3, 0, .5, 1., 3, 0, .5),
           rpex(3, 0, 1), TOL_R);
-    check("<2p|r^1|2p>", alkcalc_rp(SPECIES, 2, 1, 1.5, 1., 2, 1, 1.5),
+    check("<2P|R**(+1)|2P>", alkcalc_rp(SPECIES, 2, 1, 1.5, 1., 2, 1, 1.5),
           rpex(2, 1, 1), TOL_RFS);
-    check("<3d|r^1|3d>", alkcalc_rp(SPECIES, 3, 2, 2.5, 1., 3, 2, 2.5),
+    check("<3D|R**(+1)|3D>", alkcalc_rp(SPECIES, 3, 2, 2.5, 1., 3, 2, 2.5),
           rpex(3, 2, 1), TOL_RFS);
 
     /* Expectation value of the squared radius */
-    check("<1s|r^2|1s>", alkcalc_rp(SPECIES, 1, 0, .5, 2., 1, 0, .5),
+    check("<1S|R**(+2)|1S>", alkcalc_rp(SPECIES, 1, 0, .5, 2., 1, 0, .5),
           rpex(1, 0, 2), TOL_R);
-    check("<2s|r^2|2s>", alkcalc_rp(SPECIES, 2, 0, .5, 2., 2, 0, .5),
+    check("<2S|R**(+2)|2S>", alkcalc_rp(SPECIES, 2, 0, .5, 2., 2, 0, .5),
           rpex(2, 0, 2), TOL_R);
-    check("<2p|r^2|2p>", alkcalc_rp(SPECIES, 2, 1, 1.5, 2., 2, 1, 1.5),
+    check("<2P|R**(+2)|2P>", alkcalc_rp(SPECIES, 2, 1, 1.5, 2., 2, 1, 1.5),
           rpex(2, 1, 2), TOL_RFS);
 
     /* Negative powers of the radius */
-    check("<1s|r^-1|1s>", alkcalc_rp(SPECIES, 1, 0, .5, -1., 1, 0, .5),
+    check("<1S|R**(-1)|1S>", alkcalc_rp(SPECIES, 1, 0, .5, -1., 1, 0, .5),
           rpex(1, 0, -1), TOL_R);
-    check("<2p|r^-1|2p>", alkcalc_rp(SPECIES, 2, 1, 1.5, -1., 2, 1, 1.5),
+    check("<2P|R**(-1)|2P>", alkcalc_rp(SPECIES, 2, 1, 1.5, -1., 2, 1, 1.5),
           rpex(2, 1, -1), TOL_RFS);
-    check("<2p|r^-2|2p>", alkcalc_rp(SPECIES, 2, 1, 1.5, -2., 2, 1, 1.5),
+    check("<2P|R**(-2)|2P>", alkcalc_rp(SPECIES, 2, 1, 1.5, -2., 2, 1, 1.5),
           rpex(2, 1, -2), TOL_RFS);
-    check("<3d|r^-2|3d>", alkcalc_rp(SPECIES, 3, 2, 2.5, -2., 3, 2, 2.5),
+    check("<3D|R**(-2)|3D>", alkcalc_rp(SPECIES, 3, 2, 2.5, -2., 3, 2, 2.5),
           rpex(3, 2, -2), TOL_RFS);
-    check("<2p|r^-3|2p>", alkcalc_rp(SPECIES, 2, 1, 1.5, -3., 2, 1, 1.5),
+    check("<2P|R**(-3)|2P>", alkcalc_rp(SPECIES, 2, 1, 1.5, -3., 2, 1, 1.5),
           rpex(2, 1, -3), TOL_RFS);
-    check("<3d|r^-3|3d>", alkcalc_rp(SPECIES, 3, 2, 2.5, -3., 3, 2, 2.5),
+    check("<3D|R**(-3)|3D>", alkcalc_rp(SPECIES, 3, 2, 2.5, -3., 3, 2, 2.5),
           rpex(3, 2, -3), TOL_RFS);
 
     /* Off-diagonal elements (moduli only, see comment above) */
-    check("|<1s|r^1|2p>|",
+    check("|<1S|r**(+1)|2S>|",
           fabs(alkcalc_rp(SPECIES, 1, 0, .5, 1., 2, 1, 1.5)),
           128. * sqrt(6.) / 243., TOL_RFS);
-    check("|<2s|r^1|2p>|",
+    check("|<2S|r**(+1)|2P>|",
           fabs(alkcalc_rp(SPECIES, 2, 0, .5, 1., 2, 1, 1.5)),
           3. * sqrt(3.), TOL_RFS);
-    check("|<2p|r^1|3d>|",
+    check("|<2P|r**(+1)|3D>|",
           fabs(alkcalc_rp(SPECIES, 2, 1, 1.5, 1., 3, 2, 2.5)),
           165888. * sqrt(5.) / 78125., TOL_RFS);
 }
