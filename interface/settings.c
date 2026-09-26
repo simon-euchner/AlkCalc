@@ -37,10 +37,10 @@
  * offset    : Integer offset to select correct lowest eigenvalue             *
  * -------------------------------------------------------------------------- */
 const alkcalc_settings settings = {
-    .species =                                                    "40CA+"      ,
+    .species =                                                       "1H"      ,
     .k       =                                                          8      ,
     .N       =                                                       2000      ,
-    .nmax    =                                                        120      ,
+    .nmax    =                                                         20      ,
     .l       =                                                          0      ,
     .j       =                                                           .5    ,
     .rmax    =                                                      20000.     ,

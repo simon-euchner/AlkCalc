@@ -40,7 +40,7 @@
  *     series. The maximal principal quantum number must satisfy nmax >= 10,  *
  *     and rmax must be large enough to support the state with n = nmax. The  *
  *     tolerances used below were fixed with data generated using k = 8,      *
- *     N = 2000, nmax = 20, and rmax = 3000 (default settings in              *
+ *     N = 2000, nmax = 20, and rmax = 10000 (default settings in             *
  *     interface/settings.c).                                                 *
  *                                                                            *
  * Tolerances.                                                                *
