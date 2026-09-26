@@ -2,70 +2,46 @@
  * Tests for the library functions of AlkCalc                                 *
  *                                                                            *
  * Compile: gcc -L../lib/ tests.c -lalkcalc -lm -Wl,-rpath,../lib/            *
- *          (Preferably run 'make test' in this directory instead.)           *
+ *          (Or, simply run 'make test' in this directory instead.)           *
  *                                                                            *
  * Author of this file: Simon Euchner                                         *
  * -------------------------------------------------------------------------- *
  *                                                                            *
- * IMPORTANT: THE MASS CORRECTION MUST NOT BE INCLUDED.                       *
+ * IMPORTANT: THE MASS CORRECTION MUST NOT BE INCLUDED!                       *
  *                                                                            *
  *     All tests collected in this file are performed EXCLUSIVELY for the     *
  *     species 1H, i.e., for the Hydrogen atom, because for 1H the reference  *
  *     values are known in closed form. Every reference value used below is   *
- *     the EXACT analytical result of the non-relativistic Coulomb problem    *
- *     for an INFINITELY HEAVY nucleus, that is, for a reduced mass equal to  *
- *     the electron's mass, me.                                               *
- *                                                                            *
- *     Consequently, the corrections that originate from the finite mass of   *
- *     the nucleus, i.e., the corrections controlled by the mass ratio        *
- *                                                                            *
- *         me / (Z * mp + N * mn) ,                                           *
- *                                                                            *
- *     where me, mp, and mn denote the mass of the electron, the proton, and  *
- *     the neutron, respectively, MUST NOT BE INCLUDED when the data used by  *
- *     these tests is generated. For 1H the nucleus is a single proton        *
- *     (Z = 1, N = 0), so the correction is of relative order                 *
- *     me / mp = 5.446E-04, which exceeds every tolerance used below, the     *
- *     loosest one by a factor of about five and the tightest one by four     *
- *     orders of magnitude. Hence, if the mass correction is included, the    *
- *     tests for the eigenenergies, the radial eigenfunctions, the radial     *
- *     matrix elements, the oscillator strengths, and the lifetimes ALL FAIL. *
+ *     the EXACT analytical resul for an INFINITELY HEAVY nucleus, that is,   *
+ *     for a reduced mass which is equal to the electron's mass, me.          *
  *                                                                            *
  *     Concretely, the mass correction C, i.e., rpar[7] in src/potential.c,   *
- *     must be equal to unity, which is the DEFAULT of AlkCalc. In the file   *
- *     src/potential.c the two relevant lines must therefore read (the first  *
- *     line commented out, the second line active; the comment delimiters     *
- *     are omitted here, since they may not be nested in C):                  *
+ *     must be equal to unity, which is the DEFAULT behaviour of AlkCalc. In  *
+ *     the file src/potential.c the two relevant lines must therefore read    *
+ *     (the first line commented out, the second line active):
  *                                                                            *
  *         rpar[7] = 1. / (1. + ME / rpar[6]);   <- MUST STAY COMMENTED OUT   *
  *         rpar[7] = 1.;                         <- MUST BE THE ACTIVE LINE   *
  *                                                                            *
- *     The same holds for the angular tests, which are independent of the     *
- *     species and of the mass correction, but are run here as part of the    *
- *     same suite.                                                            *
- *                                                                            *
  * Data required by the tests.                                                *
  *                                                                            *
- *     Before the tests can be run, the eigenenergies and radial              *
- *     eigenstates of 1H must be generated (see READMEeng.txt, section        *
- *     'Generating eigenenergies and radial eigenstates') for the pairs       *
+ *     Before the tests can be run, the eigenenergies and radial eigenstates  *
+ *     of 1H must be generated (see README.txt, section 'Generating           *
+ *     eigenenergies and radial eigenstates') for the pairs                   *
  *                                                                            *
  *         (l, j) = (0, 1/2), (1, 1/2), (1, 3/2), (2, 3/2), (2, 5/2),         *
  *                  (3, 7/2)                                                  *
  *                                                                            *
  *     keeping the parameters species, k, N, nmax, and rmax in                *
  *     interface/settings.c fixed. For 1H the minimal principal quantum       *
- *     number obeys the Hydrogenic law, nl = l + 1, so the offset must be     *
- *     set to offset = -nl + 1 = -l, that is, offset = 0 for the S series,    *
- *     offset = -1 for the P series, offset = -2 for the D series, and        *
- *     offset = -3 for the F series. The maximal principal quantum number     *
- *     must satisfy nmax >= 10, and rmax must be large enough to support      *
- *     the state with n = nmax. The tolerances used below were fixed with     *
- *     data generated using k = 8, N = 2000, nmax = 20, and rmax = 3000.      *
- *                                                                            *
- *     The pair (l, j) = (3, 7/2) is needed for the lifetime of the state     *
- *     3D(j = 5/2) only. AlkCalc inspects the F series to determine which     *
- *     states lie below 3D(j = 5/2), even though no F state does.             *
+ *     number obeys the Hydrogenic law, nl = l + 1, so offset = -nl + 1 = -l  *
+ *     be set; that is, offset = 0 for the S series, offset = -1 for the P    *
+ *     series, offset = -2 for the D series, and offset = -3 for the F        *
+ *     series. The maximal principal quantum number must satisfy nmax >= 10,  *
+ *     and rmax must be large enough to support the state with n = nmax. The  *
+ *     tolerances used below were fixed with data generated using k = 8,      *
+ *     N = 2000, nmax = 20, and rmax = 3000 (default settings in              *
+ *     interface/settings.c).                                                 *
  *                                                                            *
  * Tolerances.                                                                *
  *                                                                            *
