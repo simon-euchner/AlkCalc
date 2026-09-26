@@ -115,7 +115,7 @@ Aufbau dieses README.
     "Installation" gibt Anweisungen zur richtigen Installation von AlkCalc. Der
     Abschnitt "Erzeugung der Daten" erklärt, wie die Eigenenergien und radialen
     Eigenzustände mit AlkCalc berechnet und auf der Festplatte abgelegt werden.
-    Der Abschnitt "Erprobung" erklärt, wie die Richtigkeit der
+    Der Abschnitt "Prüfung" erklärt, wie die Richtigkeit der
     Bibliotheksfunktionen von AlkCalc geprüft wird. Schließlich behandelt der
     Abschnitt "Wichtige weitere Hinweise" technische Gesichtspunkte, die vor der
     Verwendung von AlkCalc zu beachten sind.
@@ -346,38 +346,37 @@ Erzeugung der Daten.
 Prüfung.
 
         In diesem Abschnitt soll beschrieben werden, wie die Funktionsweise von
-    AlkCalc auf Richtigkeit geprüft werden kann. Zu diesem Zweck is der Ordner
-    AlkCalc/tests angelegt, in welchem die Datei tests.c abgelegt. Diese Datei
-    enthält den Kode zur Prüfung der Eigenenergien, der radialen
-    Eigenfunktionen, der radialen Matrixelemente, der Oszillator Stärken, der
+    AlkCalc auf Richtigkeit geprüft werden kann. Zu diesem Zweck ist der Ordner
+    AlkCalc/tests angelegt, in welchem die Datei tests.c abgelegt ist. Diese
+    Datei enthält den Kode zur Prüfung der Eigenenergien, der radialen
+    Eigenfunktionen, der radialen Matrixelemente, der Oszillatorstärken, der
     Lebenszeiten, der Clebsch-Gordan Koeffizienten und der Winkelanteile der
     Eigenzustände. Abgesehen von der Datei tests.c enthält AlkCalc/tests
     außerdem eine Makefile, die zur Ausführung der Prüfungen dient. In den
     folgenden drei Schritten ist der Ablauf der Prüfungen geschildert:
 
-
     1. Erzeugen Sie zunächst die Eigenenergien und die radialen Eigenzustände
-       für die Art 1H (Wasserstof). Dieser Schritt ist im Abschnitt "Erzeugen
-       der Daten" ausführlich dargelegt. Der Grund weshalb alle Tests für die
-       Art 1H angelegt sind, ist, dass für Wasserstoff die Referenzwerte mittels
-       analytisch bekannter Formeln berechnet werden können. Um die Prüfungen
+       für die Art 1H (Wasserstoff). Dieser Schritt ist im Abschnitt "Erzeugung
+       der Daten" ausführlich dargelegt. Der Grund, weshalb alle Tests für die
+       Art 1H angelegt sind, ist, dass für Wasserstoff die Kontrollwerte mittels
+       analytisch bekannter Ausdrücke bestimmt werden können. Um die Prüfungen
        auszuführen, beachten Sie, dass für die folgenden Quantenzahlen Daten
        (Eigenenergien und radiale Eigenzustände) vorhanden sein müssen:
 
            (l, j) = (0, 1/2), (1, 1/2), (1, 3/2), (2, 3/2), (2, 5/2), (3, 7/2)
 
        Dabei ist in interface/settings.c offset = -nl + 1 = -l zu setzen. Die
-       größte Hauptquantenzahl muss der bedingung nmax >= 10 genügen und rmax
+       größte Hauptquantenzahl muss der Bedingung nmax >= 10 genügen und rmax
        muss groß genug gewählt sein, damit der Träger des Zustands n = nmax im
-       Intervall [0, rmax) liegt.
+       Intervall [0, rmax) enthalten ist.
 
     2. Stellen Sie sicher, dass der Massenfaktor C, beschrieben in
        theory/theory.pdf, NICHT in der Berechnung der Eigenenergien und der
-       radialen Eigenzustände berücksichtigt wird (siehe Abschnitt 'Wichtige
-       weitere Hinweise').
+       radialen Eigenzustände berücksichtigt wird (siehe Abschnitt "Wichtige
+       weitere Hinweise").
 
     3. Führen Sie die Makefile im Ordner AlkCalc/tests mit dem Argument "test"
-       aus. Dieser Befehl, führt alle Prüfungen auf einen Schlag aus.
+       aus. Dieser Befehl führt alle Prüfungen auf einen Schlag aus.
 
 
 Wichtige weitere Hinweise.

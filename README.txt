@@ -100,10 +100,9 @@ Structure of this README.
     'Installation' provides instructions for correctly installing and setting up
     AlkCalc. The section 'Data generation' explains how the eigenenergies and
     radial eigenstates are computed and stored with AlkCalc. The section
-    'Testing' explains how the correctness of AlkCalc's library functions is
-    checked. Finally, the section 'Important additional information' discusses
-    technical aspects that should be taken into consideration before using
-    AlkCalc.
+    'Testing' explains how the correctness of AlkCalc can be tested. Finally,
+    the section 'Important additional information' discusses technical aspects
+    that should be taken into consideration before using AlkCalc.
 
 
 Software requirements.
@@ -305,21 +304,21 @@ Data generation.
 
 Testing.
 
-        This section describes how the correctness of AlkCalc's is checked.
-    The directory AlkCalc/tests contains the file tests.c, which collects all
-    tests in a single source file, together with a Makefile that runs all of
-    them at once. Tested are the eigenenergies, the radial eigenfunctions, the
-    radial matrix elements, the oscillator strengths, the lifetimes, the
-    Clebsch-Gordan coefficients, and the angular eigenstates in the uncoupled
-    as well as in the coupled (fine-structure) basis. The following three steps
-    describe how the tests are run (note that all settings discussed below are
-    already the default settings of AlkCalc):
+        This section describes how the correctness of AlkCalc is checked. The
+    directory AlkCalc/tests contains the file tests.c, which collects all tests
+    in a single source file, together with a Makefile that runs all of them at
+    once. Tested are the eigenenergies, the radial eigenfunctions, the radial
+    matrix elements, the oscillator strengths, the lifetimes, the Clebsch-Gordan
+    coefficients, and the angular eigenstates in the uncoupled as well as in the
+    coupled (fine-structure) basis. The following three steps describe how the
+    tests are run (note that all settings discussed below are already the
+    default settings of AlkCalc):
 
     1. Generate the eigenenergies and radial eigenstates for the species 1H, as
        described in the section 'Data generation'. All tests are performed
        exclusively for 1H, because for the Hydrogen atom every reference value
-       is known in closed form. The data (eigenergies and radial eigenstates) is
-       required for the pairs
+       is known in closed form. The data (eigenenergies and radial eigenstates)
+       is required for the pairs
 
            (l, j) = (0, 1/2), (1, 1/2), (1, 3/2), (2, 3/2), (2, 5/2), (3, 7/2)
 
