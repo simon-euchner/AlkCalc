@@ -115,8 +115,10 @@ Aufbau dieses README.
     "Installation" gibt Anweisungen zur richtigen Installation von AlkCalc. Der
     Abschnitt "Erzeugung der Daten" erklärt, wie die Eigenenergien und radialen
     Eigenzustände mit AlkCalc berechnet und auf der Festplatte abgelegt werden.
-    Schließlich behandelt der Abschnitt "Wichtige weitere Hinweise" technische
-    Gesichtspunkte, die vor der Verwendung von AlkCalc zu beachten sind.
+    Der Abschnitt "Erprobung" erklärt, wie die Richtigkeit der
+    Bibliotheksfunktionen von AlkCalc geprüft wird. Schließlich behandelt der
+    Abschnitt "Wichtige weitere Hinweise" technische Gesichtspunkte, die vor der
+    Verwendung von AlkCalc zu beachten sind.
 
 
 Softwareanforderungen.
@@ -339,6 +341,64 @@ Erzeugung der Daten.
                   NICHT überschrieben --- sie wird nur dann neu erzeugt, wenn
                   AlkCalc die Datei mit den Knotendaten nicht auffinden kann,
                   das heißt, wenn sie gelöscht wurde.
+
+
+Erprobung.
+
+        Dieser Abschnitt beschreibt, wie die Richtigkeit der
+    Bibliotheksfunktionen von AlkCalc geprüft wird. Der Ordner AlkCalc/examples
+    enthält neben den Beispielprogrammen die Datei tests.c, welche alle Tests in
+    einer einzigen Quelldatei zusammenfasst, sowie eine Makefile, welche alle
+    Tests auf einmal ausführt. Geprüft werden die Eigenenergien, die radialen
+    Eigenfunktionen, die radialen Matrixelemente, die Oszillatorstärken, die
+    Lebensdauern, die Clebsch-Gordan-Koeffizienten sowie die Winkelanteile der
+    Eigenzustände in der ungekoppelten und in der gekoppelten Basis. Die
+    folgenden drei Schritte beschreiben, wie die Tests ausgeführt werden.
+
+    1. Erzeugen Sie die Eigenenergien und radialen Eigenzustände für die Art 1H,
+       wie im Abschnitt "Erzeugung der Daten" beschrieben. Alle Tests werden
+       ausschließlich für 1H durchgeführt, da für das Wasserstoffatom jeder
+       Vergleichswert in geschlossener Form bekannt ist. Die Daten werden für
+       die Paare
+
+           (l, j) = (0, 1/2), (1, 1/2), (1, 3/2), (2, 3/2), (2, 5/2), (3, 7/2)
+
+       benötigt, wobei der Versatz offset = -nl + 1 = -l ist, da die minimale
+       Hauptquantenzahl von 1H dem wasserstoffartigen Gesetz nl = l + 1 folgt.
+       Die maximale Hauptquantenzahl muss nmax >= 10 erfüllen, und rmax ist groß
+       genug zu wählen, um den Zustand mit n = nmax zu tragen. Das Paar
+       (l, j) = (3, 7/2) wird allein für die Lebensdauer des Zustands
+       3D(j = 5/2) benötigt, für welche AlkCalc die F-Reihe heranzieht, obgleich
+       kein F-Zustand unterhalb von 3D(j = 5/2) liegt.
+
+    2. Stellen Sie sicher, dass der Massenfaktor C aus theory/theory.pdf gleich
+       eins ist, was der Voreinstellung von AlkCalc entspricht (siehe den
+       Abschnitt "Wichtige weitere Hinweise"). Die Vergleichswerte der Tests
+       sind die exakten analytischen Ergebnisse des nichtrelativistischen
+       Coulomb-Problems für einen unendlich schweren Kern. Die endliche Masse
+       des Kerns geht in der relativen Ordnung me / mp = 5.446E-04 ein, wobei me
+       und mp die Massen des Elektrons und des Protons sind. Dies ist größer als
+       jede von den Tests verwendete Toleranz, sodass für C ungleich eins
+       praktisch alle Tests fehlschlagen.
+
+    3. Führen Sie die Makefile im Ordner AlkCalc/examples mit dem Argument
+       "test" aus. Dies übersetzt tests.c, bindet die Datei gegen die Bibliothek
+       von AlkCalc und führt alle Tests auf einmal aus. Für jede geprüfte Größe
+       wird eine Zeile ausgegeben, welche angibt, ob der Test bestanden wurde
+       oder fehlgeschlagen ist, sowie den berechneten Wert, den Vergleichswert
+       und die Abweichung vom Vergleichswert. Am Ende werden die Anzahl der
+       durchgeführten, der bestandenen und der fehlgeschlagenen Tests angegeben.
+
+       WICHTIG: Die von den Tests verwendeten Toleranzen sind keine
+                allgemeingültigen Konstanten. Sie spiegeln die Güte der
+                Einstellungen des Eigenwertlösers k, N und rmax wider, die
+                Anzahl der Stellen, mit denen die Eigenenergien auf der
+                Festplatte abgelegt werden, sowie den Umstand, dass AlkCalc die
+                Spin-Bahn-Kopplung enthält, die nichtrelativistischen
+                Vergleichswerte hingegen nicht. Werden die Tests mit
+                Einstellungen ausgeführt, die erheblich von den im Kopf der
+                Datei tests.c genannten abweichen, müssen die Toleranzen
+                gegebenenfalls angepasst werden.
 
 
 Wichtige weitere Hinweise.

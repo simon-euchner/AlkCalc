@@ -58,8 +58,8 @@ Introduction.
     one consistent origin, and all derived quantities (oscillator strengths,
     matrix elements, lifetimes, etc.) are computed on an internally consistent
     basis. Another advantage is that low-energy eigenstates are treated
-    consistently as well, without the need to math the wave-functions inside the
-    effective nucleus to some Coulomb-Whittaker wave-functions in the
+    consistently as well, without the need to match the wave-functions inside
+    the effective nucleus to some Coulomb-Whittaker wave-functions in the
     outside-core region, as is done in quantum defect theory. Finally, not
     relying on quantum defect theory grants AlkCalc the power to solve
     essentially any problem with radial symmetry. This flexibility is one reason
@@ -99,9 +99,11 @@ Structure of this README.
     'Software requirements' lists the required external software. The section
     'Installation' provides instructions for correctly installing and setting up
     AlkCalc. The section 'Data generation' explains how the eigenenergies and
-    radial eigenstates are computed and stored with AlkCalc. Finally, the
-    section 'Important additional information' discusses technical aspects that
-    should be taken into consideration before using AlkCalc.
+    radial eigenstates are computed and stored with AlkCalc. The section
+    'Testing' explains how the correctness of AlkCalc's library functions is
+    checked. Finally, the section 'Important additional information' discusses
+    technical aspects that should be taken into consideration before using
+    AlkCalc.
 
 
 Software requirements.
@@ -299,6 +301,60 @@ Data generation.
                     the file containing the knot data is NOT overwritten --- it
                     is only regenerated in case AlkCalc cannot locate the
                     knot-data file, i.e., if it was deleted.
+
+
+Testing.
+
+        This section describes how the correctness of AlkCalc's library
+    functions is checked. Besides the example programs, the directory
+    AlkCalc/examples contains the file tests.c, which collects all tests in a
+    single source file, together with a Makefile that runs all of them at once.
+    Tested are the eigenenergies, the radial eigenfunctions, the radial matrix
+    elements, the oscillator strengths, the lifetimes, the Clebsch-Gordan
+    coefficients, and the angular eigenstates in the uncoupled as well as in
+    the coupled basis. The three steps below describe how the tests are run.
+
+    1. Generate the eigenenergies and radial eigenstates for the species 1H, as
+       described in the section 'Data generation'. All tests are performed
+       exclusively for 1H, because for the Hydrogen atom every reference value
+       is known in closed form. The data is required for the pairs
+
+           (l, j) = (0, 1/2), (1, 1/2), (1, 3/2), (2, 3/2), (2, 5/2), (3, 7/2)
+
+       with the offset offset = -nl + 1 = -l, since the minimal principal
+       quantum number of 1H follows the Hydrogenic law, nl = l + 1. The maximal
+       principal quantum number must satisfy nmax >= 10, and rmax must be
+       chosen large enough to support the state with n = nmax. The pair
+       (l, j) = (3, 7/2) is needed for the lifetime of the state 3D(j = 5/2)
+       only, for which AlkCalc inspects the F series, even though no F state
+       lies below 3D(j = 5/2).
+
+    2. Make sure that the mass correction is NOT included, that is, that the
+       mass correction factor C from theory/theory.pdf is equal to unity, which
+       is the default of AlkCalc (see the section 'Important additional
+       information'). The reference values of the tests are the exact
+       analytical results of the non-relativistic Coulomb problem for an
+       infinitely heavy nucleus. The finite mass of the nucleus enters at the
+       relative order me / mp = 5.446E-04, where me and mp are the masses of
+       the electron and of the proton. This is larger than every tolerance used
+       by the tests, so with the mass correction included essentially all tests
+       fail.
+
+    3. Run the Makefile in the directory AlkCalc/examples with the argument
+       'test'. This compiles tests.c, links it against AlkCalc's library, and
+       runs all tests at once. For every tested quantity one line is printed,
+       stating whether the test passed or failed, the computed value, the
+       reference value, and the deviation from the reference value. At the end,
+       the number of tests performed, passed, and failed is reported.
+
+       IMPORTANT: The tolerances used by the tests are not universal constants.
+                  They reflect the quality of the eigensolver settings k, N,
+                  and rmax, the number of digits with which the eigenenergies
+                  are stored on disk, and the fact that AlkCalc includes the
+                  spin-orbit coupling term, whereas the non-relativistic
+                  reference values do not. If the tests are run with settings
+                  that differ considerably from the ones stated in the header
+                  of tests.c, the tolerances may have to be adjusted.
 
 
 Important additional information.
