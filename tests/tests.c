@@ -306,19 +306,41 @@ static void test_states(void) {
 
 /* Oscillator strengths (dimensionless)                                       *
  *                                                                            *
- * Summed over the total angular momentum quantum number of the final state,  *
- * the oscillator strength reduces to the result of LS coupling, which is     *
- * known in closed form for 1H. The individual fine-structure components are  *
- * obtained from the LS-coupled result by multiplication with the             *
- * corresponding angular factors (see theory/theory.pdf).                     */
+ * The oscillator strength of the transition from an initial state            *
+ * i = (n, l, j) to a final state f = (n', l', j') is, in atomic units,       *
+ *                                                                            *
+ *     f(i -> f) = 2 / 3 * (Ef - Ei) * R**2 * al(l, j -> l', j') ,            *
+ *                                                                            *
+ * where R = <n',l'|r|n,l> is the radial dipole matrix element and al is a    *
+ * purely angular factor (see theory/theory.pdf and alkcalc_fitof in          *
+ * src/alkcalc.c). Selection rules: al vanishes unless l' = l +- 1 and        *
+ * |j' - j| <= 1. For emission, Ef < Ei, and f(i -> f) is negative.           *
+ *                                                                            *
+ * The reference values rely on one property of al: summed over the final     *
+ * total angular momentum j', it no longer depends on j, but only on l,       *
+ *                                                                            *
+ *     sum_j' al(l, j -> l', j') = max(l, l') / (2 * l + 1) .                 *
+ *                                                                            *
+ * Physically, this means that the total strength of the transition           *
+ * n,l -> n',l' is merely distributed over its fine-structure components.     *
+ * The sum over j' therefore equals the oscillator strength of 1H WITHOUT     *
+ * fine structure, which is known in closed form (up to the small effect of   *
+ * the LS coupling on Ef - Ei and R, see header). For the individual          *
+ * components the angular factors are needed explicitly. Those used below     *
+ * are                                                                        *
+ *                                                                            *
+ *     al(0, 1/2 -> 1, 1/2) = 1 / 3,   al(0, 1/2 -> 1, 3/2) = 2 / 3,          *
+ *     al(1, 3/2 -> 0, 1/2) = 1 / 3 .                                         */
 static void test_oscillator_strengths(void) {
 
     double dE, r, fsum, fh, fl;
 
     section("OSCILLATOR STRENGTHS [DIMENSIONLESS]");
 
-    /* 1S(j = 1 / 2) -> 2P(j' = 1 / 2, 3 / 2); the sum of the two components  *
-     * is the well-known value f(1s -> 2p) = 2**13 / 3**9 = 0.4162            */
+    /* 1S(j = 1 / 2) -> 2P(j' = 1 / 2, 3 / 2): the sum of the two components  *
+     * is the well-known value f(1s -> 2p) = 2**13 / 3**9 = 0.4162, which     *
+     * follows from Ef - Ei = 3 / 8, R = 128 * sqrt(6) / 243, and             *
+     * max(l, l') / (2 * l + 1) = 1. It is split in the ratio 1 : 2.          */
     fl = alkcalc_fitof(SPECIES, 1, 0, .5, 2, 1, .5);
     fh = alkcalc_fitof(SPECIES, 1, 0, .5, 2, 1, 1.5);
     fsum = 8192. / 19683.;
@@ -326,11 +348,14 @@ static void test_oscillator_strengths(void) {
     check("F(1S,1/2 -> 2P,3/2)", fh, 2. * fsum / 3., TOL_OS);
     check("F(1S,1/2 -> 2P), SUM OVER J'", fl + fh, fsum, TOL_OS);
 
-    /* 2P(j = 3 / 2) -> 1S(j' = 1 / 2), emission, hence negative */
+    /* 2P(j = 3 / 2) -> 1S(j' = 1 / 2): emission, hence negative. With        *
+     * Ef - Ei = -3 / 8 and A = 1 / 3 this gives -f(1s -> 2p) / 3.            */
     check("F(2P,3/2 -> 1S,1/2)", alkcalc_fitof(SPECIES, 2, 1, 1.5, 1, 0, .5),
           -8192. / 59049., TOL_OS);
 
-    /* 2P(j = 1 / 2, 3 / 2) -> 3D(j' = 3 / 2, 5 / 2) */
+    /* 2P(j = 1 / 2, 3 / 2) -> 3D(j' = 3 / 2, 5 / 2): only sums over j' are   *
+     * tested, which must be equal for BOTH initial values of j, namely       *
+     * f(2p -> 3d) = 2 / 3 * (Ef - Ei) * R**2 * 2 / 3 (max(l, l') = 2).       */
     dE = Eex(3) - Eex(2); r = 165888. * sqrt(5.) / 78125.;
     fsum = 2. / 3. * dE * r * r * 2. / 3.;
     fl = alkcalc_fitof(SPECIES, 2, 1, .5, 3, 2, 1.5);
@@ -339,7 +364,8 @@ static void test_oscillator_strengths(void) {
     check("F(2P,1/2 -> 3D), SUM OVER J'", fl, fsum, TOL_OS);
     check("F(2P,3/2 -> 3D), SUM OVER J'", fh, fsum, TOL_OS);
 
-    /* Selection rules, all of the following transitions are forbidden */
+    /* Selection rules. All of the following transitions are forbidden: the   *
+     * first two violate l' = l +- 1, the third violates |j' - j| <= 1.       */
     check("F(1S,1/2 -> 2S,1/2)", alkcalc_fitof(SPECIES, 1, 0, .5, 2, 0, .5),
           0., TOL_EXACT);
     check("F(1S,1/2 -> 3D,3/2)", alkcalc_fitof(SPECIES, 1, 0, .5, 3, 2, 1.5),
