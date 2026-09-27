@@ -31,7 +31,7 @@ test: ${TMP}/${F0}
 	@echo -e "\nRUNNING TESTS\n"
 	- @${TMP}/${F0}
 	@rm -f ${TMP}/${F0}
-${TMP}/${F0}${TMSTMP}: ${OBJ}/${F0}.o
+${TMP}/${F0}: ${OBJ}/${F0}.o
 	@${LD} -o ${TMP}/${F0} -L${LIB}/ ${OBJ}/${F0}.o -lm -lalkcalc \
 	-Wl,-rpath,$(abspath ${LIB}/)
 
