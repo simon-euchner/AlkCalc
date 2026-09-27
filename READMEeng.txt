@@ -162,7 +162,7 @@ Installation.
        allows matrix-vector products to be computed efficiently.
 
     6. Navigate to the directory AlkCalc/interface and set the relevant paths in
-       the file alkcalk.h. The variable PATH_TO_ALKCALC must be the absolute
+       the file alkcalc.h. The variable PATH_TO_ALKCALC must be the absolute
        path to the location of the AlkCalc directory. The variable
        PATH_TO_STATES defines where the radial eigenstates will be read from.
        The radial eigenstates can take up a fair amount of disk space (~5 GB),
@@ -258,7 +258,7 @@ Data generation.
        mathematical bound, of the potential loss of precision, assuming that the
        Hamiltonian itself is well conditioned. Even so, it is useful for
        choosing the order of the B-splines, k, and the number of knots without
-       multiplicities, N. As a rule of thumb, one looses roughly log10(kappa)
+       multiplicities, N. As a rule of thumb, one loses roughly log10(kappa)
        digits, where kappa is the condition number of the mass matrix M (see
        theory/theory.pdf). For 64-bit floating-point arithmetic, one should try
        to keep the condition number kappa less than ~1e6, so roughly 10 digits
@@ -340,9 +340,9 @@ Testing.
 Important additional information.
 
     - By default, the mass correction factor C from theory/theory.pdf is set to
-      unity in the source code in src/eigensolver.c, that is, the reduced mass
-      is approximated by the electron mass. This is because the parameters for
-      the parametric model potential (see Refs. [Mar1994,Aym1996]) were computed
+      unity in the source code in src/potential.c, that is, the reduced mass is
+      approximated by the electron mass. This is because the parameters for the
+      parametric model potential (see Refs. [Mar1994,Aym1996]) were computed
       without the mass correction: the computed ground-state energies fit the
       ideal ionisation-energy values better when the mass correction is omitted.
       If model parameters obtained WITH the mass correction are used instead,

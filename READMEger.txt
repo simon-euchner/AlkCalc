@@ -184,7 +184,7 @@ Installation.
        Vektoren effektiv numerisch zu berechnen.
 
     6. Wechseln Sie in den Ordner AlkCalc/interface und setzen Sie die
-       relevanten Pfade in der Datei alkcalk.h. Die Variable PATH_TO_ALKCALC
+       relevanten Pfade in der Datei alkcalc.h. Die Variable PATH_TO_ALKCALC
        muss der vollständige Pfad zum Ort des Ordners AlkCalc sein. Die Variable
        PATH_TO_STATES legt fest, von wo auf der Festplatte die radialen
        Eigenzustände gelesen werden. Die radialen Eigenzustände können einen
@@ -248,7 +248,7 @@ Erzeugung der Daten.
               verlangt, die größer ist als die größte in species.dat angegebene,
               l0. Für l > l0 verwendet AlkCalc dann einfach l, jedoch mit den zu
               l0 gehörigen Daten aus species.dat. Dieses Verhalten ist in
-              Übereinstimmung mit dem in den Verwweisen [Mar1994,Aym1996].
+              Übereinstimmung mit dem in den Verweisen [Mar1994,Aym1996].
 
           (5) In species.dat wird für jedes l eine niedrigste Hauptquantenzahl,
               nl, angegeben. Dabei gibt es zwei Möglichkeiten: entweder folgt nl
@@ -382,9 +382,9 @@ Prüfung.
 Wichtige weitere Hinweise.
 
     - In der Voreinstellung ist der Massenfaktor C aus theory/theory.pdf im
-      Quellkode in src/eigensolver.c auf eins gesetzt, das heißt, die reduzierte
+      Quellkode in src/potential.c auf eins gesetzt, das heißt, die reduzierte
       Masse wird durch die Elektronenmasse angenähert. Der Grund hierfür ist,
-      dass die Parameter für das parametrische Modellpotential (siehe Verwweise
+      dass die Parameter für das parametrische Modellpotential (siehe Verweise
       [Mar1994,Aym1996]) mit C = 1 berechnet wurden: Die berechneten
       Grundzustandsenergien passen besser zu den idealen Ionisationsenergien,
       wenn C = 1 ist. Werden stattdessen Modellparameter verwendet, die MIT dem
@@ -422,7 +422,7 @@ Wichtige weitere Hinweise.
       floor(2.0 * j + 0.5) gesetzt. Die Funktion floor ist als floor(x) = k in
       den nichtnegativen Ganzzahlen definiert (x reelle Zahl), wobei k die
       eindeutige Ganzzahl ist, für die x im halboffenen Intervall [k, k + 1)
-      liegt. In der Praxis bedeutet dies, dass AlkCalc für jedes j im Interval
+      liegt. In der Praxis bedeutet dies, dass AlkCalc für jedes j im Intervall
       [0.25, 0.75) den Wert j = 1 / 2 verwendet, für jedes j in [1.25, 1.75) den
       Wert j = 3 / 2, und so fort.
 
