@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------------------- *
- * Tests for the library functions of AlkCalc                                 *
+ * Tests for AlkCalc                                                          *
  *                                                                            *
  * Compile: gcc -L../lib/ tests.c -lalkcalc -lm -Wl,-rpath,../lib/            *
  *          (Or, simply run 'make test' in this directory instead.)           *
@@ -11,49 +11,73 @@
  *                                                                            *
  *     All tests collected in this file are performed EXCLUSIVELY for the     *
  *     species 1H, i.e., for the Hydrogen atom, because for 1H the reference  *
- *     values are known in closed form. Every reference value used below is   *
- *     the EXACT analytical resul for an INFINITELY HEAVY nucleus, that is,   *
- *     for a reduced mass which is equal to the electron's mass, me.          *
+ *     values are known in closed analytical form. Every reference value used *
+ *     below is the EXACT analytical result for an INFINITELY HEAVY nucleus,  *
+ *     that is, for a reduced mass which is equal to the electron's mass, me. *
  *                                                                            *
  *     Concretely, the mass correction C, i.e., rpar[7] in src/potential.c,   *
  *     must be equal to unity, which is the DEFAULT behaviour of AlkCalc. In  *
  *     the file src/potential.c the two relevant lines must therefore read    *
- *     (the first line commented out, the second line active):
+ *     (the first line commented out, the second line active):                *
  *                                                                            *
  *         rpar[7] = 1. / (1. + ME / rpar[6]);   <- MUST STAY COMMENTED OUT   *
  *         rpar[7] = 1.;                         <- MUST BE THE ACTIVE LINE   *
  *                                                                            *
- * Data required by the tests.                                                *
+ * Data required by the tests                                                 *
  *                                                                            *
  *     Before the tests can be run, the eigenenergies and radial eigenstates  *
- *     of 1H must be generated (see README.txt, section 'Generating           *
- *     eigenenergies and radial eigenstates') for the pairs                   *
+ *     of 1H must be generated (see README.txt, section 'Data generation')    *
+ *     for the pairs                                                          *
  *                                                                            *
  *         (l, j) = (0, 1/2), (1, 1/2), (1, 3/2), (2, 3/2), (2, 5/2),         *
  *                  (3, 7/2)                                                  *
  *                                                                            *
  *     keeping the parameters species, k, N, nmax, and rmax in                *
- *     interface/settings.c fixed. For 1H the minimal principal quantum       *
- *     number obeys the Hydrogenic law, nl = l + 1, so offset = -nl + 1 = -l  *
- *     be set; that is, offset = 0 for the S series, offset = -1 for the P    *
- *     series, offset = -2 for the D series, and offset = -3 for the F        *
- *     series. The maximal principal quantum number must satisfy nmax >= 10,  *
- *     and rmax must be large enough to support the state with n = nmax. The  *
- *     tolerances used below were fixed with data generated using k = 8,      *
- *     N = 2000, nmax = 20, and rmax = 10000 (default settings in             *
- *     interface/settings.c).                                                 *
+ *     interface/settings.c fixed. The pair (3, 7/2) is not tested directly,  *
+ *     but it is needed by the lifetime of the 3D(j = 5 / 2) state. For 1H    *
+ *     the minimal principal quantum number obeys the Hydrogenic law,         *
+ *     nl = l + 1, so offset = -nl + 1 = -l must be set; that is, offset = 0  *
+ *     for the S series, offset = -1 for the P series, offset = -2 for the D  *
+ *     series, and offset = -3 for the F series. The maximal principal        *
+ *     quantum number must satisfy nmax >= 10, and rmax must be large enough  *
+ *     to support the state with n = nmax. The tolerances used below were     *
+ *     fixed with data generated using k = 8, N = 2000, nmax = 10, and        *
+ *     rmax = 20000 (default settings in interface/settings.c).               *
  *                                                                            *
- * Tolerances.                                                                *
+ * Tolerances                                                                 *
  *                                                                            *
  *     A test passes if the deviation from the reference value, relative for  *
  *     reference values of magnitude larger than unity and absolute           *
  *     otherwise, is smaller than the tolerance stated below. The tolerances  *
  *     are not universal: they reflect the quality of the eigensolver         *
  *     settings (k, N, rmax), the number of digits with which eigenenergies   *
- *     are stored on disk, and the fact that AlkCalc includes the spin-orbit  *
- *     coupling term VR (see src/potential.c), whereas the non-relativistic   *
- *     reference values do not. The latter is the reason why states with      *
- *     l > 0 are tested with a looser tolerance than states with l = 0.       *
+ *     are stored on disk, and, most importantly, the LS coupling.            *
+ *                                                                            *
+ * Why quantities with l > 0 need looser bounds (LS coupling)                 *
+ *                                                                            *
+ *     The reference values below are the results for the Hydrogen problem,   *
+ *     whereas the potential of AlkCalc contains spin-orbit (LS) coupling     *
+ *     term VR (see src/potential.c). This term is proportional to            *
+ *                                                                            *
+ *         j * (j + 1) - l * (l + 1) - 3 / 4,                                 *
+ *                                                                            *
+ *     and hence vanishes identically for l = 0 (j = 1 / 2). For S states     *
+ *     AlkCalc should preoduce the reference values EXACTLY and discrepancies *
+ *     are purely of numerical origin.                                        *
+ *                                                                            *
+ *     For l > 0, however, VR does not vanish. It shifts the eigenenergies    *
+ *     by the fine-structure splitting, which is of order alpha**2 / n**3     *
+ *     Hartree and it deforms the radial eigenfunctions at relative order     *
+ *     alpha**2. These deviations are PHYSICAL, not numerical errors: AlkCalc *
+ *     is right!, the reference value simply does not contain the LS          *
+ *     coupling. Small discrepancies arising from this propagate into every   *
+ *     quantity involving an l > 0 state, i.e., into radial matrix elements,  *
+ *     oscillator strengths, and lifetimes. The observed deviations are up to *
+ *     ~10**(-6) for the eigenenergies and up to ~10**(-5) for all other      *
+ *     quantities, so these quantities are tested with the looser tolerances  *
+ *     TOL_EFS, TOL_RFS, TOL_FFS, TOL_OS, and TOL_TAU. These are chosen about *
+ *     one order of magnitude above the LS-coupling effect, yet still far     *
+ *     below any deviation that would indicate an actual error.               *
  * -------------------------------------------------------------------------- */
 
 #include <stdio.h>
@@ -73,9 +97,9 @@
 /* Tolerances (see header)                                                    *
  *                                                                            *
  * States with l > 0 are shifted by the spin-orbit coupling term VR (see      *
- * src/potential.c), which the non-relativistic reference values do not       *
- * contain. Quantities involving such states are therefore tested with the    *
- * looser tolerances TOL_EFS, TOL_RFS, and TOL_FFS.                           */
+ * src/potential.c), which the reference values do not contain. Quantities    *
+ * involving such states are therefore tested with the looser tolerances      *
+ * TOL_EFS, TOL_RFS, TOL_FFS, TOL_OS, and TOL_TAU.                            */
 #define TOL_EXACT 1e-13 /* Results that are exact up to rounding errors */
 #define TOL_E     1e-7  /* Eigenenergies, l = 0 */
 #define TOL_EFS   1e-5  /* Eigenenergies, l > 0 */
@@ -86,8 +110,9 @@
 #define TOL_OS    1e-4  /* Oscillator strengths */
 #define TOL_TAU   1e-4  /* Lifetimes */
 
-/* Number of tests performed and number of tests failed */
-static int32_t ntests = 0, nfails = 0;
+/* Number of tests performed (ntests) and number of tests failed (nfails) */
+static int32_t ntests = 0;
+static int32_t nfails = 0;
 
 static void section(const char *);
 static void check(const char *, double, double, double);
@@ -127,7 +152,7 @@ int main(int argc, char **argv)
     printf("TESTS PERFORMED: %" PRId32 "\n", ntests);
     printf("TESTS PASSED   : %" PRId32 "\n", ntests - nfails);
     printf("TESTS FAILED   : %" PRId32 "\n", nfails);
-    printf("\n%s\n", nfails ? "--- END (FAILURE)" : "--- END (SUCCESS)");
+    printf("\n%s\n", "--- END");
 
     return nfails ? 1 : 0;
 }
@@ -140,12 +165,12 @@ int main(int argc, char **argv)
  *                                                                            *
  * For 1H the exact eigenenergies are E(n) = -1 / (2 * n**2), independent of  *
  * the quantum numbers l and j. The degeneracy in l and j is lifted by the    *
- * spin-orbit coupling term VR (see src/potential.c) only, which is why       *
- * states with l > 0 are tested with the looser tolerance TOL_EFS.            */
+ * spin-orbit coupling term VR (see src/potential.c), which is why states     *
+ * with l > 0 are tested with the looser tolerance TOL_EFS.                   */
 static void test_eigenenergies(void) {
 
+    char name[101];
     int32_t n;
-    char name[81];
 
     section("EIGENENERGIES [HARTREE]");
 
@@ -179,8 +204,9 @@ static void test_eigenenergies(void) {
  * of the radial eigenstate and must equal unity.                             *
  *                                                                            *
  * An eigenvector is fixed by the eigensolver up to a global factor of -1     *
- * only. Therefore only the modulus of an off-diagonal radial matrix element  *
- * is a well-defined quantity, and only the modulus is tested here.           */
+ * only. Therefore only the absolute value of an off-diagonal radial matrix   *
+ * element is a well-defined quantity, and only the absolute value is tested  *
+ * here.                                                                      */
 static void test_radial_matrix_elements(void) {
 
     section("RADIAL MATRIX ELEMENTS [BOHR'S RADIUS]");
@@ -227,14 +253,14 @@ static void test_radial_matrix_elements(void) {
     check("<3D|R**(-3)|3D>", alkcalc_rp(SPECIES, 3, 2, 2.5, -3., 3, 2, 2.5),
           rpex(3, 2, -3), TOL_RFS);
 
-    /* Off-diagonal elements (moduli only, see comment above) */
-    check("|<1S|r**(+1)|2S>|",
+    /* Off-diagonal elements (absolute values only, see comment above) */
+    check("|<1S|R**(+1)|2P>|",
           fabs(alkcalc_rp(SPECIES, 1, 0, .5, 1., 2, 1, 1.5)),
           128. * sqrt(6.) / 243., TOL_RFS);
-    check("|<2S|r**(+1)|2P>|",
+    check("|<2S|R**(+1)|2P>|",
           fabs(alkcalc_rp(SPECIES, 2, 0, .5, 1., 2, 1, 1.5)),
           3. * sqrt(3.), TOL_RFS);
-    check("|<2P|r**(+1)|3D>|",
+    check("|<2P|R**(+1)|3D>|",
           fabs(alkcalc_rp(SPECIES, 2, 1, 1.5, 1., 3, 2, 2.5)),
           165888. * sqrt(5.) / 78125., TOL_RFS);
 }
@@ -242,22 +268,22 @@ static void test_radial_matrix_elements(void) {
 /* Radial eigenfunctions fnlsj(t) = t * Rnl(t), t in units of Bohr's radius   *
  *                                                                            *
  * As stated above, an eigenvector is determined up to a global factor of -1  *
- * only. Therefore the modulus of fnlsj is tested.                            */
+ * only. Therefore the absolute value of fnlsj is tested.                     */
 static void test_states(void) {
 
-    int32_t i, ltevals;
     char name[81];
+    int32_t ltevals, i;
     double tevals[6], t[] = {.1, .5, 1., 2., 5., 10.};
 
     ltevals = 6;
 
-    section("Radial eigenfunctions |fnlsj(t)| [1 / sqrt(Bohr's radius)]");
+    section("RADIAL EIGENFUNCTIONS |FNLSJ(T)| [1 / SQRT(BOHR'S RADIUS)]");
 
     /* Ground state, 1S(j = 1 / 2) */
     for (i = 0; i < ltevals; i++) { tevals[i] = t[i]; }
     alkcalc_fnlsj_eval(SPECIES, 1, 0, .5, tevals, ltevals);
     for (i = 0; i < ltevals; i++) {
-        (void)sprintf(name, "|f(n=1,l=0,j=1/2;t=%4.1f)|", t[i]);
+        (void)sprintf(name, "|F(N=1,L=0,J=1/2;T=%4.1f)|", t[i]);
         check(name, fabs(tevals[i]), fabs(f1s(t[i])), TOL_F);
     }
 
@@ -265,7 +291,7 @@ static void test_states(void) {
     for (i = 0; i < ltevals; i++) { tevals[i] = t[i]; }
     alkcalc_fnlsj_eval(SPECIES, 2, 0, .5, tevals, ltevals);
     for (i = 0; i < ltevals; i++) {
-        (void)sprintf(name, "|f(n=2,l=0,j=1/2;t=%4.1f)|", t[i]);
+        (void)sprintf(name, "|F(N=2,L=0,J=1/2;T=%4.1f)|", t[i]);
         check(name, fabs(tevals[i]), fabs(f2s(t[i])), TOL_F);
     }
 
@@ -273,7 +299,7 @@ static void test_states(void) {
     for (i = 0; i < ltevals; i++) { tevals[i] = t[i]; }
     alkcalc_fnlsj_eval(SPECIES, 2, 1, 1.5, tevals, ltevals);
     for (i = 0; i < ltevals; i++) {
-        (void)sprintf(name, "|f(n=2,l=1,j=3/2;t=%4.1f)|", t[i]);
+        (void)sprintf(name, "|F(N=2,L=1,J=3/2;T=%4.1f)|", t[i]);
         check(name, fabs(tevals[i]), fabs(f2p(t[i])), TOL_FFS);
     }
 }
@@ -289,19 +315,19 @@ static void test_oscillator_strengths(void) {
 
     double dE, r, fsum, fh, fl;
 
-    section("Oscillator strengths [dimensionless]");
+    section("OSCILLATOR STRENGTHS [DIMENSIONLESS]");
 
     /* 1S(j = 1 / 2) -> 2P(j' = 1 / 2, 3 / 2); the sum of the two components  *
      * is the well-known value f(1s -> 2p) = 2**13 / 3**9 = 0.4162            */
     fl = alkcalc_fitof(SPECIES, 1, 0, .5, 2, 1, .5);
     fh = alkcalc_fitof(SPECIES, 1, 0, .5, 2, 1, 1.5);
     fsum = 8192. / 19683.;
-    check("f(1s,1/2 -> 2p,1/2)", fl, fsum / 3., TOL_OS);
-    check("f(1s,1/2 -> 2p,3/2)", fh, 2. * fsum / 3., TOL_OS);
-    check("f(1s,1/2 -> 2p), sum over j'", fl + fh, fsum, TOL_OS);
+    check("F(1S,1/2 -> 2P,1/2)", fl, fsum / 3., TOL_OS);
+    check("F(1S,1/2 -> 2P,3/2)", fh, 2. * fsum / 3., TOL_OS);
+    check("F(1S,1/2 -> 2P), SUM OVER J'", fl + fh, fsum, TOL_OS);
 
     /* 2P(j = 3 / 2) -> 1S(j' = 1 / 2), emission, hence negative */
-    check("f(2p,3/2 -> 1s,1/2)", alkcalc_fitof(SPECIES, 2, 1, 1.5, 1, 0, .5),
+    check("F(2P,3/2 -> 1S,1/2)", alkcalc_fitof(SPECIES, 2, 1, 1.5, 1, 0, .5),
           -8192. / 59049., TOL_OS);
 
     /* 2P(j = 1 / 2, 3 / 2) -> 3D(j' = 3 / 2, 5 / 2) */
@@ -310,15 +336,15 @@ static void test_oscillator_strengths(void) {
     fl = alkcalc_fitof(SPECIES, 2, 1, .5, 3, 2, 1.5);
     fh = alkcalc_fitof(SPECIES, 2, 1, 1.5, 3, 2, 1.5)
        + alkcalc_fitof(SPECIES, 2, 1, 1.5, 3, 2, 2.5);
-    check("f(2p,1/2 -> 3d), sum over j'", fl, fsum, TOL_OS);
-    check("f(2p,3/2 -> 3d), sum over j'", fh, fsum, TOL_OS);
+    check("F(2P,1/2 -> 3D), SUM OVER J'", fl, fsum, TOL_OS);
+    check("F(2P,3/2 -> 3D), SUM OVER J'", fh, fsum, TOL_OS);
 
     /* Selection rules, all of the following transitions are forbidden */
-    check("f(1s,1/2 -> 2s,1/2)", alkcalc_fitof(SPECIES, 1, 0, .5, 2, 0, .5),
+    check("F(1S,1/2 -> 2S,1/2)", alkcalc_fitof(SPECIES, 1, 0, .5, 2, 0, .5),
           0., TOL_EXACT);
-    check("f(1s,1/2 -> 3d,3/2)", alkcalc_fitof(SPECIES, 1, 0, .5, 3, 2, 1.5),
+    check("F(1S,1/2 -> 3D,3/2)", alkcalc_fitof(SPECIES, 1, 0, .5, 3, 2, 1.5),
           0., TOL_EXACT);
-    check("f(2p,1/2 -> 3d,5/2)", alkcalc_fitof(SPECIES, 2, 1, .5, 3, 2, 2.5),
+    check("F(2P,1/2 -> 3D,5/2)", alkcalc_fitof(SPECIES, 2, 1, .5, 3, 2, 2.5),
           0., TOL_EXACT);
 }
 
@@ -329,19 +355,20 @@ static void test_oscillator_strengths(void) {
  * assembled from the exact eigenenergies and radial dipole matrix elements   *
  * of 1H, together with the angular factors of the decay channels involved    *
  * (see theory/theory.pdf). For orientation, the reference lifetimes are      *
- * 1.595 ns for 2P, 5.268 ns for 3P, and 15.459 ns for 3D.                    */
+ * 1.595 ns for the state 2P, 5.268 ns for the state 3P, and 15.459 ns for    *
+ * the state 3D.                                                              */
 static void test_lifetimes(void) {
 
     double dE1, dE2, r1, r2, Gamma;
 
-    section("Lifetimes at T = 0 K [ns]");
+    section("LIFETIMES AT T = 0 K [NS]");
 
     /* 2P decays into 1S only, the angular factor of the channel is 1 / 3 */
     dE1 = Eex(2) - Eex(1); r1 = 128. * sqrt(6.) / 243.;
     Gamma = dE1 * dE1 * (2. / 3. * dE1 * r1 * r1 / 3.);
-    check("tau(n=2,l=1,j=1/2)", alkcalc_tau(0., SPECIES, 2, 0, 1, .5),
+    check("TAU(N=2,L=1,J=1/2)", alkcalc_tau(0., SPECIES, 2, 0, 1, .5),
           1. / (TONS * Gamma), TOL_TAU);
-    check("tau(n=2,l=1,j=3/2)", alkcalc_tau(0., SPECIES, 2, 0, 1, 1.5),
+    check("TAU(N=2,L=1,J=3/2)", alkcalc_tau(0., SPECIES, 2, 0, 1, 1.5),
           1. / (TONS * Gamma), TOL_TAU);
 
     /* 3P decays into 1S and 2S, both channels have angular factor 1 / 3 */
@@ -349,9 +376,9 @@ static void test_lifetimes(void) {
     dE2 = Eex(3) - Eex(2); r2 = 27648. * sqrt(3.) / 15625.;
     Gamma = dE1 * dE1 * (2. / 3. * dE1 * r1 * r1 / 3.)
           + dE2 * dE2 * (2. / 3. * dE2 * r2 * r2 / 3.);
-    check("tau(n=3,l=1,j=1/2)", alkcalc_tau(0., SPECIES, 3, 0, 1, .5),
+    check("TAU(N=3,L=1,J=1/2)", alkcalc_tau(0., SPECIES, 3, 0, 1, .5),
           1. / (TONS * Gamma), TOL_TAU);
-    check("tau(n=3,l=1,j=3/2)", alkcalc_tau(0., SPECIES, 3, 0, 1, 1.5),
+    check("TAU(N=3,L=1,J=3/2)", alkcalc_tau(0., SPECIES, 3, 0, 1, 1.5),
           1. / (TONS * Gamma), TOL_TAU);
 
     /* 3D(j = 5 / 2) decays into 2P(j' = 3 / 2) only, since the channel       *
@@ -359,7 +386,7 @@ static void test_lifetimes(void) {
      * the allowed channel is 2 / 5.                                          */
     dE1 = Eex(3) - Eex(2); r1 = 165888. * sqrt(5.) / 78125.;
     Gamma = dE1 * dE1 * (2. / 3. * dE1 * r1 * r1 * 2. / 5.);
-    check("tau(n=3,l=2,j=5/2)", alkcalc_tau(0., SPECIES, 3, 0, 2, 2.5),
+    check("TAU(N=3,L=2,J=5/2)", alkcalc_tau(0., SPECIES, 3, 0, 2, 2.5),
           1. / (TONS * Gamma), TOL_TAU);
 }
 
@@ -371,48 +398,48 @@ static void test_clebsch_gordan(void) {
 
     double cu, cd;
 
-    section("Clebsch-Gordan coefficients [dimensionless]");
+    section("CLEBSCH-GORDAN COEFFICIENTS [DIMENSIONLESS]");
 
     /* Some coefficients with known values */
-    check("c(2,-1;1,0|1,-1)",
+    check("C(2,-1;1,0|1,-1)",
           cgtof(alkcalc_cj1m1j2m2jmj(2., -1., 1., 0., 1., -1.)),
           -sqrt(3. / 10.), TOL_EXACT);
-    check("c(1/2,-1/2;1/2,1/2|0,0)",
+    check("C(1/2,-1/2;1/2,1/2|0,0)",
           cgtof(alkcalc_cj1m1j2m2jmj(.5, -.5, .5, .5, 0., 0.)),
           -sqrt(.5), TOL_EXACT);
-    check("c(1/2,1/2;1/2,-1/2|0,0)",
+    check("C(1/2,1/2;1/2,-1/2|0,0)",
           cgtof(alkcalc_cj1m1j2m2jmj(.5, .5, .5, -.5, 0., 0.)),
           sqrt(.5), TOL_EXACT);
-    check("c(3/2,-1/2;1,1|3/2,1/2)",
+    check("C(3/2,-1/2;1,1|3/2,1/2)",
           cgtof(alkcalc_cj1m1j2m2jmj(1.5, -.5, 1., 1., 1.5, .5)),
           -sqrt(8. / 15.), TOL_EXACT);
-    check("c(1,1;1,-1|0,0)",
+    check("C(1,1;1,-1|0,0)",
           cgtof(alkcalc_cj1m1j2m2jmj(1., 1., 1., -1., 0., 0.)),
           sqrt(1. / 3.), TOL_EXACT);
-    check("c(1,0;1,0|2,0)",
+    check("C(1,0;1,0|2,0)",
           cgtof(alkcalc_cj1m1j2m2jmj(1., 0., 1., 0., 2., 0.)),
           sqrt(2. / 3.), TOL_EXACT);
-    check("c(1,0;1,0|1,0)",
+    check("C(1,0;1,0|1,0)",
           cgtof(alkcalc_cj1m1j2m2jmj(1., 0., 1., 0., 1., 0.)),
           0., TOL_EXACT);
 
     /* Coefficients of the coupled basis states with l = 1 */
     cu = cgtof(alkcalc_cj1m1j2m2jmj(1., 0., .5, .5, 1.5, .5));
     cd = cgtof(alkcalc_cj1m1j2m2jmj(1., 1., .5, -.5, 1.5, .5));
-    check("c(1,0;1/2,1/2|3/2,1/2)", cu, sqrt(2. / 3.), TOL_EXACT);
-    check("c(1,1;1/2,-1/2|3/2,1/2)", cd, sqrt(1. / 3.), TOL_EXACT);
-    check("Norm of |l=1,j=3/2,mj=1/2>", cu * cu + cd * cd, 1., TOL_EXACT);
+    check("C(1,0;1/2,1/2|3/2,1/2)", cu, sqrt(2. / 3.), TOL_EXACT);
+    check("C(1,1;1/2,-1/2|3/2,1/2)", cd, sqrt(1. / 3.), TOL_EXACT);
+    check("NORM OF |L=1,J=3/2,MJ=1/2>", cu * cu + cd * cd, 1., TOL_EXACT);
     cu = cgtof(alkcalc_cj1m1j2m2jmj(1., 0., .5, .5, .5, .5));
     cd = cgtof(alkcalc_cj1m1j2m2jmj(1., 1., .5, -.5, .5, .5));
-    check("c(1,0;1/2,1/2|1/2,1/2)", cu, -sqrt(1. / 3.), TOL_EXACT);
-    check("c(1,1;1/2,-1/2|1/2,1/2)", cd, sqrt(2. / 3.), TOL_EXACT);
-    check("Norm of |l=1,j=1/2,mj=1/2>", cu * cu + cd * cd, 1., TOL_EXACT);
+    check("C(1,0;1/2,1/2|1/2,1/2)", cu, -sqrt(1. / 3.), TOL_EXACT);
+    check("C(1,1;1/2,-1/2|1/2,1/2)", cd, sqrt(2. / 3.), TOL_EXACT);
+    check("NORM OF |L=1,J=1/2,MJ=1/2>", cu * cu + cd * cd, 1., TOL_EXACT);
 
     /* Coefficients that vanish, since mj is not equal to m1 + m2 */
-    check("c(1,0;1/2,1/2|3/2,3/2)",
+    check("C(1,0;1/2,1/2|3/2,3/2)",
           cgtof(alkcalc_cj1m1j2m2jmj(1., 0., .5, .5, 1.5, 1.5)),
           0., TOL_EXACT);
-    check("c(1,1;1/2,1/2|1/2,1/2)",
+    check("C(1,1;1/2,1/2|1/2,1/2)",
           cgtof(alkcalc_cj1m1j2m2jmj(1., 1., .5, .5, .5, .5)),
           0., TOL_EXACT);
 }
@@ -420,19 +447,19 @@ static void test_clebsch_gordan(void) {
 /* Angular eigenstates in the uncoupled basis (dimensionless)                 *
  *                                                                            *
  * The spherical harmonics are tested against their closed-form expressions   *
- * in the Condon-Shortley convention, and the addition theorem                *
+ * including the Condon-Shortley phase, and the addition theorem              *
  * sum_ml |Y(l,ml)|**2 = (2 * l + 1) / (4 * pi) is verified. These tests are  *
  * independent of the atom/ion species.                                       */
 static void test_uncoupled_basis(void) {
 
+    char name[101];
     int32_t l, ml;
-    char name[81];
     double theta, phi, sum;
     alkcalc_spinor yu, yd;
 
     theta = .736; phi = 3.57;
 
-    section("Uncoupled basis states [dimensionless]");
+    section("UNCOUPLED BASIS STATES [DIMENSIONLESS]");
 
     for (l = 0; l <= 2; l++) {
         sum = 0.;
@@ -441,18 +468,18 @@ static void test_uncoupled_basis(void) {
             yd = alkcalc_YlmlXsms(l, ml, -.5, theta, phi);
 
             /* Upper component for ms = 1 / 2, lower one for ms = -1 / 2 */
-            (void)sprintf(name, "Y(%" PRId32 ",%+" PRId32 ")X(1/2,+1/2)_u",
+            (void)sprintf(name, "Y(%" PRId32 ",%+" PRId32 ")X(1/2,+1/2)_U",
                           l, ml);
             checkz(name, yu.u, Yex(l, ml, theta, phi), TOL_EXACT);
-            (void)sprintf(name, "Y(%" PRId32 ",%+" PRId32 ")X(1/2,-1/2)_d",
+            (void)sprintf(name, "Y(%" PRId32 ",%+" PRId32 ")X(1/2,-1/2)_D",
                           l, ml);
             checkz(name, yd.d, Yex(l, ml, theta, phi), TOL_EXACT);
 
             /* Vanishing components */
-            (void)sprintf(name, "Y(%" PRId32 ",%+" PRId32 ")X(1/2,+1/2)_d",
+            (void)sprintf(name, "Y(%" PRId32 ",%+" PRId32 ")X(1/2,+1/2)_D",
                           l, ml);
             checkz(name, yu.d, 0., TOL_EXACT);
-            (void)sprintf(name, "Y(%" PRId32 ",%+" PRId32 ")X(1/2,-1/2)_u",
+            (void)sprintf(name, "Y(%" PRId32 ",%+" PRId32 ")X(1/2,-1/2)_U",
                           l, ml);
             checkz(name, yd.u, 0., TOL_EXACT);
 
@@ -460,7 +487,7 @@ static void test_uncoupled_basis(void) {
         }
 
         /* Addition theorem */
-        (void)sprintf(name, "sum_ml |Y(l=%" PRId32 ",ml)|^2", l);
+        (void)sprintf(name, "SUM_ML |Y(L=%" PRId32 ",ML)|**2", l);
         check(name, sum, (2. * l + 1.) / (4. * PI), TOL_EXACT);
     }
 }
@@ -474,8 +501,7 @@ static void test_uncoupled_basis(void) {
  *     |l,1/2,l-1/2,mj> = -sqrt((l-mj+1/2) / (2l+1)) |ml=mj-1/2,ms=+1/2>      *
  *                       + sqrt((l+mj+1/2) / (2l+1)) |ml=mj+1/2,ms=-1/2>      *
  *                                                                            *
- * which are orthonormal for fixed mj, as it must be.                         *
- *                                                                            *
+ * (which are orthonormal for fixed mj, as it must be)                         *
  * and the sum rule sum_mj |Phi(l,s,j,mj)|**2 = (2 * j + 1) / (4 * pi) is     *
  * verified. These tests are independent of the atom/ion species.             */
 static void test_coupled_basis(void) {
@@ -487,26 +513,26 @@ static void test_coupled_basis(void) {
 
     theta = .736; phi = 3.57;
 
-    section("Coupled basis states [dimensionless]");
+    section("COUPLED BASIS STATES [DIMENSIONLESS]");
 
     /* Phi(l = 1, s = 1 / 2, j = 3 / 2, mj = -1 / 2) */
     s = alkcalc_Philsjmj(1, 1.5, -.5, theta, phi);
-    checkz("Phi(l=1,j=3/2,mj=-1/2)_u", s.u,
+    checkz("PHI(L=1,J=3/2,MJ=-1/2)_U", s.u,
            sqrt(1. / 3.) * Yex(1, -1, theta, phi), TOL_EXACT);
-    checkz("Phi(l=1,j=3/2,mj=-1/2)_d", s.d,
+    checkz("PHI(L=1,J=3/2,MJ=-1/2)_D", s.d,
            sqrt(2. / 3.) * Yex(1, 0, theta, phi), TOL_EXACT);
 
     /* Phi(l = 1, s = 1 / 2, j = 1 / 2, mj = 1 / 2) */
     s = alkcalc_Philsjmj(1, .5, .5, theta, phi);
-    checkz("Phi(l=1,j=1/2,mj=+1/2)_u", s.u,
+    checkz("PHI(L=1,J=1/2,MJ=+1/2)_U", s.u,
            -sqrt(1. / 3.) * Yex(1, 0, theta, phi), TOL_EXACT);
-    checkz("Phi(l=1,j=1/2,mj=+1/2)_d", s.d,
+    checkz("PHI(L=1,J=1/2,MJ=+1/2)_D", s.d,
            sqrt(2. / 3.) * Yex(1, 1, theta, phi), TOL_EXACT);
 
     /* Phi(l = 2, s = 1 / 2, j = 5 / 2, mj = 5 / 2) (stretched state) */
     s = alkcalc_Philsjmj(2, 2.5, 2.5, theta, phi);
-    checkz("Phi(l=2,j=5/2,mj=+5/2)_u", s.u, Yex(2, 2, theta, phi), TOL_EXACT);
-    checkz("Phi(l=2,j=5/2,mj=+5/2)_d", s.d, 0., TOL_EXACT);
+    checkz("PHI(L=2,J=5/2,MJ=+5/2)_U", s.u, Yex(2, 2, theta, phi), TOL_EXACT);
+    checkz("PHI(L=2,J=5/2,MJ=+5/2)_D", s.d, 0., TOL_EXACT);
 
     /* Sum rule */
     for (l = 1; l <= 2; l++) {
@@ -518,7 +544,8 @@ static void test_coupled_basis(void) {
                 sum += creal(s.u * conj(s.u)) + creal(s.d * conj(s.d));
             }
             (void)sprintf(name,
-                          "sum_mj |Phi(l=%" PRId32 ",j=%3.1f,mj)|^2", l, j);
+                          "SUM_MJ |PHI(L=%" PRId32 ",J=%" PRId32 "/2,MJ)|**2",
+                          l, (int32_t)(2. * j));
             check(name, sum, (2. * j + 1.) / (4. * PI), TOL_EXACT);
         }
     }
@@ -537,9 +564,9 @@ static void section(const char *title) {
 
 /* Compare a real result to its reference value and report the outcome        *
  *                                                                            *
- * The error is the deviation relative to the reference value, unless the     *
+ * The error is the relative discrepancy to the reference value, unless the   *
  * magnitude of the reference value is smaller than unity, in which case the  *
- * absolute deviation is used.                                                */
+ * absolute discrepancy is used.                                              */
 static void check(const char *name, double is, double should, double tol) {
 
     double scale, err;
@@ -548,22 +575,25 @@ static void check(const char *name, double is, double should, double tol) {
     scale = (fabs(should) > 1.) ? fabs(should) : 1.;
     err = fabs(is - should) / scale;
     if (err > tol) { nfails++; }
+    /* Adding 0 urns a negative zero into +0, so zeros print uniformly    */
     printf("%-4s %-32s %+1.7E  %+1.7E  %1.1E\n", (err > tol) ? "FAIL" : "PASS",
-           name, is, should, err);
+           name, is + 0., should + 0., err);
 }
 
-/* Compare a complex result to its reference value and report the outcome     */
+/* Compare a complex result to its reference value and report the outcome     *
+ *                                                                            *
+ * The real and imaginary parts are checked separately (see check above) and  *
+ * are therefore reported on two consecutive lines, as RE(...) and IM(...),   *
+ * respectively.                                                              */
 static void checkz(const char *name, double complex is, double complex should,
                    double tol) {
 
-    double scale, err;
+    char part[101];
 
-    ntests++;
-    scale = (cabs(should) > 1.) ? cabs(should) : 1.;
-    err = cabs(is - should) / scale;
-    if (err > tol) { nfails++; }
-    printf("%-4s %-32s (%+1.3E,%+1.3E)   %1.1E\n",
-           (err > tol) ? "FAIL" : "PASS", name, creal(is), cimag(is), err);
+    (void)sprintf(part, "RE(%.70s)", name);
+    check(part, creal(is), creal(should), tol);
+    (void)sprintf(part, "IM(%.70s)", name);
+    check(part, cimag(is), cimag(should), tol);
 }
 
 /* Convert a symbolic Clebsch-Gordan coefficient into a floating-point number */
@@ -624,7 +654,7 @@ static double f2p(double t) {
     return t * t * exp(-.5 * t) / (2. * sqrt(6.));
 }
 
-/* Exact spherical harmonics for l = 0, 1, 2 (Condon-Shortley convention)     */
+/* Exact spherical harmonics for l = 0, 1, 2 (with Condon-Shortley phase)     */
 static double complex Yex(int32_t l, int32_t ml, double theta, double phi) {
 
     double st, ct, pf;
