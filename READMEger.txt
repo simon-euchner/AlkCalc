@@ -65,38 +65,32 @@ Einführung.
     Ursprung entstammen, und daher alle abgeleiteten Größen (Oszillatorstärken,
     Matrixelemente, Lebenszeiten, usw.) auf einer konsistenten Basis von wahren
     Eigenzuständen des parameterischen Modellpotentials basieren. Ein weiterer
-    Vorteil ist, dass auch energetisch niedrig gelegene Zustände konsistent
-    berechnet werden können, ohne den Teil der Wellenfunktion die den effektiven
-    Kern durchdringt an eine Coulomb-Whittaker Wellenfunktion im äußeren Bereich
-    anpassen zu müssen, wie es üblich ist in der Quantendefekttheorie.
-    Schließlich verleiht der Verzicht auf die Quantendefekttheorie AlkCalc nicht
-    nur Konsistenz, sondern auch die Fähigkeit, im Grunde jedes Problem mit
-    radialer Symmetrie zu behandeln. Unter anderem ist diese Anpassungsfähigkeit
-    der Grund dafür, dass es mit AlkCalc so einfach ist sowohl Rydbergzustände
-    in neutralen Atomen, als auch in Ionen, von Haus aus zu behandeln --- man
-    beachte, dass ARC und PairInteraction für neutrale Rydbergatome ausgelegt
-    sind. Um die Schnittstelle sauber und einfach zu halten, sind alle Parameter
-    der parametrischen Modellpotentiale in einer einzigen Textdatei gesammelt.
-    Tatsächlich werden sämtliche zu AlkCalc gehörigen Daten in reinen
-    Textdateien abgelegt, was den Vorteil hat, dass keine weiteren
-    Softwarevoraussetzungen zum Lesen binärer Datenformate und dergleichen
-    entstehen.
+    Vorteil des Verzichts auf die Quantendefekttheorie ist das AlkCalc nicht nur
+    Konsistent ist, sondern auch die Fähigkeit besitzt, im Grunde jedes Problem
+    mit radialer Symmetrie zu behandeln. Unter anderem ist diese
+    Anpassungsfähigkeit der Grund dafür, dass es mit AlkCalc so einfach ist
+    sowohl Rydbergzustände in neutralen Atomen, als auch in Ionen, von Haus aus
+    zu behandeln --- man beachte, dass ARC und PairInteraction bis dato für
+    neutrale Rydbergatome ausgelegt sind. Um die Schnittstelle sauber und
+    einfach zu halten, sind alle Parameter der parametrischen Modellpotentiale
+    in einer einzigen Textdatei gesammelt. Tatsächlich werden sämtliche zu
+    AlkCalc gehörigen Daten in reinen Textdateien abgelegt, was den Vorteil hat,
+    dass keine weiteren Softwarevoraussetzungen zum Lesen binärer Datenformate
+    und dergleichen entstehen.
 
-        Letztendlich ist AlkCalc für Forscher gedacht, denen die volle Kontrolle
-    über die Daten hinter ihrer Forschung wichtig ist. Weiter gefasst ist
-    AlkCalc für jeden gedacht, dem durchsichtige Software wichtig ist: nichts
-    ist "versteckt", alles liegt offen, es werden keine unnötigen binären
-    Datenformate verwendet (nur reine Textdateien), und die Software bleibt
-    einfach und leichtgewichtig, ohne dabei die Vollständigkeit zu verlieren ---
-    vollständig ist AlkCalc in dem Sinne, dass die Eigenenergien und
-    Eigenzustände berechnet werden können, sprich, das Problem also gelöst ist.
-    Zudem ist AlkCalc völlig quelloffen, und Anwender sind ausdrücklich dazu
-    ermutigt, den Quellkode einzusehen und mit diesem zu arbeiten. Außerdem
-    kommt AlkCalc ohne Abhängigkeiten von Drittsoftware aus, abgesehen von einem
-    C-Compiler, einem FORTRAN-Compiler und einer C-Bibliothek. Der Grund dafür
-    ist, dass alle sonstige benötigte Software direkt in AlkCalc selbst
-    eingearbeitet ist. Die eingebaute Drittsoftware ist dabei jahrzehntelang
-    erprobter Code von Netlib [Don1987].
+        Letztendlich ist AlkCalc für Forscher zugeschnitten, denen durchsichtige
+    Software wichtig ist: nichts ist "versteckt", alles liegt offen, es werden
+    keine unnötigen binären Datenformate verwendet (nur reine Textdateien), und
+    die Software bleibt einfach und leichtgewichtig, ohne dabei die
+    Vollständigkeit zu verlieren --- vollständig ist AlkCalc in dem Sinne, dass
+    die Eigenenergien und Eigenzustände berechnet werden können, sprich, das
+    Problem also gelöst ist. Zudem ist AlkCalc völlig quelloffen, und Anwender
+    sind ausdrücklich dazu ermutigt, den Quellkode einzusehen und mit diesem zu
+    arbeiten. Außerdem kommt AlkCalc ohne Abhängigkeiten von Drittsoftware aus,
+    abgesehen von einem C-Compiler, einem FORTRAN-Compiler und einer
+    C-Bibliothek. Der Grund dafür ist, dass alle sonstige benötigte Software
+    direkt in AlkCalc selbst eingearbeitet ist. Die eingebaute Drittsoftware ist
+    dabei jahrzehntelang erprobter Code von Netlib [Don1987].
 
         Neben dieser README gibt die Datei theory/theory.pdf eine gründliche
     Einführung in die Physik der Hamiltonoperatoren einzelner Atome und Ionen,

@@ -53,36 +53,32 @@ Introduction.
     parametric model potentials are described in detail in theory/theory.pdf.
     Unlike typical packages for treating Rydberg atoms, such as ARC [Sib2017] or
     PairInteraction [Web2017], AlkCalc does not rely on quantum defect theory.
-    Instead, AlkCalc computes everything self-consistently from the parametric
-    model potential. This has the advantage that the radial eigenstates share
-    one consistent origin, and all derived quantities (oscillator strengths,
-    matrix elements, lifetimes, etc.) are computed on an internally consistent
-    basis. Another advantage is that low-energy eigenstates are treated
-    consistently as well, without the need to match the wave-functions inside
-    the effective nucleus to some Coulomb-Whittaker wave-functions in the
-    outside-core region, as is done in quantum defect theory. Finally, not
-    relying on quantum defect theory grants AlkCalc the power to solve
-    essentially any problem with radial symmetry. This flexibility is one reason
-    why it is so simple to employ AlkCalc for both Rydberg states in neutral
-    atoms AND atomic ions --- note that ARC and PairInteraction are designed for
-    neutral Rydberg atoms. To keep the interface clean and simple, all
-    parameters associated with the parametric model potentials are collected in
-    a single text file. In fact, all data associated with AlkCalc is stored in
-    plain text files, which has the advantage of not introducing additional
-    software requirements for reading binary data formats and alike.
+    Instead, AlkCalc computes everything consistently from the parametric model
+    potential. This has the advantage that the radial eigenstates share one
+    consistent origin, and all derived quantities (oscillator strengths, matrix
+    elements, lifetimes, etc.) are computed on an internally consistent basis.
+    Further, not relying on quantum defect theory grants AlkCalc the power to
+    solve essentially any problem with radial symmetry. This flexibility is one
+    reason why it is so simple to employ AlkCalc for both Rydberg states in
+    neutral atoms AND atomic ions --- note that ARC and PairInteraction, up to
+    date, are designed for neutral Rydberg atoms. To keep the interface clean
+    and simple, all parameters associated with the parametric model potentials
+    are collected in a single text file. In fact, all data associated with
+    AlkCalc is stored in plain text files, which has the advantage of not
+    introducing additional software requirements for reading binary data formats
+    and alike.
 
-        Ultimately, AlkCalc is designed for researchers who value full control
-    over the data underlying their research. More broadly, AlkCalc is for anyone
-    who values transparent software: nothing is 'hidden', everything is laid out
-    plainly, no unnecessarily complicated data formats are used (plain text
-    files only), and the software remains simple and lightweight while still
-    being complete --- complete in the sense that the eigenenergies and
-    eigenstates can indeed be computed, so the problem is actually solved.
-    AlkCalc is fully open source, and users are explicitly encouraged to inspect
-    and interact with the source code. Finally, AlkCalc comes with no external
-    dependencies beyond a C compiler, a FORTRAN compiler, and a C library. This
-    is because all other required software is built directly into AlkCalc
-    itself, using decades-tested code from Netlib [Don1987].
+        Ultimately, AlkCalc is for researcher who values transparent software:
+    nothing is 'hidden', everything is laid out plainly, no unnecessarily
+    complicated data formats are used (plain text files only), and the software
+    remains simple and lightweight while still being complete --- complete in
+    the sense that the eigenenergies and eigenstates can indeed be computed, so
+    the problem is actually solved. AlkCalc is fully open source, and users are
+    explicitly encouraged to inspect and interact with the source code. Finally,
+    AlkCalc comes with no external dependencies beyond a C compiler, a FORTRAN
+    compiler, and a C library. This is because all other required software is
+    built directly into AlkCalc itself, using decades-tested code from
+    Netlib [Don1987].
 
         In addition to this README, the file theory/theory.pdf provides a
     thorough introduction to the physics of the single-atom and single-ion
