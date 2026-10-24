@@ -1090,9 +1090,9 @@
     To numerically compute the these components the software \alkcalc again
     employs Gau\ss-Legendre quadratures defined in Eq.~\eqref{eq:Quadratures}.
     For integer $p\geq0$ the relevant integrals are over polynomials of order
-    $2d+p$. Therefore, one employs the quadrature of order $n=d+p\slash{2}$ for
-    even $p$ and $n=d+(p-1)\slash{2}$ for odd ones. When $p$ is not an integer,
-    one chooses sufficiently large $n$ such that the integral is well
+    $2d+p$. Therefore, one employs the quadrature of order $n=d+1+p\slash{2}$
+    for even $p$ and $n=d+(p+1)\slash{2}$ for odd ones. When $p$ is not an
+    integer, one chooses sufficiently large $n$ such that the integral is well
     approximated.  The indeed employed quadrature order is hard coded to retain
     simplicity, but of course can be directly viewed or changed in the source
     code of \alkcalc.
