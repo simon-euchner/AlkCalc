@@ -319,17 +319,17 @@ double alkcalc_rp(const char *species, int32_t nb, int32_t lb, double jb,
      *                                                                        *
      * When the power p is (almost; see code below for meaning of 'almost') a *
      * non-negative integer, the matrix component can be computed exactly up  *
-     * to machine precision. In this case, nRp = k - 1 + p / 2 yields the     *
-     * correct result for even p and nRp = k - 1 + (p - 1) / 2 yields the     *
+     * to machine precision. In this case, nRp = k - 1 + 1 + p / 2 yields the *
+     * correct result for even p and nRp = k - 1 + (p + 1) / 2 yields the     *
      * correct result for odd p. In all other cases the integral is           *
      * approximated. For this it is best to choose a high quadrature order    *
      * nRp. This is the point in the code where this order is hard-coded. It  *
      * can be adjusted by the user, if necessary.                             */
     if ((ip = (int32_t)round(p)) >= 0. && fabs(p - ip) < 1e-11) { /* Integer */
         if (ip & 1) { /* Odd */
-            nRp = k - 1 + (ip - 1) / 2;
+            nRp = k - 1 + (ip + 1) / 2;
         } else { /* Even */
-            nRp = k - 1 + ip / 2;
+            nRp = k - 1 + 1 + ip / 2;
         }
     } else { /* General */
         nRp = 1000;
