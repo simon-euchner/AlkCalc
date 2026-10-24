@@ -627,9 +627,10 @@ double alkcalc_tau(double T, const char *species, int32_t n, int32_t dn,
     nextrm(species, &nmnlp1, &nmxlp1, lp, lp + .5); /* l' = l + 1 */
     nlp1 = (n < nmnlp1) ? nmnlp1 : n;
     if (alkcalc_Enlsj(species, nlp1, lp, lp + .5) > En) {
-        while (    nmnlp1 < --nlp1
-                && alkcalc_Enlsj(species, nlp1, lp, lp + .5) > En );
-        nlp1++;
+        while (    nmnlp1 < nlp1
+                && alkcalc_Enlsj(species, nlp1 - 1, lp, lp + .5) > En ) {
+            nlp1--;
+        }
     } else {
         while (alkcalc_Enlsj(species, ++nlp1, lp, lp + .5) < En);
     }
@@ -637,9 +638,10 @@ double alkcalc_tau(double T, const char *species, int32_t n, int32_t dn,
     nextrm(species, &nmnlm1, &nmxlm1, lm, lm + .5);
     nlm1 = (n < nmnlm1) ? nmnlm1 : n;
     if (alkcalc_Enlsj(species, nlm1, lm, lm + .5) > En) {
-        while (    nmnlm1 < --nlm1
-                && alkcalc_Enlsj(species, nlm1, lm, lm + .5) > En );
-        nlm1++;
+        while (    nmnlm1 < nlm1
+                && alkcalc_Enlsj(species, nlm1 - 1, lm, lm + .5) > En ) {
+            nlm1--;
+        }
     } else {
         while (alkcalc_Enlsj(species, ++nlm1, lm, lm + .5) < En);
     }
